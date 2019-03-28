@@ -1,0 +1,1104 @@
+23
+
+adaptive sequential recommendation for discussion
+forums on moocs using context trees
+fei mi
+boi faltings
+artificial intelligence lab
+école polytechnique fédérale de lausanne, switzerland
+firstname.lastname@epfl.ch
+abstract
+
+massive open online courses (moocs) have demonstrated growing popularity and rapid development in recent years. discussion
+forums have become crucial components for students and instructors to widely exchange ideas and propagate knowledge. it is important to recommend helpful information from forums to students
+for the benefit of the learning process. however, students or instructors update discussion forums very often, and the student preferences over forum contents shift rapidly as a mooc progresses.
+so, mooc forum recommendations need to be adaptive to these
+evolving forum contents and drifting student interests. these frequent changes pose a challenge to most standard recommendation
+methods as they have difficulty adapting to new and drifting observations. we formalize the discussion forum recommendation
+problem as a sequence prediction problem. then we compare different methods, including a new method called context tree (ct),
+which can be effectively applied to online sequential recommendation tasks. the results show that the ct recommender performs
+better than other methods for moocs forum recommendation task.
+we analyze the reasons for this and demonstrate that it is because
+of better adaptation to changes in the domain. this highlights the
+importance of considering the adaptation aspect when building recommender system with drifting preferences, as well as using machine learning in general.
+
+keywords
+
+moocs forum recommendation, context tree, model adaptation
+
+1. introduction
+
+with the increased availability of data, machine learning has become the method of choice for knowledge acquisition in intelligent
+systems and various applications. however, data and the knowledge derived from it have a timeliness, such that in a dynamic environment not all the knowledge acquired in the past remains valid.
+therefore, machine learning models should acquire new knowledge incrementally and adapt to the dynamic environments. today, many intelligent systems deal with dynamic environments: information on websites, social networks, and applications in com-
+
+mercial markets. in such evolving environments, knowledge needs
+to adapt to the changes very frequently. many statistical machine
+learning techniques interpolate between input data and thus their
+models can adapt only slowly to new situations. in this paper,
+we consider the dynamic environments for recommendation task.
+drifting user interests and preferences [3, 11] are important in building personal assistance systems, such as recommendation systems
+for social networks or for news websites where recommendations
+need be adaptive to drifting trends rather than recommending obsolete or well-known information. we focus on the application
+of recommending forum contents for massive open online courses
+(moocs) where we found that the adaptation issue is a crucial aspect for providing useful and trendy information to students.
+the rapid emergence of some mooc platforms and many moocs
+provided on them has opened up a new era of education by pushing
+the boundaries of education to the general public. in this special online classroom setting, sharing with your classmates or asking help
+from instructors is not as easy as in traditional brick-and-mortar
+classrooms. so discussion forums there have become one of the
+most important components for students to widely exchange ideas
+and to obtain instructors’ supplementary information. mooc forums play the role of social learning media for knowledge propagation with increasing number of students and interactions as a course
+progresses. every member in the forum can talk about course content with each other, and the intensive interaction between them
+supports the knowledge propagation between members of the learning community.
+the online discussion forums are usually well structured via the
+different threads which are created by students or instructors; they
+can contain several posts and comments within the topic. an example of the discussion forum from a famous “machine learning”
+course by andre ng on coursera1 is shown in figure 1. the left
+figure shows various threads and the right figure illustrates some
+replies within the last thread ("having a problem with the collaborative filtering cost"). in general, the replies within a thread are
+related to the topic of the thread and they can also refer to some
+other threads for supplementary information, like the link in the
+second reply. our goal is to point the students towards useful forum threads through effectively mining forum visit patterns.
+two aspects set forum recommendation system for moocs apart
+from other recommendation scenarios. first, student interests and
+preferences drift fast during the span of a course, which is influenced by the dynamics in forums and the content of the course;
+second, the pool of items to be recommended and the items them1
+
+https://www.coursera.org/24
+
+figure 1: an sample discussion forum. left: sample threads. right: replies within the last thread ("having a problem with the collaborative filtering cost").
+selves are evolving over time because forum threads can be edited
+very frequently by either students or instructors. so the recommendations provided to students need to be adaptive to these drifting
+preferences and evolving items. traditional recommendation techniques, such as collaborative filtering and methods based on matrix factorization, only adapt slowly, as they build an increasingly
+complex model of users and items. therefore, when a new item is
+superseded by a newer version or a new preference pattern appears,
+it takes time for recommendations to adapt. to better address the
+dynamic nature of recommendation in moocs, we model the recommendation problem as a dynamic and sequential machine learning problem for the task of predicting the next item in a sequence of
+items consumed by a user. during the sequential process, the challenge is combining old knowledge with new knowledge such that
+both old and new patterns can be identified fast and accurately. we
+use algorithms for sequential recommendation based on variableorder markov models. more specifically, we use a structure called
+context tree (ct) [21] which was originally proposed for lossless
+data compression. we apply the ct method for recommending
+discussion forum contents for moocs, where adapting to drifting preferences and dynamic items is crucial. in experiments, it is
+compared with various sequential and non-sequential methods. we
+show that both old knowledge and new patterns can be captured effectively through context activation using ct, and that this is why
+it is particularly strong at adapting to drifting user preferences and
+performs extremely well for mooc forum recommendation tasks.
+the main contribution of this paper is fourfold:
+• we applied the context tree structure to a sequential recommendation tasks where dynamic item sets and drifting user
+preferences are of great concern.
+• analyze how the dynamic changes in user preferences are
+followed in different recommendation techniques.
+• extensive experiments are conducted for both sequential and
+non-sequential recommendation settings. through the experimental analysis, we validate our hypothesis that the ct
+recommender adapts well to drifting preferences.
+
+• partial context matching (pct) technique, built on top of the
+standard ct method, is proposed and tested to generalize to
+new sequence patterns, and it further boosts the recommendation performance.
+
+2.
+
+related work
+
+typical recommender systems adopt a static view of the recommendation process and treat it as a prediction problem over all historical
+preference data. from the perspective of generating adaptive recommendations,we contend that it is more appropriate to view the
+recommendation problem as a sequential decision problem. next,
+we mainly review some techniques developed for recommender
+systems with temporal or sequential considerations.
+the most well-known class of recommender system is based on
+collaborative filtering (cf) [19]. several attempts have been made
+to incorporate temporal components into the collaborative filtering
+setting to model users’ drifting preferences over time. a common
+way to deal with the temporal nature is to give higher weights to
+events that happened recently. [6, 7, 15] introduced algorithms
+for item-based cf that compute the time weightings for different
+items by adding a tailored decay factor according to the user’s own
+purchase behavior. for low dimensional linear factor models, [11]
+proposed a model called “timesvd” to predict movie ratings for
+netflix by modeling temporal dynamics, including periodic effects,
+via matrix factorization. as retraining latent factor models is costly,
+one alternative is to learn the parameters and update the decision
+function online for each new observation [1, 16]. [10] applied the
+online cf method, coupled with an item popularity-aware weighting scheme on missing data, to recommending social web contents
+with implicit feedbacks.
+markov models are also applied to recommender systems to learn
+the transition function over items. [24] treated recommendation as
+a univariate time series problem and described a sequential model
+with a fixed history. predictions are made by learning a forest of
+decision trees, one for each item. when the number of items is big,
+this approach does not scale. [17] viewed the problem of generating
+recommendations as a sequential decision problem and they con-25
+
+sidered a finite mixture of markov models with fixed weights. [4]
+applied markov models to recommendation tasks using skipping
+and weighting techniques for modeling long-distance relationships
+within a sequence. a major drawback of these markov models is
+that it is not clear how to choose the order of markov chain.
+online algorithms for recommendation are also proposed in several literatures. in [18], a q-learning-based travel recommender is
+proposed, where trips are ranked using a linear function of several
+attributes and the weights are updated according to user feedback.
+a multi-armed bandit model called linucb is proposed by [13]
+for news recommendation to learn the weights of the linear reward
+function, in which news articles are represented as feature vectors;
+click-through rates of articles are treated as the payoffs. [20] proposed a similar recommender for music recommendation with rating feedback, called bayes-ucb, that optimizes the nonlinear reward function using bayesian inference. [14] used a markov decision process (mdp) to model the sequential user preferences for
+recommending music playlists. however, the exploration phase of
+these methods makes them adapt slowly. as user preferences drift
+fast in many recommendation setting, it is not effective to explore
+all options before generating useful ones.
+within the context of recommendation for moocs, [23] proposed
+an adaptive feature-based matrix factorization framework for course
+forum recommendation, and the adaptation is achieved by utilizing
+only recent features. [22] designed a context-aware matrix factorization model to predict student preferences for forum contents, and
+the context considered includes only supplementary statistical features about students and forum contents. in this paper, we focus on
+a class of recommender systems based on a structure, called context tree [21], which was originally used to estimate variable-order
+markov models (vmms) for lossless data compression. then, [2,
+12, 5] applied this structure to various discrete sequence prediction tasks. recently it was applied to news recommendation by
+[8, 9]. the most important property of online algorithms is the noregret property, meaning that the model learned online is eventually
+as good as the best model that could be learned offline. according to [21], the no-regret property is achieved by context trees for
+the data compression problem. regret analysis for ct was conducted through simulation by [5] for stochastically generated hidden markov models with small state space. they show that ct
+achieves the no-regret property when the environment is stationary.
+as we focus on dynamic recommendation environments with timevarying preferences and limited observations, the no-regret property can be hardly achieved while the model adaptation is a bigger
+issue for better performance.
+
+3.
+
+context tree recommender
+
+due to the sequential item consumption process, user preferences
+can be summarized by the last several items visited. when modeling the process as a fixed-order markov process [17], it is difficult
+to select the order. a variable-order markov model (vmm), like a
+context tree, alleviates this problem by using a context-dependent
+order. the context tree is a space efficient structure to keep track
+of the history in a variable-order markov chain so that the data
+structure is built incrementally for sequences that actually occur. a
+local prediction model, called expert, is assigned to each tree node,
+it only gives predictions for users who have consumed the sequence
+of items corresponding to the node. in this section, we first introduce how to use the ct structure and the local prediction model for
+sequential recommendation. then, we discuss adaptation properties and the model complexity of the ct recommender.
+
+3.1 the context tree data structure
+
+in ct, a sequence s = hn1 , . . . , nl i is an ordered list of items
+ni ∈ n consumed by a user. the sequence of items viewed until
+time t is st and the set of all possible sequences s.
+a context s = {s ∈ s : ξ ≺ s} is the set of all possible sequences
+in s ending with the suffix ξ. ξ is the suffix (≺) of s if last elements
+of s are equal to ξ. for example, one suffix ξ of the sequence
+s = hn2 , n3 , n1 i is given by ξ = hn3 , n1 i.
+a context tree t = (v, e) with nodes v and edges e is a partition
+tree over all contexts of s. each node i ∈ v in the context tree
+corresponds to a context si . if node i is the ancestor of node j then
+sj ⊂ si . initially the context tree t only contains a root node
+with the most general context. every time a new item is consumed,
+the active leaf node is split into a number of subsets, which then
+become nodes in the tree. this construction results in a variableorder markov model. figure 2 illustrates a simple ct with some
+sequences over an item set hn1 , n2 , n3 i. each node in the ct corresponds to a context. for instance, the node hn1 i represents the
+context with all sequences end with item n1 .
+
+figure 2: an example context tree. for the sequence s = hn2 , n3 , n1 i,
+nodes in red-dashed are activated.
+
+3.2 context tree for recommendation
+
+for each context si , an expert µi is associated in order to compute
+the estimated probability p(nt+1 |st ) of the next item nt+1 under
+this context. a user’s browsing history st is matched to the ct and
+identifies a path of matching nodes (see figure 2). all the experts
+associated with these nodes are called active. the set of active
+experts a(st ) = {µi : ξi ≺ st } is the set of experts µi associated
+to contexts si = {s : ξi ≺ st } such that ξi are suffix of st . a(st )
+is responsible for the prediction for st .
+
+3.2.1
+
+expert model
+
+the standard way for estimating the probability p(nt+1 |st ), as proposed by [5], is to use a dirichlet-multinomial prior for each expert
+µi . the probability of viewing an item x depends on the number of
+times αxt the item x has been consumed when the expert is active
+until time t. the corresponding marginal probability is:
+pi (nt+1 = x|st ) = p
+
+αxt + α0
+αjt + α0
+
+(1)
+
+j ∈n
+
+where α0 is the initial count of the dirichlet prior26
+
+3.2.2
+
+combining experts to prediction
+
+when making recommendation for a sequence st , we first identify
+the set of contexts and active experts that match the sequence. the
+predictions given by all the active experts are combined by mixing
+the recommendations given by them:
+x
+p(nt+1 = x|st ) =
+ui (st )pi (nt+1 = x|st )
+(2)
+
+in their old contexts. it allows the model to make predictions using more complex contexts as more data is acquired so that old and
+new knowledge can be elegantly combined. for new knowledge
+or patterns added to an established ct, they can immediately be
+identified through context matching. this context organization and
+context matching mechanism help new patterns to be recognized to
+adapt to changing environments.
+
+i∈a(st )
+
+the mixture coefficient ui (st ) of expert µi is computed in eq. 3
+using the weight wi ∈ [0, 1]. weight wi is the probability that
+the chosen recommendation stops at node i given that the it can be
+generated by the first i experts, and it can be updated in using eq.5.
+( q
+wi j:sj ⊂si (1 − wj ), if st ∈ si
+(3)
+ui (st ) =
+0,
+otherwise
+the combined prediction of the first i experts is defined as qi and
+it can be computed using the recursion in eq. 4. the recursive
+construction that estimates, for each context at a certain depth i,
+whether it makes better prediction than the combined prediction
+qi−1 from depth i − 1.
+qi = wi pi (nt+1 = x|st ) + (1 − wi )qi−1
+
+(4)
+
+the weights are updated by taking into account the success of a
+recommendation. when a user consumes a new item x, we update
+the weights of the active experts corresponding to the suffix ending
+before x according to the probability qi (x) of predicting x sequentially via bayes’ theorem. the weights are updated in closed form
+in eq. 5, and a detailed derivation can be found in [5].
+wi0 =
+
+3.2.3
+
+wi pi (nt+1 = x|st )
+qi (x)
+
+(5)
+
+ct recommender algorithm
+
+the whole recommendation process first goes through all users’ activity sequences over time incrementally to build the ct; the local
+experts and weights updated using equations 1 and 5 respectively.
+as users browse more contents, more contexts and paths are added
+and updated, thus building a deeper, more complete ct. the recommendation for an activity or context in a sequence is generated
+using eq. 2 continuously as experts and weights are updated. at
+the same time, a pool of candidate items is maintained through a
+dynamically evolving context tree. as new items are added, new
+branches are created. at the same time, nodes corresponding to old
+items are removed as soon as they disappear from the current pool.
+the ct recommender is a mixture model. on the one hand, the
+prediction p(nt+1 = x|st ) is a mixture of the predictions given
+by all the activated experts along the activated path so that it’s a
+mixtures of local experts or a mixture of variable order markov
+models whose oder are defined by context depths. on the other
+hand, one path in a ct can be constructed or updated by multiple
+users so that it’s a mixture of users’ preferences.
+
+3.3
+
+adaptation analysis
+
+our hypothesis, which is validated in later experiments, is that the
+ct recommender can be applied elegantly to domains where adaptation and timeliness are of concern. two properties of the ct
+methods are crucial to the goal. first, the model parameter learning process and recommendations generated are online such that
+the model adapts continuously to a dynamic environment. second,
+adaptability can be achieved by the ct structure itself as knowledge is organized and activated by context. new items or paths are
+recognized in new contexts, whereas old items can still be accessed
+
+3.4 complexity analysis
+
+learning ct uses the recursive update defined in eq. 4 and recommendations are generated by weighting the experts’ predictions
+along the activated path given by eq. 2. for trees of depth d, the
+time complexity of model learning and prediction for a new observation are both o(d). for input sequence of length t , the updating and recommending complexity are o(m 2 ), where m =
+min(d, t ). space complexity in the worst case is exponential to
+the depth of the tree. however, as we do not generate branches
+unless the sequence occurs in the input, we achieve a much lower
+bound determined by the total size of the input. so the space complexity is o(n ), where n is the total number of observations.
+compared with the way that markov models are learned, in which
+the whole transition matrix needs to be learned simultaneously, the
+space efficiency of ct offers us an advantage for model learning.
+for tasks that involve very long sequences, we can limit the depth
+d of the ct for space and time efficiency.
+
+4.
+
+dataset and problem analysis
+
+4.1 dataset description
+
+in this paper, we work with recommending discussion forum threads
+to mooc students. a forum thread can be updated frequently and
+it contains multiple posts and comments within the topic. as we
+mentioned before that the challenge is adapting to drifting user
+preferences and evolving forum threads as a course progresses. for
+the experiments elaborated in the following section, we use forum
+viewing data from three courses offered by école polytechnique
+fédérale de lausanne on coursera. these three courses include
+the first offering of “digital signal processing”, the third offering of “functional program design in scala”, and the first offering of “’reactive programming’. they are referred to course 1,
+course 2 and course 3. some discussion forum statistics for the
+three courses are given in table 1. from the number of forum
+participants, forum threads, and thread views, we can see that the
+course scale increase from course 1 to course 3. a student on
+moocs often accesses course forums many times during the span
+of a mooc. each time the threads she views are tracked as one
+visit session by the web browser. the total number of visit sessions
+and the average session lengths for three courses are presented in
+table 1. the length of a session is the number of threads she viewed
+within a visit session. the thread viewing sequences corresponding to these regular visit sessions are called separated sequences
+in our later experiments and they treat threads in one visit session
+as one sequence. models built using separated sequences try to
+catch short-term patterns within one visit session and we do not
+differentiate the patterns from different students. another setting,
+called combined sequences, concatenates all of a student’s visit sessions into one longer sequence so that models built using combined
+sequences try to learn long-term patterns across students. the average length of combined sequences is the average session length
+times the average number of sessions per student. from course 1
+to course 3, average lengths for separated and combined sequences
+both increase.27
+
+# of forum participants
+# of forum threads
+# of thread views
+# of sessions
+avg. session length
+avg. # of sessions per student
+
+course 1 course 2 course 3
+5,399
+12,384
+13,914
+1,116
+1,646
+2,404
+130,093 379,456 777,304
+19,892
+40,764
+30,082
+6.5
+9
+25.8
+3.7
+3.3
+2.2
+
+table 1: course forum statistics for three datasets.
+another important issue that we can discover from the statistics is
+that thread viewing data available for sequential recommendation is
+very sparse. for example in course 1, the average session length is
+6.5 and the number of threads is around 1116. then the complete
+space to be explored will be 11166.5 , which is much larger than
+the size of observations (130,093 thread views). the similar data
+sparsity issue is even more severe in the other two datasets.
+
+4.2
+
+forum thread view pattern
+
+next, we study the thread viewing pattern which highlights the significance of adaptation issues for thread recommendation. figure
+3 illustrates the distribution of thread views against freshness for
+three courses. the freshness of an item is defined as the relative
+creation order of all items that have been created so far. for example, when a student views a thread tm which is the m-th thread
+created in the currently existing pool of n threads, then freshness
+of tm is defined as:
+m
+(6)
+f reshness =
+n
+we can see from figure 3 that there is a sharp trend that the new
+forum threads are viewed much more frequently than the old ones
+for all three courses. it is mainly due to the fact that fresh threads
+are closely relevant to the current course progress. moreover, fresh
+threads can also supersede the contents in some old ones to be
+viewed. this tendency to view fresh items leads to drifting user
+preferences. such drifting preferences, coupled with the evolving nature of forum contents, requires recommendations adaptive
+to drifting or recent preferences.
+
+old. in general, sequential patterns are observed more often within
+specific threads as some specific follow-up threads might be related
+and useful to the one that you are viewing. so the patterns learned
+could be used to guide your forum browsing process. on the contrary, sequential patterns on general threads are relatively random
+and imperceptible.
+general threads
+“using gnu octave”
+“any one from india??”
+“where is everyone from?
+“numerical examples in pdf”
+“how to get a certificate”
+
+specific threads
+“homework day 1 / question 9”
+“quiz for module 4.2”
+“quiz -1 question 04”
+‘homework 3, question 11”
+“week 1: q10 gema problem”
+
+table 2: sample thread titles of general and specific threads.
+
+5. results and evaluation
+
+in this section, we compare the proposed ct method against various baseline methods in both non-sequential and sequential settings. the results show that the ct recommender performs better
+than other methods under different setting for all three moocs
+considered. through the adaptation analysis, we validate our hypothesis that the superior performance of ct recommender comes
+from the adaptation power to drifting preferences and trendy patterns in the domain. in the end, a regularization technique for ct,
+called partial context matching (pct), is introduced. it is demonstrated that pct helps better generalize among sequence patterns
+and further boost performance.
+
+5.1 baseline methods
+
+5.1.1 non-sequential methods
+
+figure 3: thread viewing activities against freshness
+
+matrix factorization methods proposed by [23, 22] are the state-ofthe-art for moocs course content recommendation. besides the
+user-based mf given in [23], we also consider item-based mf that
+generates recommendations based on the similarity of the latent
+item features learned from standard mf. in our case, each entry in
+the user-item matrix of mf contains the number of times a student
+views a thread. we also test a version where the matrix had a 1 for
+any number of views, but the performance was not as good, so the
+development of this version was not taken any further. mf models considered here are updated periodically (week-by-week). to
+enable a fair comparison against non-sequential matrix factorization techniques, we implemented versions where the ct model is
+updated at fixed time intervals, equal to those of the mf models.
+in the “one-shot ct” version, we compute the ct recommendations for each user based on the data available at the time of the
+model update, and the user then receives these same recommendations at every future time step until the next update. this mirrors
+the conditions of user-based mf. to compare with item-based mf,
+the “slow-update ct” version updates the recommendations, but
+not the model, at each time point based on the sequential forum
+viewing information available at that time.
+
+a further investigation through those views on old threads leads us
+to a classification of threads into two categories: general threads
+and specific threads. some titles of the general and specific threads
+are listed in table 2. we could see the clear difference between
+these two classes of threads as the general ones corresponds to
+broad topics and specific ones are related to detailed course contents or exercises. we also found that only a very small part of the
+old threads are still rather active to be viewed and they are mostly
+general ones. different from general threads, specific threads that
+subject to a fine timeliness are viewed very few times after they get
+
+sequential methods update model parameters and recommendations continuously as items are consumed. the first two simple
+methods are based on the observation and heuristic that fresh threads
+are viewed much frequently than old ones. fresh_1 recommends
+the last 5 updated threads, and fresh_2 recommends the last 5 created threads. another baseline method, referred as popular, recommends the top 5 threads among the last 100 threads viewed before
+the current one. we also consider an online version of mf [10] that
+
+distribution of thread views against freshness
+
+0.3
+
+probability
+
+0.25
+
+course 1
+course 2
+course 3
+
+0.2
+0.15
+0.1
+0.05
+0
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+freshness
+
+5.1.2 sequential methods28
+
+40%
+
+60%
+
+30%
+20%
+10%
+0%
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+50%
+40%
+
+overall perforamance (course 2)
+
+60%
+
+ct
+slow-update ct
+one-shot ct
+item-base mf
+user-based mf
+
+succ@5ahead
+
+50%
+
+overall perforamance (course 1)
+ct
+slow-update ct
+one-shot ct
+item-base mf
+user-based mf
+
+succ@5ahead
+
+succ@5ahead
+
+60%
+
+30%
+20%
+10%
+0%
+1
+
+2
+
+3
+
+week
+
+4
+
+5
+
+6
+
+7
+
+50%
+40%
+
+overall perforamance (course 3)
+ct
+slow-update ct
+one-shot ct
+item-base mf
+user-based mf
+
+30%
+20%
+10%
+0%
+1
+
+2
+
+3
+
+week
+
+4
+
+5
+
+6
+
+7
+
+week
+
+figure 4: overall performance comparison of ct and non-sequential methods
+is currently the state-of-the-art sequential recommendation method,
+referred to “online-mf”, in which the corresponding latent factor
+of the item i and user u are updated when a new observation rui
+arrive. the model optimization is implemented based on elementwise alternating least squares. the number of latent factors is
+tuned to be 15, 20, 25 for three datasets, and the regularization parameter is set as 0.01. moreover, the weight of a new observation is
+the same as old ones during optimization for achieving the best performance. furthermore, the proposed ct recommender refers to
+the full context tree algorithm with a continuously updated model.
+
+5.2
+
+5.2.1
+
+performance and adaptation analysis
+evaluation metrics
+
+in our case, all methods recommend top-5 threads each time. two
+evaluation metrics are adopted in the following experiments:
+• succ@5: the mean average precision (map) of predicting
+the immediately next thread view in a sequence.
+• succ@5ahead: the map of predicting the future thread
+views within a sequence. in this case, a recommendation
+is successful even if it is viewed later in a sequence.
+
+5.2.2
+
+comparison of non-sequential methods
+
+figure 4 shows the performance comparison between different versions of methods based on mf and ct on three datasets. “ct”
+is the sequential method with a continuously updated model, and
+all other methods figure 4 are non-sequential versions. combined
+sequences are used for the ct methods here to have a parallel comparison against mf. we found that a small value of the depth limit
+of the cts hurts performances, yet a very large depth limit does
+not increase performance at the cost of computation and memory.
+through experiments, we tune depths empirically and set them as
+15, 20, 30 for three datasets.
+among non-sequential methods, one-shot ct and user-based mf
+perform the worst for all three courses, which means that recommending the same content for the next week without any sequence
+consideration is ineffective. slow-update ct performs consistently
+the best among non-sequential methods, and it proves that adapting
+recommendations through context tree helps boost performance although the model itself is not updated continuously. compared
+to slow-update ct, item-based mf performs much worse. they
+both update model parameters periodically and the recommendations are adjusted given the current observation. however, using
+the contextual information within a sequence and the corresponding prediction experts of slow-update ct are much more powerful
+than just using latent item features of item-base mf. moreover, we
+can clearly see that the normal ct with continuous update outperforms all other non-sequential methods by a large margin for three
+datasets. it means that drifting preferences need to be followed
+though continuous and adaptive model update, so sequential methods are better choices. next, we focus on sequential methods, and
+
+we validate our hypothesis that the ct model has superior performances because it better handles drifting user preferences.
+
+5.2.3
+
+comparison of sequential methods
+
+the results presented in table 3 show the performance of the full
+ct recommender compared with other sequential baseline methods under different settings and evaluation metrics. each result
+tuple contains the performance on the three datasets. we also consider a tail performance metric, referred to personalized evaluation,
+where the most popular threads (20, 30, and 40 for three courses)
+are excluded from recommendations. the depth limits of cts using separated sequences are set to 8, 10, and 15 for three courses.
+we notice that the online-mf method, with continuous model update, performs much worse compared with the ct recommender
+for all three datasets. this result shows that matrix factorization,
+which is based on interpolation over the user-item matrix, is not
+sensitive enough to rapidly drifting preferences with limited observations. the performances of two versions of the fresh recommender are comparable with online-mf, and fresh_1 even outperforms online-mf in many cases, especially for succ@5ahead.
+it means that simply recommending fresh items even does a better job than online-mf for this recommendation task with drifting
+preferences. we can see that the ct recommender outperforms
+all other sequential methods under various settings, except for using non-personalized succ@5ahead for course 2. the popular
+recommender is indeed a very strong contender when using nonpersonalized evaluation since there is a bias that students can click a
+“top threads” tag from user interface to view popular threads which
+are similar to the ones given by popular recommender. from the
+educational perspective, the setting using separated sequences and
+personalized evaluation is the most interesting as it reflects shotterm visiting patterns within a session over those specific and less
+popular forum threads. we could see from the upper right part of
+table 3 that the ct recommender outperforms all other methods by
+a large margin under this setting.
+
+ct
+online-mf
+popular
+fresh_1
+fresh_2
+ct
+online-mf
+popular
+fresh_1
+fresh_2
+
+non-personalized
+personalized
+succ@5 succ@5ahead succ@5 succ@5ahead
+separated sequences
+[25, 23, 21]% [48, 53, 52]% [19, 14, 16]% [41, 37, 42]%
+[15, 12, 8]% [33, 29, 23]% [10, 7 ,6 ]% [27, 25, 20]%
+[15, 20, 16]% [40, 61, 51]% [9, 8 ,8 ]% [34, 31, 36]%
+[12, 14, 10]% [37, 43, 41]% [10, 10, 8]% [33, 31, 37]%
+[9, 8, 6]% [31, 31, 29]% [8, 7, 6 ]% [30, 30, 28]%
+combined sequences
+[21, 20, 20]% [55, 55, 56]% [16, 13, 14]% [46, 39, 46]%
+[9, 8, 7]% [34, 27, 23]%
+[7,6,6]%
+[29, 24, 20]%
+[13, 14, 14]% [52, 62, 58]% [9, 8, 7]% [45, 36, 43]%
+[10, 12, 9]% [48, 44, 44]% [8, 9, 8]% [44, 34, 42]%
+[7, 6, 6]% [43, 34, 32]% [6, 6, 6]% [42, 32, 31]%
+
+table 3: performance comparison of sequential methods
+
+5.2.4
+
+adaptation comparison29
+
+ct
+online-mf
+
+0.8
+0.6
+0.4
+0.2
+0
+0
+
+0.2
+
+average cdf of recommendation freshness (course 2)
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+1
+
+average cdf of recommendation freshness (course 3)
+
+ct
+online-mf
+
+recommended probability
+
+1
+
+recommended probability
+
+recommended probability
+
+average cdf of recommendation freshness (course 1)
+
+0.8
+0.6
+0.4
+0.2
+0
+0
+
+0.2
+
+freshness
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+1
+
+ct
+online-mf
+
+0.8
+0.6
+0.4
+0.2
+0
+0
+
+0.2
+
+freshness
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+freshness
+
+figure 5: distribution of recommendation freshness of ct and online-mf
+0.4
+
+ct
+online-mf
+
+0.2
+0.1
+0
+0
+
+0.4
+
+0.3
+
+probability
+
+probability
+
+0.3
+
+p (success|f reshness) for course 2
+ct
+online-mf
+
+0.2
+0.1
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+0
+0
+
+freshness
+
+p (success|f reshness) for course 3
+ct
+online-mf
+
+0.3
+
+probability
+
+0.4
+
+p (success|f reshness) for course 1
+
+0.2
+0.1
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+0
+0
+
+freshness
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+freshness
+
+figure 6: conditional success rate of ct and online-mf
+after seeing the superior performance of the ct recommender, we
+move to an insight analysis of the results. to be specific, we compare ct and online-mf in terms of their adaptation capabilities
+to new items. figure 5 illustrates the cumulative density function (cdf) of the threads recommended by different methods against
+thread freshness. we can see that the cdfs of ct increase sharply
+when thread freshness increases, which means that the probability
+of recommending fresh items is high compared to online-mf. in
+other words, ct recommends more fresh items than online-mf. as
+we mentioned before that a large portion of fresh threads are specific ones, instead of general ones, so ct recommends more specific and trendy threads to students while methods based on matrix
+factorization recommend more popular and general threads.
+other than the quantity of recommending fresh and specific threads,
+the quality is crucial as well. figure 6 shows the conditional success rate p (success|f reshness) across different degrees of freshness for three courses. p (success|f reshness) is defined as the
+fraction of the items successfully recommended given the item freshness. for instance, if an item with freshness 0.5 is viewed 100 times
+throughout a course, then p (success|f reshness = 0.5) = 0.25
+means it is among the top 5 recommended items 25 times. as
+the freshness increases, the conditional success rate of online-mf
+drops speedily while the ct method keeps a solid and stable performance. it is significant that ct outperforms online-mf by a
+large margin when freshness is high, in other words, it is particularly strong for recommending fresh items. fresh items are often
+not popular in terms of the total number of views at the time point
+of recommendation. so identifying fresh items accurately implies
+a strong adaptation power to new and evolving forum visiting patterns. the analysis above validates our hypothesis that the ct recommender can adapt well to drifting user preferences. another
+conclusion drawn from figure 6 is that the performance of ct is as
+good as online-mf for items with low freshness. this is because
+that the context organization and context matching mechanism help
+old items to be identifiable though old contexts. to conclude, ct is
+flexible at combining old knowledge and new knowledge so that it
+performances well for items with various freshness, especially for
+fresh ones with drifting preferences.
+
+5.3
+
+partial context matching (pct)
+
+at last, we introduce another technique, built on top of the standard ct, to generalize to new sequence patterns and further boost
+the recommendation performance. the standard ct recommender
+adopts a complete context matching mechanism to identify active
+experts for a sequence s. that is, active experts of s come exactly
+from the set of suffixes of s. we design a partial context matching (pct) mechanism where active experts of a sequence are not
+constrained by exact suffixes, yet they can be those very similar
+ones. two reasons bring us to design the pct mechanism for context tree learning. first, pct mechanism is a way of adding regularization. sequential item consumption process does not have to
+follow exactly the same order, and slightly different sequences are
+also relevant for both model learning and recommendation generation. second, the data sparsity issue we discussed before for sequential recommendation setting can be solved to some extent by
+considering similar contexts for learning model experts. the way
+pct does aims to activate more experts to train the model, and to
+generate recommendations from a mixture of similar contexts.
+we will focus on a skip operation that we add on top of the standard
+ct recommender. some complex operations, like swapping item
+orders, are also tested, but they do not generate better performance.
+for a sequence hsp , . . . , s1 i with length p, the skip operation generates p candidate partially matched contexts that skip one sk for
+k ∈ [1 . . . p]. all the contexts on the paths from root to partially
+matched contexts are activated. for example, the path to context
+hn2 , n1 i can be activated from the context hn2 , n3 , n1 i by the skipping n3 . however, for each partially matched context, there may
+not exist a fully matched path in the current context tree. in this
+case, for each partially matched context, we identify the longest
+path that corresponds it with length q. if q/p is larger than some
+threshold t, we update experts on this paths and use them to generate recommendations for the current observation. predictions from
+multiple paths are combined by averaging the probabilities.
+
+pct-0.5
+pct-0.6
+pct-0.7
+pct-0.8
+pct-0.9
+
+success@5
+[+0.4, +0.6, +0.2]%
+[+0.5, +0.8, +0.3]%
+[+0.7, +0.9, +0.5]%
+[+0.8, +1.1, +0.6]%
+[+1.0, +1.4, +0.7]%
+
+success@5ahead
+[+0.8, +0.9, +0.4]%
+[+1.1, +1.3, +0.5]%
+[+1.6, +1.9, +0.7]%
+[+1.9, +2.4, +1.0]%
+[+2.0, +2.7, +1.3]%
+
+ratio
+[4.9, 4.5, 3.3]
+[4.4, 4.1, 2.9]
+[3.7, 3.2, 2.5]
+[3.2, 2.9, 2.1]
+[2.4, 2.2, 1.4]
+
+table 4: performance comparison of pct against ct for three courses30
+
+table 4 shows the performance of applying pct for both model
+update and recommendation with threshold t (pct-t). results are
+compared with the full ct recommender with separated sequences
+and non-personalized evaluation. for cases where the threshold is
+smaller than 0.5, we sometimes obtain negative results since partially matched contexts are too short to be relevant. the “ratio”
+column is the ratio of the number of updated paths in pct compared with standard ct. we can see that pct updates more paths
+and it offers us consistent performance boosts at the cost of computation.
+
+6. conclusion and future work
+
+in this paper, we formulate the mooc forum recommendation
+problem as a sequential decision problem. through experimental
+analysis, both performance boost and adaptation to drifting preferences are achieved using a new method called context tree. furthermore, a partial context matching mechanism is studied to allow a
+mixture of different but similar paths. as a future work, exploratory
+algorithms are interesting to be tried. as exploring all options for
+all contexts are not feasible, we consider to explore only those top
+options from similar contexts. deploying the ct recommender in
+some moocs for online evaluation would be precious to obtain
+more realistic evaluation.
+
+7. references
+
+[1] j. abernethy, k. canini, j. langford, and a. simma. online
+collaborative filtering. university of california at berkeley,
+tech. rep, 2007.
+[2] r. begleiter, r. el-yaniv, and g. yona. on prediction using
+variable order markov models. journal of artificial
+intelligence research, pages 385–421, 2004.
+[3] r. m. bell, y. koren, and c. volinsky. the bellkor 2008
+solution to the netflix prize. statistics research department
+at at&t research, 2008.
+[4] g. bonnin, a. brun, and a. boyer. a low-order markov
+model integrating long-distance histories for collaborative
+recommender systems. in international conference on
+intelligent user interfaces, pages 57–66. acm, 2009.
+[5] c. dimitrakakis. bayesian variable order markov models. in
+international conference on artificial intelligence and
+statistics, pages 161–168, 2010.
+[6] y. ding and x. li. time weight collaborative filtering. in
+acm international conference on information and
+knowledge management, pages 485–492. acm, 2005.
+[7] y. ding, x. li, and m. e. orlowska. recency-based
+collaborative filtering. in australasian database conference,
+pages 99–107. australian computer society, inc., 2006.
+[8] f. garcin, c. dimitrakakis, and b. faltings. personalized
+news recommendation with context trees. in acm
+conference on recommender systems, pages 105–112.
+acm, 2013.
+[9] f. garcin, b. faltings, o. donatsch, a. alazzawi, c. bruttin,
+and a. huber. offline and online evaluation of news
+recommender systems at swissinfo.ch. in acm conference
+on recommender systems, pages 169–176. acm, 2014.
+[10] x. he, h. zhang, m.-y. kan, and t.-s. chua. fast matrix
+factorization for online recommendation with implicit
+feedback. in international acm conference on research and
+development in information retrieval, volume 16, 2016.
+[11] y. koren. collaborative filtering with temporal dynamics.
+communications of the acm, 53(4):89–97, 2010.
+
+[12] s. s. kozat, a. c. singer, and g. c. zeitler. universal
+piecewise linear prediction via context trees. ieee
+transactions on signal processing, 55(7):3730–3745, 2007.
+[13] l. li, w. chu, j. langford, and r. e. schapire. a
+contextual-bandit approach to personalized news article
+recommendation. in international conference on world
+wide web, pages 661–670. acm, 2010.
+[14] e. liebman, m. saar-tsechansky, and p. stone. dj-mc: a
+reinforcement-learning agent for music playlist
+recommendation. in international conference on
+autonomous agents and multiagent systems, pages 591–599.
+ifaamas, 2015.
+[15] n. n. liu, m. zhao, e. xiang, and q. yang. online
+evolutionary collaborative filtering. in acm conference on
+recommender systems, pages 95–102. acm, 2010.
+[16] j. mairal, f. bach, j. ponce, and g. sapiro. online learning
+for matrix factorization and sparse coding. journal of
+machine learning research, 11(jan):19–60, 2010.
+[17] g. shani, r. i. brafman, and d. heckerman. an mdp-based
+recommender system. in conference on uncertainty in
+artificial intelligence, pages 453–460. morgan kaufmann
+publishers inc., 2002.
+[18] a. srivihok and p. sukonmanee. e-commerce intelligent
+agent: personalization travel support agent using
+q-learning. in international conference on electronic
+commerce, pages 287–292. acm, 2005.
+[19] x. su and t. m. khoshgoftaar. a survey of collaborative
+filtering techniques. advances in artificial intelligence,
+2009:4, 2009.
+[20] x. wang, y. wang, d. hsu, and y. wang. exploration in
+interactive personalized music recommendation: a
+reinforcement learning approach. acm transactions on
+multimedia computing, communications, and applications,
+11(1):7, 2014.
+[21] f. m. willems, y. m. shtarkov, and t. j. tjalkens. the
+context-tree weighting method: basic properties. ieee
+transactions on information theory, 41(3):653–664, 1995.
+[22] d. yang, d. adamson, and c. p. rosé. question
+recommendation with constraints for massive open online
+courses. in acm conference on recommender systems,
+pages 49–56. acm, 2014.
+[23] d. yang, m. piergallini, i. howley, and c. rose. forum
+thread recommendation for massive open online courses. in
+educational data mining, 2014.
+[24] a. zimdars, d. m. chickering, and c. meek. using temporal
+data for making recommendations. in conference on
+uncertainty in artificial intelligence, pages 580–588.
+morgan kaufmann publishers inc., 2001.

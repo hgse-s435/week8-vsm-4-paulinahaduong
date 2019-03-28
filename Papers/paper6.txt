@@ -1,0 +1,1100 @@
+55
+
+toward the automatic labeling of course questions for
+ensuring their alignment with learning outcomes
+s. supraja
+
+kevin hartman
+
+sivanagaraja tatinati
+
+andy w. h. khong
+
+nanyang technological
+university
+50 nanyang ave
+singapore 639798
+ssupraja001@e.ntu.edu.sg
+
+nanyang technological
+university
+50 nanyang ave
+singapore 639798
+khartman@ntu.edu.sg
+
+nanyang technological
+university
+50 nanyang ave
+singapore 639798
+tatinati@ntu.edu.sg
+
+nanyang technological
+university
+50 nanyang ave
+singapore 639798
+andykhong@ntu.edu.sg
+
+abstract
+expertise in a domain of knowledge is characterized by a greater
+fluency for solving problems within that domain and a greater
+facility for transferring the structure of that knowledge to other
+domains. deliberate practice and the feedback that takes place
+during practice activities serve as gateways for developing domain
+expertise. however, there is a difficulty in consistently aligning
+feedback about a learner’s practice performance with the intended
+learning outcomes of those activities – especially in situations
+where the person providing feedback is unfamiliar with the
+intention of those activities. to address this problem, we propose
+an intelligent model to automatically label opportunities for
+practice (assessment questions) according to the learning outcomes
+intended by the course designers. as a proof of concept, we used a
+reduced version of bloom’s taxonomy to define the intended
+learning outcomes. using a factorial design, we employed term
+frequency-inverse document frequency (tf-idf) and latent
+dirichlet allocation (lda) to transform questions from text to word
+weightages with support vector machine (svm) and extreme
+learning machine (elm) to train and automatically label the
+questions. we trained our models with 120 questions labeled by the
+subject matter expert of an undergraduate engineering course.
+compared to existing works which create models based on a selfgenerated dataset, our proposed approach uses 30 untrained
+questions from online/textbook sources to validate the performance
+of our models. exhaustive comparison analysis of the testing set
+showed that tf-idf with elm outperformed the other
+combinations by yielding 0.86 reliability (f1 measure) with the
+subject matter expert.
+
+keywords
+learning outcomes, term frequency-inverse document frequency,
+latent dirichlet allocation, extreme learning machine, support
+vector machine
+
+1. introduction
+increasingly, modern curriculum design in tertiary and adult
+learning settings has become a collaborative endeavor between
+subject matter experts, learning designers, and learning
+technologists. while these teams employ a variety of process
+
+models for the planning, execution, and revision of their curriculum
+and activity designs, often greater attention is paid to the
+construction of a course design and the course content rather than
+the assessment practices that measure learning and their ongoing
+maintenance.
+the algorithms and use case described in this paper exist in a
+particular context of outcome-based education. in this context,
+learning is defined by observable changes in a learner’s behavior.
+these changes commensurate with krathwohl’s model of learning
+objectives [1] but learning outcomes go beyond objectives.
+learning outcomes are predicated on having learners observably
+demonstrate their growing understanding of a topic or proficiency
+within a field [2]. when learning activities become more openended and exploratory, and when learners are offered choices for
+how to proceed, learners often look to how they will ultimately be
+assessed to gauge which learning strategies they should employ [3].
+when a course’s learning activities support its assessment practices
+and the assessment practices support the types of outcomes that are
+relevant to learners in the future, the course’s activities and
+intended learning outcomes exhibit constructive alignment with
+each other [2]. adhering to constructive alignment creates a
+seamless path from learning, to applying, to transferring concepts
+and relationships when solving novel problems.
+however, the promise of constructive alignment is not easily
+delivered upon. oftentimes, a course’s learning outcomes cannot
+be measured by its assessment practices, or its assessment practices
+are decontextualized from the types of activities and practices
+learners are actually preparing for [4]. whether in the context of
+higher learning or professional development, when thinking about
+developing flexible, life-long learners it is paramount to have
+mechanisms in place to support learners as they work to gain
+domain expertise. these processes should reliably measure
+learning and link assessment practices to authentic activities.
+
+1.1 learning design for domain expertise
+prior work in designing for adaptive domain expertise, the kind of
+expertise necessary for learners to function in changing
+environments and flexible job scopes, has shown that learning
+design teams need to be cognizant of three elements which will be
+discussed in turn.
+
+1.1.1 levels of learning outcomes
+learning outcomes range in sophistication and vary by field. in
+medicine, miller’s pyramid [5] lists learning outcomes beginning
+with knowing about a subject, progressing to knowing how to do
+something, to being able to actually demonstrate it in a contrived
+setting like a role-play with actors, and to being able to demonstrate
+it in a real environment like a surgical theater [6]. the idea is based
+on the belief that the development of expertise is a progression from56
+
+the recall of facts to the execution of skills. however, as research
+on problem based learning has shown, demonstration of skill and
+the recall of facts can proceed independently of each other
+depending on the learning environment [7].
+in [8], a field agnostic method of classifying learning outcomes
+based on their quality is presented. essentially, the structure of
+observed learning outcomes (solo) taxonomy identifies the
+level of cognitive sophistication a learning outcome requires.
+lower level learning outcomes indicate a learner is capable of
+remembering facts in isolation. more sophisticated levels require
+learners to assimilate information from various sources to make
+connections and transform that understanding into something new.
+perhaps the most popular listing of learning outcomes is bloom’s
+taxonomy. similar to miller’s pyramid, bloom’s revised
+taxonomy also begins with the retrieval of facts and information
+as its foundation and builds up to application of knowledge and
+further to analyzing, evaluating, and creating. because of its
+simplicity and familiarity with learning designers and subject
+matter experts alike, bloom’s taxonomy can easily be used to
+identify the levels of learning outcomes in a course [9].
+
+1.1.2 opportunities for deliberate practice
+along with identifying a learning activity’s intended outcomes,
+expertise development requires opportunities for deliberate
+practice. in contrast to repetitive practice intended for learners to
+develop automaticity in either the recall of information or the
+application of a skill, often during time-limited tasks, deliberate
+practice focuses on mastering the nuances of the domain itself to
+fine-tune performance [10]. in fact, a learner’s level of grit, a
+combination of perseverance and passion, predicts how close to
+expert performance a learner will eventually show [11].
+the key difference in processes between repetitive practice and
+deliberate practice leads to different forms of expertise: adaptive
+and routine [12]. routine forms of expertise allow a learner to
+conduct a task at an optimal level. adaptive expertise allows
+learners to learn new tasks or solve novel problems at an
+accelerated rate. in an industrial setting, routine expertise helps a
+worker complete a particular job function. adaptive expertise
+enables that same worker to retrain to fill new job functions.
+typically, the amount of time necessary to achieve expert
+performance in a domain is in the order of years to decades [13].
+however, incremental improvement can be seen in a few practice
+cycles when activities align to the intended learning outcomes.
+
+1.1.3 formative assessments and actionable
+feedback
+hand in hand with creating opportunities for deliberate practice is
+providing formative feedback to the learner about how to improve
+that practice while that improvement is still relevant. imagine
+students who diligently answer every question in an engineering
+textbook but never receive feedback on the quality of their
+solutions. in this case, the learners would be unable to gauge their
+performance in relation to the course learning outcomes or have an
+idea about how to improve their performance in the future. now
+imagine if those same students do receive feedback, but that
+feedback arrives after the course’s final examination. if the content
+of the course is mostly self-contained and will not be revisited, the
+feedback is mostly irrelevant.
+formative feedback consists of two parts: 1) an interpretable
+indication of a learner’s performance on an assessment of learning
+with respect to a standard of performance (learning outcome) and
+
+2) the opportunity to improve performance before the final
+evaluation [14].
+cognitive tutors provide a clear example of the power of coupling
+formative assessment and actionable feedback together in the
+domain of mathematics learning [15]. by presenting learners with
+a series of structured problems, cognitive tutors are capable of
+intervening at any point during the problem-solving process to
+provide students with feedback about their performance. this
+feedback may be the identification of an error, the presentation of
+a hint, or the request for more information about the learner’s
+reasoning. after the feedback, learners have the opportunity to
+adjust their problem-solving heuristics to improve their
+performance going forward.
+such an interaction sequence works with highly structured tasks
+with application-oriented learning outcomes. however, the
+feedback cycle is more difficult to manage when the learning
+outcomes are aligned to higher-order reasoning like evaluation,
+analyzing and creating. these outcomes have multiple paths for
+reaching a satisfactory answer.
+with this difficulty in mind, we looked at techniques to automate
+the process of identifying the reasoning level of text-based
+assessment items (questions) with the intention of better aligning
+questions to learning outcomes as a first step toward being able to
+provide opportunities for deliberate practice. subsequently, the
+outcome of our proposed work is to link actionable feedback to a
+learner’s performance on assessment items.
+
+1.2 automated question classification
+techniques
+prior work has shown the viability of automatically labeling
+questions in accordance with a course’s learning outcomes.
+however, our work goes beyond labeling existing content to
+helping course instructors promote deliberate practice and expertise
+development by providing a method of finding new questions that
+align to the course designer’s original intended learning outcomes.
+we highlight the drawbacks of prior work and how our proposed
+approach addresses those limitations.
+
+1.2.1 labeling questions based on difficulty level
+early attempts at automatically labeling questions relied on subject
+matter experts to pre-define the difficulty levels of questions.
+artificial neural network trained by backpropagation then used the
+question features and assigned difficulty levels in the training set to
+classify new questions. a five-dimensional feature vector that
+consisted of query-text relevance, mean term frequency, length of
+questions and answers, term frequency distribution (variance),
+distribution of questions and answers in a text were used. the
+method yielded an f1 measure, a classification reliability metric
+that measures a test’s accuracy, of 0.78 [16]. however, a major
+pitfall this method is its lack of semantic analysis.
+entropy-based decision tree has also been used to label questions
+[17]. the weakness in this strategy is that there is high possibility
+of overfitting the model during the training phase that then
+negatively affects the subsequent prediction performance.
+
+1.2.2 labeling questions based on bloom’s
+taxonomy using natural language processing
+natural language processing (nlp) has been used for the
+generation of assessments, answering questions, supporting users
+in learning management systems and preparing course materials.
+the wordnet package has been used to detect semantic similarity.
+by performing a rule-based approach, the accuracy of labeling a57
+
+question based on bloom’s taxonomy reaches 82% [18]. to
+improve the rule-based approach, a hybrid technique of using an ngram classifier with a rule-based approach has also been explored.
+rules were based on combining parts-of-speech tagging, and the
+n-gram classifier found the probabilities of predicting certain
+words. such a hybrid method yielded an f1 measure of 0.86 [19].
+
+understanding) were collapsed into remember. applying
+remained its own category. all of the higher-order reasoning
+categories (analyzing, evaluating, and creating) were collapsed
+into transfer. figure 1 shows how our labeling scheme categories
+map onto the original categories from bloom’s revised taxonomy.
+
+1.2.3 labeling questions based on bloom’s
+taxonomy using machine learning techniques
+machine learning algorithms can be broadly split into either
+supervised or unsupervised training implementations. generally,
+supervised training is adopted when, during training, labels have
+been pre-determined and questions are labeled by an expert. the
+most commonly used method in such cases is the term frequencyinverse document frequency (tf-idf). the algorithm assigns
+weightages to individual words in a question statement to define a
+custom vector space to each question.
+machine learning techniques such k-nearest neighbors, naïve
+bayes and support vector machine (svm) have been implemented
+for labeling questions. when doing a performance comparison
+among these three techniques, an f1 measure of 0.71 was achieved
+using svm [20]. to increase the accuracy level, additional features
+were incorporated in future versions of the work. three different
+feature selection processes, namely: odd ratio, chi-square statistic
+and mutual information were used with the three machine learning
+techniques. the f1 measure result reached 0.9 [21].
+furthermore, an integrated approach of feature extraction has been
+proposed by using headword, semantic, keyword and syntactic
+extractions, which are fed into svm [22]. however, this work has
+not yet been completed by using a testing dataset to quantify the
+reliability of prediction.
+a major downside in existing works is that both the training as well
+as testing questions are part of the same course curriculum; the
+questions are generated by the same author/instructor. even when
+a high f1 measure is achieved, it does not enable the algorithm to
+label questions written by another subject matter expert. our work
+increases the flexibility of labeling methods by testing our models
+with a new set of questions compiled from textbook and online
+resources.
+in addition, our work introduces extreme learning machine (elm),
+which has been shown to outperform svm during similar labeling
+tasks [23]. moreover, we introduce lda as an alternative technique
+to tf-idf for transforming question statements into numerical
+word weightages.
+by comparing combinations of these new techniques with more
+traditional techniques, we aim to gauge which combination attains
+the highest labeling reliability with the subject matter expert when
+automatically labeling untrained questions. for our purposes, using
+the combination with the highest f1 measure (fewest false
+negatives and false positives) becomes paramount. in our use case,
+a mislabeling by the algorithm will lead to the wrong set of practice
+questions to be given to students and diminish the impact of
+deliberate practice on reaching the intended learning outcomes.
+
+2. methods
+2.1 materials
+2.1.1 labeling scheme
+the core of this study centers on a labeling scheme for identifying
+the sophistication of learning outcomes based on a simplified
+version of bloom’s taxonomy. in this labeling scheme, the first
+two levels of bloom’s taxonomy (remembering and
+
+figure 1: mapping of bloom's revised taxonomy [24]
+we collapsed the taxonomy into three categories for two reasons.
+first, the subject matter expert tasked with labeling the questions
+was unsure about how reliably the questions could be labeled by
+someone without a background in learning design, educational
+psychology, or curriculum development. collapsing the categories
+to remember, apply, and transfer made manually labeling
+hundreds of questions to train the machine learning algorithms
+more tractable. second, collapsing the categories had the effect of
+making bloom’s taxonomy more analogous to the successful use
+cases of miller’s pyramid by subject matter experts in both higher
+education and professional development settings [5].
+
+2.1.2 question dataset
+the dataset consists of a total of 150 questions used for training and
+testing the machine learning algorithms based on the content of an
+undergraduate electrical and electronic engineering course.
+for this study, we formed a training set of 120 questions by
+randomly selecting 40 remember, apply, and transfer items from
+the larger question pool of more than 200 questions used in that
+course. the pool came from a repository of four years’ worth of
+assignment, homework, quiz and exam questions presented to
+students. these questions prompt students for a range of answer
+types (i.e., open-ended, multiple-choice, short-structured, essay).
+we then created a testing set of 30 new questions compiled from
+external sources such as textbooks and online question banks. this
+set was also balanced with equal representation of remember,
+apply, and transfer questions.
+
+2.2 data pre-processing procedures
+we pre-processed the raw questions in two phases. first, the subject
+matter expert labeled every question according to the labeling
+scheme described above. second, we transformed the text of every
+question into a machine-readable format before passing them
+through the machine learning algorithms.
+
+2.2.1 subject matter expert pre-processing
+the subject matter expert manually labeled each question in the
+training set based on its intended learning outcome (remember,
+apply or transfer). the subject matter expert then labeled the 30
+new questions in the testing set in the same manner. these new
+questions are labeled for the purpose of knowing the ground truth
+for performance evaluation. table 1 below shows some examples
+of the labeled questions.58
+
+table 1 - examples of labeled questions
+remember
+consider a signal described by y[n] = 2n +4. what would be the
+amplitude of the signal at sample index n=3?
+apply
+consider the following input and output signals: find the transfer
+function and state the poles and zeros of this transfer function.
+transfer
+describe how the bandpass filter can be utilized for radar
+applications.
+
+2.2.2 text pre-processing
+the text transformation began by excising all equations,
+mathematical symbols and diagrams from the questions. we only
+kept the core of the question prompts by removing the descriptive
+and explanatory text from scenario and hypothetical questions. for
+example, if a question began by setting the stage with “peter has
+been asked to perform…”, followed by the question prompt “how
+much voltage should peter expect in the circuit?”, all of the
+descriptive text prior to the question prompt was removed to
+improve the consistency of word length and usage between items.
+for the remaining words in the questions, we changed all of the
+characters to lower case, removed all punctuation marks, numbers,
+and non-unicode characters. we then stemmed the remaining
+words to obtain a list of root words. from this list of root words, we
+removed all words with fewer than three letters. because we were
+unsure of the relationship between the words and the labels, we did
+not create a list of stopwords for removal.
+
+3. techniques
+we tested four combinations (in no particular order) of word
+weighting and question labeling algorithms, as shown in figure 2,
+to identify the techniques with the highest reliability for our
+automated learning outcome labeler.
+
+we implemented a modified version of tf-idf that used individual
+questions as the source of the analysis instead of complete
+documents. this focused the model on finding the relevance of each
+word within each single question. by converting each question into
+a vector of weightages based on word frequencies, the machine
+learning algorithms were then used to label the questions. the
+modified tf-idf model can be described by
+𝑇𝐹 − 𝐼𝐷𝐹(𝑤𝑖 , 𝑞𝑘 ) = #(𝑤𝑖 , 𝑞𝑘 ) × log
+
+𝑇𝑅
+#𝑇𝑅(𝑤𝑖 )
+
+(1)
+
+where wi refers to a particular word i, qk refers to a particular
+question k, #(wi,qk) refers to number of times wi occurs in qk, tr
+refers to total number of questions and #tr(wi) refers to question
+frequency, or the number of questions in which wi occurs [20].
+in the case where the term frequency (tf) count is biased towards
+longer questions, the tf count is normalized as
+𝑇𝐹𝑖,𝑘 =
+
+𝑛𝑖,𝑘
+
+(2)
+
+∑𝑗 𝑛𝑗,𝑘
+
+where ni,k refers to the number of times wi occurs in qk, the
+denominator term (size of each question) refers to the sum of the
+number of times each word appears in qk [25].
+for our work, the pre-processing procedures registered a total of
+465 unique stemmed words in our compilation of 120 training
+questions and 30 testing questions. this led to each question being
+represented as a vector of 1 row and 465 columns arranged in
+alphabetical order by stemmed word. when a word is present in a
+question, the normalized weight of that word is assigned to that
+question’s vector element. if a word is not present in the question,
+the weight is zero.
+after determining the unique word weightage vectors for all 150
+questions, the entire matrix is sorted such that for each question, the
+weightages are arranged in ascending order. the top ten weightages
+are chosen for each question. the 10 weightages may correspond
+to different words in each question, but their combinations remain
+question-specific and give a numerical representation of each
+question statement. this new vector of 10 columns per question
+serves as the input to the machine learning algorithms.
+as an example, we will use the pre-processed question prompt:
+for signal which begin when the one side unilateral ztransform given
+
+table 2 below shows the weightages assigned to the above example
+after the application of the tf-idf technique. the weightages are
+then arranged in ascending order and the top 10 values are taken.
+table 2 - tf-idf weightage arrangement
+figure 2: four combinations of algorithms
+every word in each question prompt was assigned a weightage
+value based on either term frequency-inverse document frequency
+(tf-idf) or latent dirichlet allocation (lda). subsequently, the
+vector values for each question were passed through either support
+vector machine (svm) or extreme learning machine (elm) to
+assign a label. all algorithms were implemented in r studio.
+
+3.1 term frequency-inverse document
+frequency
+term frequency-inverse document frequency (tf-idf) is a
+technique for finding the relative frequency of words in a given
+document, and comparing those frequencies with the inverse of
+how often each of those words appear in the complete document
+corpus. the resulting ratio can be used to signify the relevance of
+each unique word within a single document.
+
+word (alphabetical order)
+
+weightage
+
+begin
+
+0.392
+
+for
+
+0.140
+
+given
+
+0.140
+
+one
+
+0.222
+
+side
+
+0.356
+
+signal
+
+0.116
+
+the
+
+0.007
+
+unilateral
+
+0.392
+
+when
+
+0.279
+
+which
+
+0.230
+
+ztransform
+
+0.21659
+
+3.2 latent dirichlet allocation
+latent dirichlet allocation (lda) is a probabilistic technique for
+topic modeling based on the bayesian model. the essential idea of
+lda is that each document consists of a mixture of topics, with the
+continuous-valued mixture properties distributed in a dirichlet
+random variable, a continuous multivariate probability distribution.
+again, in the context of our work, we applied lda to questions in
+the dataset by substituting the original notion of documents in the
+lda algorithm with questions in our modified model. therefore,
+the modified model attempted to find k number of topics (k is a
+user-defined parameter to determine the desired number of topics,
+or dimensionality of the dirichlet distribution) for a given set of
+question statements based on the choice and usage of words in each
+question. the joint distribution of a topic mixture, a set of topics
+and a set of words can be represented by
+𝑝(𝜃, 𝑡, 𝑤|𝛼, 𝛽) = 𝑝(𝜃|𝛼) ∏𝑀
+𝑖=1 𝑝(𝑡𝑖 |𝜃)𝑝(𝑤𝑖 |𝑡𝑖 , 𝛽)
+
+(3)
+
+where parameter α is a k-vector with components more than zero,
+parameter β refers to the matrix of word probabilities, θ refers to a
+k-dimensional dirichlet random variable, ti refers to a topic, wi
+refers to a word [26].
+figure 3 shows a graphical model representation of lda. the
+bigger circle refers to questions while the smaller circle refers to
+the repeated choice of topics and words within each question.
+
+out of the entire set of stemmed words detected, ten words have
+been identified as topic names. hence, lda automatically
+associates the remaining words the above-mentioned ten topics.
+based on the words that appear in each question, lda displays the
+number of topics per question. based on the topic assignments, the
+topic weightages for each question is generated. for topics not
+present in a question, a minimal weightage is given to those topics
+in lieu of a zero value. the value ensures that the topic weightages
+for a question sum to one. similar to the tf-idf output, the new
+vector of 10 columns per question becomes the input for the
+machine learning algorithms.
+
+3.3 extreme learning machine
+extreme learning machine (elm) is a learning algorithm for
+single-hidden layer feedforward neural networks (slfns). elm
+can be used for classification, regression, clustering, compression
+and feature learning. elm randomly chooses the hidden nodes and
+determines the output weights of the neural networks.
+the following three-step learning model explains elm. given a
+training set that is labeled (information about the target nodes),
+hidden node activation function and number of hidden nodes,
+step 1: randomly assign hidden node parameters
+step 2: calculate the hidden layer output matrix, h
+step 3: calculate the output weight 𝛾
+given a set of inputs with unknown labels, the objective is to find
+the target outputs [27]. once the inter-layer weights have been
+found, the same weights are used during the testing phase. for a
+given set of input samples xk, the target/output is given by tk. for
+number of hidden nodes l and with a certain activation function
+f(x), the slfn is modeled as
+∑𝐿𝑗=1 𝛾𝑗 𝑓𝑗 (𝑥𝑘 ) = ∑𝐿𝑗=1 𝛾𝑗 𝑓(𝑤𝑗 ∙ 𝑥𝑘 + 𝑏𝑗 ) = 𝑜𝑘 , 𝑘 = 1, … , 𝐿 (4)
+
+figure 3: graphical model representation of lda
+since lda involves topic modeling, an appropriate k value chosen
+for our work was ten. this allowed a standard comparison between
+lda and the top ten weightages from the tf-idf method. the
+generated unique topics (based on the stemmed words) are shown
+in table 3.
+table 3 - topic names generated by lda
+topic number
+
+stemmed topic name
+
+1
+
+differ
+
+2
+
+discrete
+
+3
+
+impulse
+
+4
+
+signal
+
+5
+
+filter
+
+6
+
+apply
+
+7
+
+dft
+
+8
+
+output
+
+9
+
+sample
+
+10
+
+system
+
+where wj refers to the weight vector that stores the weights between
+input and hidden nodes, 𝛾j refers to the weight vector that stores the
+weights between the hidden and output nodes, bj refers to the
+threshold of the jth hidden nodes. the objective is that ok and tk
+(original target) should have zero difference [23] using possible
+activation functions that include sigmoid, sine, radial basis and
+hard-limit.
+in our case, the output of the elm are three continuous values that
+represent the values assigned to the three learning outcome
+categories (remember, apply and transfer). to convert the three
+values into a binary value for comparing the predicted labels with
+the actual labels, we set the learning outcome category with the
+highest value to one and the remaining two to zero.
+
+3.4 support vector machine
+support vector machine (svm) is a mapping of data samples such
+that these samples can be distinctly labeled. the concept of svm
+is derived from margins and subsequently separating data into
+groups with large gaps between them. deriving an optimal
+hyperplane for identifying linearly separable patterns is the key to
+svm. this idea is extended to cases where the patterns are nonlinearly separable, by using a kernel function to transform the
+original data samples to map onto a new space [28]. possible
+kernels are: linear, polynomial, radial basis and sigmoid.
+for our work, we used the c-support vector classification type.
+given a set of inputs and targets, the cost function is given by [29]
+1
+
+min 𝑝𝑇 𝑝 + 𝐶 ∑𝑘𝑗=1 𝜉𝑗
+
+𝑝,𝑚,𝜉 2
+
+(5)
+
+subject to 𝑦𝑗 (𝑝𝑇 𝜙(𝑣𝑗 ) + 𝑚) ≥ 1 − 𝜉𝑗 , 𝜉𝑗 ≥ 0, 𝑗 = 1, … , 𝑘60
+
+where c>0 is the regularization parameter, m is a constant, p is the
+vector of coefficients, 𝜉𝑗 refers to parameters that handle the inputs,
+index j refers to labeling the k training cases, v refers to the
+independent variables, y refers to the class labels, 𝜙 refers to the
+kernel used that transforms data from the input to the chosen feature
+space.
+fundamentally, support vectors are data points that lie close to the
+decision boundary, which are the hardest to classify. svm
+maximizes the margin around the hyperplane that separates these
+points. the cost function is determined based on the training
+samples (support vectors). these support vectors are the basic
+elements of a training set that would change the position of the
+hyperplane dividing the dataset. svm becomes an optimization
+problem for determining the optimal hyperplane.
+
+3.5 performance metrics
+to evaluate the reliability of our four technique combinations with
+the subject matter expert’s labels, we looked at using the f1
+measure. accuracy is the number of correct labels divided by the
+size of testing data. the f1 measure is a harmonic mean of two
+other metrics: precision and recall. precision refers to the
+correctness of questions that have been selected as a particular
+category. recall refers to the correctness of selection of the correct
+category given all the questions that were correctly classified.
+because minimizing the number of false positives and false
+negatives was important for accurately assigning new questions to
+the correct practice sets, we used the f1 measure as the basis for
+our algorithm comparisons. to explain the f1 measure, we will step
+through the confusion matrix used to describe the performance of a
+labeling model on a set of testing data. there are four concepts used
+to construct the confusion matrix:
+true positive (tp) refers to the number of questions that the
+algorithm correctly identifies as presenting a label.
+false positive (fp) refers to the number of questions that the
+algorithm identifies as presenting a label while the subject matter
+expert indicates the label was absent.
+true negative (tn) refers to the number of questions that the
+algorithm correctly identifies as having a label absent.
+false negative (fn) refers to the number of questions that the
+algorithm identifies as having a label absent while the subject
+matter expert indicates the label was present.
+the f1 measure is calculated as follows [30]
+𝑃𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛 =
+𝑅𝑒𝑐𝑎𝑙𝑙 =
+𝐹1 𝑚𝑒𝑎𝑠𝑢𝑟𝑒 =
+
+𝑇𝑃
+(𝑇𝑃+𝐹𝑃)
+𝑇𝑃
+
+(𝑇𝑃+𝐹𝑁)
+
+2 × 𝑝𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛 × 𝑟𝑒𝑐𝑎𝑙𝑙
+𝑝𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛+𝑟𝑒𝑐𝑎𝑙𝑙
+
+(6)
+(7)
+(8)
+
+4. results and analysis
+4.1 insights by subject matter expert
+when looking at every question presented to students over the
+course of a semester, the subject matter expert identified the
+number of questions corresponding to remember, apply and
+transfer as shown in table 4. just by labeling the course questions,
+the subject matter expert realized how misaligned the course’s
+learning outcomes were with its assessment practices. a large
+emphasis on apply questions was expected, but the dearth of
+transfer questions was surprising. of those 23 transfer items, most
+were presented during the final exam.
+
+table 4 - frequency of questions aligned to learning outcomes
+learning outcome
+
+frequency (number of questions)
+
+remember
+
+62
+
+apply
+
+131
+
+transfer
+
+23
+
+one of the stated learning outcomes of the course was to prepare
+students to flexibly transfer course content to novel problems and
+new situations. however, waiting until the final exam to present
+students with such opportunities denied them actionable feedback
+during the semester. in response to the pre-processing labeling
+efforts, the subject matter expert then added 42 new transfer
+questions throughout the course for the next semester.
+
+4.2 model reliability with subject matter
+expert
+the objective of this implementation is to evaluate whether the
+trained model is able to predict the type of question (remember,
+apply or transfer). based on the trained model using questions
+from the undergraduate course, the testing questions from
+textbooks and online sources were passed through our model to
+determine the level of reliability of labeling new questions that
+were not generated by the subject matter expert. in our intended use
+case, the testing dataset would not need to be manually labeled.
+however, to determine the level of reliability of our labeling
+algorithms, the subject matter expert’s manual labels served as a
+ground truth for the f1 measure calculations.
+
+4.2.1 parameter selection
+we first determined the best set of parameters based on 10-fold
+cross validation of the training dataset. as there were 120
+questions, 90% of the questions (108 questions) were used for
+training and 10% of the questions (12 questions) were used as a
+validation set. this process was done 10 times using 10 different
+bundles of the 120 questions. the best set of parameters were
+chosen based on a grid search for both elm and svm.
+the parameters that were varied for elm were:
+1.
+2.
+
+number of hidden nodes
+activation function (sigmoid / radial basis / hard-limit)
+
+the parameters yielding the best results corresponded to 72 hidden
+nodes using hard-limit activation function.
+the parameters that were varied for svm were:
+1.
+2.
+3.
+
+kernel (sigmoid / radial basis)
+cost value
+gamma value
+
+the parameters yielding the best results corresponded to sigmoid
+kernel, cost value = 1, gamma value = 0.26
+
+4.2.2 comparing four combinations
+with respect to the f1 measure, calculations were done separately
+for the three labels. the mean of those calculations was then used
+as the algorithm’s overall performance measure. with respect to
+elm, the calculation was repeated 10 times because the
+initialization weights are randomly assigned in each iteration. the
+mean value of the f1 measure was taken.
+table 5 below shows the f1 measure values (for each individual
+class and overall f1 mean) for the four combinations. “r” refers to
+remember, “a” refers to apply, “t” refers to transfer and “s.d.”
+refers to standard deviation.61
+
+table 5 - f1 measure values for four combinations
+combination
+
+r
+
+a
+
+t
+
+mean
+
+s.d.
+
+1. tf-idf
+with svm
+
+0.870
+
+0.737
+
+0.667
+
+0.758
+
+0.084
+
+2. lda with
+svm
+
+0.400
+
+0.593
+
+0.556
+
+0.516
+
+0.084
+
+3. tf-idf
+with elm
+
+0.926
+
+0.815
+
+0.840
+
+0.860
+
+0.048
+
+4. lda with
+elm
+
+0.467
+
+0.520
+
+0.647
+
+0.545
+
+0.076
+
+tf-idf with elm achieved the highest mean f1 measure value
+and the lowest standard deviation – indicating that it was the most
+reliable combination. it can be seen that the remember label yields
+the highest f1 values out of the three labels in combination 3. in
+general, remember-labeled questions are short, resulting in about
+four to five zero values in the tf-idf vector of 10 columns that is
+passed as an input into the elm. hence, the algorithm identifies
+remember-labeled questions very accurately due to their size.
+the result of high reliability in using elm is as expected because
+it has already been demonstrated that elm outperforms svm when
+comparing in terms of standard deviation of training and testing
+root-mean-square values, time taken, network complexity, as well
+as performance comparison in real medical diagnosis application
+[23]. on the other hand, although lda has been shown to achieve
+higher performance as it groups words together in terms of topics
+instead of looking at combinations of individual words which may
+not link together, in the context of our work, tf-idf outperforms
+lda instead. this is because for lda, the goal is to correctly
+assign each document (or question) to a class label in a reduced
+dimensional space [31]. however, in our corpus of questions, there
+are several technical terms involved, without any prior labeling of
+topics. hence, lda is not appropriate for our analysis.
+
+5. conclusions
+based on the comparison of our four algorithms, our most reliable
+model (tf-idf with elm) is able to accurately label new course
+questions for the undergraduate electrical and electronic
+engineering course with 0.86 reliability in terms of f1 measure.
+any novice instructor who takes over this course in the future or
+teaching assistants tasked with refreshing the course assignments
+would be able to extract new questions from any external source
+and pass them to the algorithm to automatically label the questions
+as the original course coordinator would. this allows members of
+the course design team without a strong background in learning to
+make curriculum decisions regarding the alignment of the course’s
+learning outcomes.
+as discussed earlier, outcome-based learning environments
+facilitate transforming the model of instruction from instructorcentric and lecture-based to being more learner focused filled with
+a variety of activities and learning pathways. however, in learnercentered environments, assessment is still the key driver, and often
+the key inhibitor of learning [3]. if the assessments require shallow
+understanding, then learners calibrate their efforts to achieve this
+low bar. when assessments require deep understanding or great
+proficiency, learners are likely to put in more effortful practice.
+in line with this assessment philosophy, our tf-idf with elm
+model is theoretically capable of matching any learning activity to
+any set of learning outcomes as long as the course designers or
+subject matter experts provide enough examples that are explicitly
+
+aligned to the intended learning outcomes when training the model.
+for the convenience of the subject matter expert in our context, we
+used a reduced version of bloom’s taxonomy in this study.
+however, the final algorithm is capable of using the full bloom’s
+model, a different model, or a custom set of learning outcomes as
+its labeling framework.
+hence, with the high reliability of the prediction algorithm
+presented in our work, our process for calibrating the algorithm can
+be used in any academic or industrial setting to provide the right set
+of formative assessment opportunities to students (enhancing
+subject knowledge) or employees (professional development).
+once the learning outcomes of activities are labeled reliably, it is
+then easier to think about how to engage learners in deliberate
+practice to reach those outcomes and develop their expertise. once
+opportunities for deliberate practice that align to the course learning
+outcomes are implemented into a course, it becomes easier to think
+about how to align the feedback regarding those opportunities to
+support the development of domain expertise.
+this work provides a first step at being able to regularly introduce
+learning activities that promote the development of adaptive
+expertise into a course by matching external sources of activities
+with the course’s learning outcomes. deliberate practice requires
+repetition that varies in ways that highlight the structural elements
+of a domain. having a way to incorporate new sources of questions
+and problems into a course that align with the course’s goals
+provides learners more opportunities for internalizing when to
+apply their domain specific skills and knowledge. finally, our
+algorithm is potentially useful for designing courses to reach noncontent-based learning outcomes, making policies that support
+constructive alignment, and evaluating course assessment of
+learning plans.
+
+6. future work
+building off of our machine learning labeling work, we would like
+to explore constructing a new version of lda that can be tailormade to label questions. there are situations in which weightages
+given to words are the same, with different words representing
+those weightages. similarly, the same words can have different
+weightages. we are keen to continue working on features based on
+word arrangement, word context and word order that affect
+weightage assignments. in addition, elm can be enhanced by
+using kernels.
+from the learning aspect, we would like to extend our question
+label categories to all six outcomes described in bloom’s
+taxonomy and expand the model to label outcomes based on the
+types of sentences used in forum conversations and other
+collaborative learning activities. eventually, we aim to determine
+the proficiency level of learners so we can put learning supports in
+place to guide their learning journeys. ultimately, we wish to
+provide learners with learning activities and opportunities for
+deliberate practice embedded with actionable feedback to develop
+their adaptive expertise.
+
+7. acknowledgments
+this work was conducted within the delta-ntu corporate lab for
+cyber-physical systems with funding support from delta
+electronics inc and the national research foundation (nrf)
+singapore under the corp lab@university scheme.
+
+8. references
+[1] krathwohl, d.r. 2002. a revision of bloom's taxonomy:
+an overview. theory into practice. 41, 4 (2002), 212-218.
+doi= http://dx.doi.org/10.1207/s15430421tip4104_262
+
+[2] biggs, j. 1996. enhancing teaching through constructive
+alignment. higher education. 32, 3 (1996), 347-364. doi=
+http://dx.doi.org/10.1007/bf00138871
+[3] boud, d. 2010. sustainable assessment: rethinking
+assessment for the learning society. studies in continuing
+education. 22, 2 (2010), 151-167. doi=
+http://dx.doi.org/10.1080/713695728
+[4] boud, d. and falchikov, n. 2006. aligning assessment with
+long-term learning. assessment & evaluation in higher
+education. 31, 4 (2006), 399-413. doi=
+http://dx.doi.org/10.1080/02602930600679050
+[5] miller, g. e. 1990. the assessment of clinical
+skills/competence/performance. academic medicine. 65, 9
+(1990), s63-s67. doi=
+http://dx.doi.org/10.1097/00001888-199009000-00045
+[6] wass, v. et al. 2001. assessment of clinical competence.
+the lancet. 357, 9260 (2001), 945-949. doi=
+http://dx.doi.org/10.1016/s0140-6736(00)04221-5
+[7] hmelo-silver, c.e. 2004. problem-based learning: what
+and how do students learn? educational psychology
+review. 16, 3 (2004). 235-266. doi=
+http://dx.doi.org/10.1023/b:edpr.0000034022.16470.f3
+[8] biggs, j. b. and collis, k.f. 2014. evaluating the quality of
+learning: the solo taxonomy (structure of the observed
+learning outcomes). academic press.
+[9] crowe, a. et al. 2008. biology in bloom: implementing
+bloom's taxonomy to enhance student learning in biology.
+cbe-life sciences education. 7, 4 (2008), 368-381. doi=
+http://dx.doi.org/10.1187/cbe.08-05-0024
+[10] ericsson, k.a. et al. 1993. the role of deliberate practice
+in the acquisition of expert performance. psychological
+review. 100, 3 (1993), 363-406. doi=
+http://dx.doi.org/10.1037/0033-295x.100.3.363
+[11] duckworth, a. l. et al. 2007. grit: perseverance and
+passion for long-term goals. journal of personality and
+social psychology. 92, 6 (2007), 1087. doi=
+http://dx.doi.org/10.1037/0022-3514.92.6.1087
+[12] schwartz d. l. et al. 2005. efficiency and innovation in
+transfer. transfer of learning from a modern
+multidisciplinary perspective. information age publishing.
+1-51.
+[13] chi, m. t. 2006. two approaches to the study of experts'
+characteristics. the cambridge handbook of expertise and
+expert performance. cambridge university press. 21-30.
+[14] black, p. and william, d. 1998. assessment and classroom
+learning. assessment in education principles policy and
+practice. 5, 1 (1998), 7-74. doi=
+http://dx.doi.org/10.1080/0969595980050102
+[15] ritter, s. et al. 2007. cognitive tutor: applied research in
+mathematics education. psychonomic bulletin & review. 14,
+2 (2007), 249-255. doi=
+http://dx.doi.org/10.3758/bf03194060
+[16] fei, t. et al. 2003. question classification for e-learning by
+artificial neural network. in proceedings of the 2003 joint
+fourth international conference on information,
+communications and signal processing and the fourth
+pacific rim conference on multimedia (singapore, 2003),
+1-5. doi= http://dx.doi.org/10.1109/icics.2003.1292768
+
+[17] cheng, s. c. et al. 2005. automatic leveling system for elearning examination pool using entropy-based decision
+tree. in advances in web-based learning – icwl 2005
+(hong kong, 2005), 273-278. doi=
+http://dx.doi.org/10.1007/11528043_27
+[18] jayakodi, k. et al. 2015. an automatic classifier for exam
+questions in engineering: a process for bloom's
+taxonomy. in 2015 ieee international conference on
+teaching, assessment, and learning for engineering
+(tale) (zhuhai, china, 2015). doi=
+https://dx.doi.org/10.1109/tale.2015.7386043
+[19] haris, s. s. and omar, n. 2015. bloom's taxonomy question
+categorization using rules and n-gram approach. journal of
+theoretical and applied information technology. 76, 3
+(2015), 401-407.
+[20] yahya, a. a. et al. 2013. analyzing the cognitive level of
+classroom questions using machine learning techniques. in
+the 9th international conference on cognitive science
+(kuching, sarawak, malaysia, 2013). 587-595. doi=
+http://dx.doi.org/10.1016/j.sbspro.2013.10.277
+[21] abduljabbar, d. a. and omar, n. 2015. exam questions
+classification based on bloom's taxonomy cognitive level
+using classifiers combination. journal of theoretical and
+applied information technology. 78, 3 (2015), 447-455.
+[22] sangodiah, a. et al. 2014. a review in feature extraction
+approach in question classification using support vector
+machine. in 2014 ieee international conference on
+control system, computing and engineering (penang,
+malaysia, 2014), 536-541. doi=
+http://dx.doi.org/10.1109/iccsce.2014.7072776
+[23] huang, g. b. et al. 2006. extreme learning machine:
+theory and applications. neurocomputing. 70, 1-3 (2006),
+489-501. doi=
+http://dx.doi.org/10.1016/j.neucom.2005.12.126
+[24] trinity university course assessment and outcomes: 2016
+https://inside.trinity.edu/collaborative/collaborativegrants/course-redesign-stipends/course-assessment-andoutcomes. accessed: 2017-02-24.
+[25] bernardi, r. term frequency and inverted document
+frequency. university of trento, trentino.
+[26] blei, d. m. et al. 2003. latent dirichlet allocation. journal
+of machine learning research. 3 (2003), 993-1022.
+[27] huang, g. b. 2015. what are extreme learning machines?
+filling the gap between frank rosenblatt’s dream and
+john von neumann’s puzzle. cognitive computation. 7, 3
+(2015), 263-278. doi= http://dx.doi.org/10.1007/s12559015-9333-0
+[28] weston, j. support vector machine (and statistical
+learning theory). nec labs america, princeton.
+[29] chang, c. c. and lin, c. j. 2011. libsvm: a library for
+support vector machines. acm transactions on
+intelligent systems and technology (tist). 2, 3 (2011), 139. doi= http://dx.doi.org/10.1145/1961189.1961199
+[30] santra, a. k. and christy, c. j. 2012. genetic algorithm
+and confusion matrix for document clustering. ijcsi
+international journal of computer science issues. 9, 1
+(2012), 322-328.
+[31] hu, d. j. 2009. latent dirichlet allocation for text,
+images, and music.

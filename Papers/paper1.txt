@@ -1,0 +1,889 @@
+15
+
+measuring similarity of educational items using data on
+learners’ performance
+jiří řihák
+
+faculty of informatics
+masaryk university
+brno, czech republic
+
+thran@mail.muni.cz
+abstract
+educational systems typically contain a large pool of items
+(questions, problems). using data mining techniques we can
+group these items into knowledge components, detect duplicated items and outliers, and identify missing items. to
+these ends, it is useful to analyze item similarities, which can
+be used as input to clustering or visualization techniques.
+we describe and evaluate different measures of item similarity that are based only on learners’ performance data, which
+makes them widely applicable. we provide evaluation using
+both simulated data and real data from several educational
+systems. the results show that pearson correlation is a suitable similarity measure and that response times are useful
+for improving stability of similarity measures when the scope
+of available data is small.
+
+1. introduction
+interactive educational systems offer learners items (problems, questions) for solving. realistic educational systems
+typically contain a large number of such items. this is particularly true for adaptive systems, which try to present suitable items for different kinds of learners. the management
+of a large pool of items is difficult. however, educational
+systems collect data about learners’ performance and the
+data can be used to get insight into item properties. in this
+work we focus on methods for computing item similarities
+based on learners’ performance data, which consists of binary information about the answers (correct/incorrect).
+automatically detected item similarities are the first and
+necessary step in further analysis such as clustering of the
+items, which is useful in several ways, with one particular
+application being learner modeling [9]. learner models estimate knowledge and skills of learners and are the basis
+of adaptive behavior of educational systems. a learner’s
+models requires a mapping of items into knowledge components [17]. item clusters can serve as a basis for knowledge
+component definition or refinement. the specified knowledge components are relevant not only for modeling, but
+
+radek pelánek
+
+faculty of informatics
+masaryk university
+brno, czech republic
+
+pelanek@mail.muni.cz
+they are typically directly visible to
+terface of a system, e.g., in a form
+visualizing the estimated knowledge
+ized overview of mistakes, which is
+components.
+
+learners in the user inof open learner model
+state, or in a personalgrouped by knowledge
+
+information about items is also very useful for management
+of the content of educational systems – preparation of new
+items, filtering of unsuitable items, preparation of explanations, and hint messages. information about item similarities and clusters can be also relevant for teachers as it can
+provide them an inspiration for “live” discussions in class.
+this type of applications is in line with baker’s argument [1]
+for focusing on the use of learning analytics for “leveraging
+human intelligence” instead of its use for automatic intelligent methods.
+item similarities and clusters are studied not only in educational data mining but also in a closely related area of
+recommender systems. the setting of recommender systems
+is in many aspects very similar to educational systems – in
+both cases we have users and items, just instead of “performance” (the correctness of answers, the speed of answers)
+recommender systems consider “ratings” (how much a user
+likes an item). item similarities and clustering techniques
+have thus been also considered in the recommender systems
+research (we mention specific techniques below). there is a
+slight, but important difference between the two areas. in
+recommender systems item similarities and clusterings are
+typically only auxiliary techniques hidden within a “recommendation black box”. in educational system, it is useful to
+make these results explicitly available to system developers,
+curriculum production teams, or teachers.
+there are two basic approaches to dealing with item similarities and knowledge components: a “model based approach”
+and an “item similarity approach”. the basic idea of the
+model based approach is to construct a simplified model that
+explains the observed data. based on a matrix of learners’
+answers to items we construct a model that predicts these
+answers. typically, the model assigns several latent skills to
+learners and uses a mapping of items to corresponding latent
+factors. this kind of models can often be naturally expressed
+using matrix multiplication, i.e., fitting a model leads to matrix factorization. once we fit the model to data, items that
+have the same value of a latent factor can be denoted as
+“similar”. this approach leads naturally to multiple knowledge components per skill. the model is typically computed16
+
+using some optimization technique that leads only to local
+optima (e.g., gradient descent). it is thus necessary to address the role of initialization, and parameter setting of the
+search procedure. in recommender systems this approach is
+used for implementation of collaborative filtering; it is often
+called “singular value decomposition” (svd) [18]. in educational context many variants of this approach have been
+proposed under different names and terminology, e.g., qmatrix [3], non-negative matrix factorization techniques [8],
+sparse factor analysis [19], or matrix refinement [10].
+
+syntactic
+similarity
+of items
+
+learner
+data
+
+expert
+input
+
+item similarity
+matrix
+visualization
+
+clusters
+
+with the item similarity approach we do not construct an
+explicit model of learners’ behavior, but we compute directly
+a similarity measure for each pairs of items. these similarities are then used to compute clusters of items, to project
+items into a plane, or for other analysis (e.g., for each item
+listing the 3 most similar items). this approach naturally
+leads to a mapping with a single knowledge component per
+item (i.e., different kind of output from most model based
+methods). one advantage of this approach is easier interpretability. in recommender system research this approach
+is called neighborhood-based methods [11] or item-item collaborative filtering [7]. similarity has been used for clustering of items [23, 24] and also for clustering of users [29].
+in educational setting item similarity has been analyzed using correlation of learners’ answers [22] and problem solving
+times [21], and also using learners’ wrong answers [25].
+
+figure 1: high-level illustration of the general approach to item analysis based on item similarities.
+
+so far we have discussed methods that are based only on
+data about learners’ answers. often we have some additional
+information about items and their similarities, e.g., a manual labeling or data based on syntactic similarity of items
+(text of questions). for both model based and item similarity approaches previous research has studied techniques for
+combination of these different types of inputs [10, 21].
+
+in this work we focus on computing item similarities using
+learners’ performance data. as figure 1 shows, the similarity computation can also utilize information from domain
+experts or automatically determined information based on
+the inner structure of items (e.g., text of questions or some
+available meta-data).
+
+in this work we focus on the item similarity approach, because in the educational setting this approach is less explored than the model based approach. we discuss specific
+techniques, clarify details of their usage, and provide evaluation using both data from real learners and simulated data.
+simulated data are useful for evaluation of the considered
+unsupervised machine learning tasks, because in the case of
+real-world data we do not know the “ground truth”.
+the specific contributions of this work are the following. we
+provide guidelines for the choice of item similarity measures
+– we discuss different options and provide results identifying
+suitable measures (pearson, yule, cohen); we also demonstrate the usefulness of “two step similarity measures”. we
+explore benefits of the use of response time information as
+supplement to usual information of correctness of answer.
+we use and discuss several evaluation methods for the considered tasks. we specifically consider the issue of “how
+much data do we need”. this is often practically more important than the exact choice of a used technique, but the
+issue is rather neglected in previous work.
+
+2.
+
+measures of item similarity
+
+figure 1 provides a high-level illustration of the item similarity approach. this approach consist of two steps that
+are to a large degree independent. at first, we compute an
+item similarity matrix, i.e., for each pair of items i, j we
+
+compute similarity sij of these items. at second, we can
+construct clusters or visualizations of items using only the
+item similarity matrix.
+experience with clustering algorithms suggests that the appropriate choice of similarity measure is more important
+than choice of clustering algorithm [13]. the choice of similarity measure is domain specific and it is typically not explored in general research on clustering. therefore, we focus
+on the first step – the choice of similarity measure – and explore it for the case of educational data.
+
+2.1 basic setting
+
+we discuss different possibilities for computation of item
+similarities. note that in our discussion we consistently use
+“similarity measures” (higher values correspond to higher
+similarity), some related works provide formulas for dissimilarity measures (distance of items; lower values correspond
+to higher similarity). this is just a technical issue, as we can
+easily transform similarity into dissimilarity by subtraction.
+the input to item similarity computation are data about
+learner performance, i.e., a matrix l × i, where l is the
+number of learners and i is the number of items. the matrix values specify learners’ performance. the matrix is typically very sparse (many missing values). the output of the
+computation is an item similarity matrix, which specifies
+similarity for each pair of items.
+note that in our discussion we mostly ignore the issue of
+learning (change of learners skill as they progress through
+items). when learning is relatively slow and items are presented in a randomized order, learning is just a reasonably
+small source of noise and does not have a fundamental impact on the computation of item similarities. in cases where
+learning is fast or items are presented in a fixed order, it
+may be necessary to take learning explicitly into account.
+
+2.2 correctness of answers
+the basic type of information available in educational systems is the correctness of learners’ answers. so we start with17
+
+similarity measures that utilize only this type of information, i.e., dichotomous data (correct/incorrect) on learners’
+answers on items. the advantage of these measures is that
+they are applicable in wide variety of settings.
+with dichotomous data we can summarize learners’ performance on items i and j using an agreement matrix with
+just four values (table 1). although we have just four values to quantify the similarity of items i and j, previous research has identified large number of different measures for
+dichotomous data and analyzed their relations [5, 12, 20].
+for example choi et al. [5] discuss 76 different measures, albeit many of them are only slight variations on one theme.
+similarity measures over dichotomous data are often used in
+biology (co-occurrence of species) [14]. a more directly relevant application is the use of similarity measures for recommendations [30]. recommender systems typically use either
+pearson correlation or cosine similarity for computation of
+item similarities [11], but they consider richer than binary
+data.
+table 1: an agreement matrix for two items and definitions of similarity measures based on the agreement matrix (n = a + b + c + d is the total number of
+observations).
+item i
+incorrect correct
+item j
+
+incorrect
+correct
+
+a
+c
+
+b
+d
+
+cohen
+
+sy = (ad − bc)/(ad + bc)
+p
+sp = (ad − bc)/ (a + b)(a + c)(b + d)(c + d)
+
+sokal
+
+ss = (a + d)/(a + b + c + d)
+
+jaccard
+
+sj = a/(a + b + c)
+p
+so = a/ (a + b)(a + c)
+
+yule
+pearson
+
+ochiai
+
+sc = (po − pe )/(1 − pe )
+po = (a + d)/n
+pe = ((a + b)(a + c) + (b + d)(c + d))/n2
+
+table 1 provides definitions of 6 measures that we have chosen for our comparison. in accordance with previous research (e.g., [5, 14]) we call measures by names of researchers
+who proposed them. the choice of measures was done in
+such a way as to cover measures used in the most closely related work and measures which achieved good results (even
+if the previous work was in other domains). we also tried
+to cover different types of measures.
+pearson measure is the standard pearson correlation coefficient evaluated over the dichotomous data. in the context of dichotomous data it is also called phi coefficient or
+matthews correlation coefficient. yule measure is similar
+measure, which achieved good results in previous work [30].
+cohen measure is typically used as a measure of inter-rater
+agreement (it is more commonly called “cohen’s kappa”).
+in our setting it makes sense to consider this measure when
+
+we view learners’ answers as “ratings” of items. relations
+between these three measures are discussed in [32].
+ochiai coefficient is typically used in biology [14]. it is also
+equivalent to cosine similarity evaluated over dichotomous
+data; cosine similarity is often used in recommender systems for computing item similarity, albeit typically over interval data [7]. sokal measure is also called sokal-michener
+or “simple matching”. it is equivalent to accuracy measure
+used in information retrieval. together with jaccard measure they are often used in biology, but they have also been
+used for clustering of educational data [12].
+note that some similarity measures are asymmetric with respect to 0 and 1 values. these measures are typically used
+in contexts where the interpretation of binary values is presence/absence of a specific feature (or observation). in the
+educational context it is more natural to use measures which
+treat correct and incorrect answers symmetrically. nevertheless, for completeness we have included also some of the
+commonly used asymmetric measures (ochiai and jaccard).
+in these cases we focus on incorrect answers (value a as opposed to d) as these are typically less frequent and thus bear
+more information.
+
+2.3
+
+other data sources
+
+the correctness of answers is the basic source of information about item similarities, but not the only one. we
+can also use other data. the second major type of performance data is response time (time taken to answer an
+item). the basic approach to utilization of response time
+is to combine it with the correctness of an answer. given
+the correctness value c ∈ {0, 1}, a response time t ∈ r+ ,
+and the median of all response times τ , we combine them
+into a single score r. examples of such transformations
+are: linear transformation for correct answers only (r =
+c · max(1 − t/2τ, 0)); exponential discounting used in matmat [28] (r = c · min(1, 0.9t/τ −1 )); linear transformation
+inspired by high speed, high stakes scoring rule used in math
+garden [16] (r = (2c − 1) · max(1 − t/2τ, 0)). the first
+approach was used in our experiment due to its simplicity
+and high influence of response time information.
+the scores obtained in this way are real numbers. given the
+scores it is natural to compute similarity of two items using
+pearson correlation coefficient of scores (over learners who
+answered both items). it is also possible to utilize specific
+wrong answers for computation of item similarity [25].
+it is also possible to combine performance based measures
+with other types of data. for example we may estimate
+item similarity based on analysis of the content of items
+(syntactical similarity of texts), or collect expert opinion
+(manual categorization of items into several groups). the
+advantage of the similarity approach (compared to model
+based approach) is that different similarity measures can be
+usually combined in straightforward way by using a weighted
+average of different measures.
+
+2.4 second level of item similarity
+the basic computation of item similarities computes similarity of items i and j using only data about these two items.
+to improve a similarity measure, it is possible to employ a18
+
+“second of level of item similarity” that is based on the computed item similarity matrix and uses information on all
+items. examples of such a second step is euclidean distance
+or correlation. similarity of items i and j is given by the
+euclidean distance or pearson correlation of rows i and j
+in the similarity matrix. note that euclidean distance may
+be used implicitly when we use standard implementation of
+some clustering algorithms (e.g., k-means).
+with the basic approach to item similarity, we consider
+items similar when performance of learners on these items is
+similar. with the second step of item similarity, we consider
+two items similar when they behave similarly with respect
+to other items. the main reason for using this second step
+is the reduction of noise in data by using more information. this may be useful particularly to deal with learning.
+two very similar items may have rather low direct similarity, because getting a feedback on the first item can strongly
+influence the performance on the second item. however, we
+expect both items to have similar similarities to other items.
+a more technical reason to using the second step (particularly the euclidean distance) is to obtain a measure that
+is a distance metric. the measures described above mostly
+do not satisfy triangle inequality and thus do not satisfy
+the requirements on distance metric; this property may be
+important for some clustering algorithms.
+
+3. evaluation
+in this work we focus on item similarity, but we keep the
+overall context depicted in figure 1 in mind. the quality of
+a visualization is to a certain degree subjective and difficult
+to quantify, but the quality of clusters can be quantified and
+thus we can use it to compare similarity measures. from
+the large pool of existing clustering algorithms [15] we consider k-means, which is the most common implementation
+of centroid-based clustering, and hierarchical clustering. we
+used agglomerative or “bottom up” approach where items
+are successively merged to clusters using ward’s method as
+linkage criteria.
+
+3.1
+
+data
+
+we use data from real educational systems as well as simulated learner data. real-world data provide information
+about the realistic performance of techniques, but the evaluation is complicated by the fact that we do not know the
+“ground truth” (the “correct” similarity or clusters of items).
+simulated data provide a setting that is in many aspects
+simplified but allows easier evaluation thanks to the access
+to the ground truth.
+for generating simulated data we use a simple approach
+with minimal number of assumptions and ad hoc parameters. each item belongs to one of k knowledge components. each knowledge component contains n items. each
+item has a difficulty generated from the standard normal
+distribution di ∼ n (0, 1). skills of learners with respect to
+individual knowledge components are independent. skill of
+a learner l with respect to knowledge component j is generated from the standard normal distribution θlj ∼ n (0, 1).
+we assume no learning (constant skills). answers are generated as bernoulli trials with the probability of a correct
+answer given by the logistic function of the difference of a
+
+table 2: data used for analysis.
+learners items
+answers
+czech 1 (adjectives)
+czech 2
+matmat: numbers
+matmat: addition
+math garden: addition
+math garden: multiplic.
+
+1 134
+4 567
+6 434
+3 580
+83 297
+97 842
+
+108
+210
+60
+135
+30
+30
+
+62 613
+336 382
+67 753
+20 337
+881 994
+1 233 024
+
+relevant skill and an item difficulty (a rasch model): p =
+exp(θlj − di )−1 . this approach is rather standard, for example piech at al. [26] use very similar procedure and also
+other works use closely related procedures [4, 12]. in the
+experiment reported below the basic setting is 100 learners,
+5 knowledge components with 20 items each.
+to evaluate techniques on realistic educational data, we use
+data from three educational systems. table 2 describes the
+size of the used data sets.
+umı́me česky (umimecesky.cz) is a system for practice of
+czech spelling and grammar. we use data only from one exercise from the system – simple “fill-in-the-blank” questions
+with two options. we use only data on the correctness of
+answers (response time is available, but since it depends on
+the text of a particular item its utilization is difficult). we
+focus particularly on one subset of items: questions about
+the choice between i/y in suffixes of czech adjectives. for
+this subset we have manually determined 7 groups of items
+corresponding to czech grammar rules.
+matmat (matmat.cz) is a system for practice of basic arithmetic (e.g., counting, addition, multiplication). for each
+item we know the underlying construct (e.g., “13” or “7 +
+8”) and also the specific form of questions (e.g., what type of
+visualization has been used). we use data on both correctness and response time. we selected the two largest subsets:
+multiplication and numbers (practice of number sens, counting).
+math garden is another system for practice of basic arithmetic [16]. this system is more widely used than matmat,
+but we do not have direct access to the system and detailed
+data. for the analysis we reuse publicly available data from
+previous research [6]. the available data contain both correctness of answers and response times, but they contain
+information only about 30 items without any identification
+of these items.
+
+3.2 comparison of similarity measures
+to evaluate similarity measures we consider several types
+of analysis. with simulated data, we analyze the similarity
+measures with respect to the ground truth while for realworld data we evaluate correlations among similarity measures. we also compare the quality of subsequent clusterings using adjusted rand index (ari) [27, 31], which measures the agreement of two clusterings (with a correction for
+agreement due to chance). typically, we use the adjusted
+rand index to compare the clustering with a ground truth
+(available for simulated data) or with a manually provided19
+
+pearson
+
+pearson → pearson
+
+within-cluster
+
+within-cluster
+
+between-cluster
+
+between-cluster
+
+yule
+
+czech 1 (adjectives)
+
+matmat: numbers
+
+yule → pearson
+
+within-cluster
+
+within-cluster
+
+between-cluster
+
+between-cluster
+
+jaccard
+
+sokal
+
+within-cluster
+
+within-cluster
+
+between-cluster
+
+between-cluster
+
+figure 3: correlations of similarity measures.
+
+figure 2: differences between similarity values
+inside knowledge components and between them.
+simulated data set with the basic setting were used.
+
+classification (available for the czech 1 data set). it can be
+also used to compare two detected clusterings (clusterings
+based on two different algorithms or clusterings based on
+two independent halves of data).
+as a first step in the evaluation of similarity measures, we
+consider experiments with simulated data where we can utilize the ground truth. in clustering we expect high withincluster similarity values and low between-cluster similarity
+values. figure 2 shows distribution of the similarity values
+for selected measures and suggest which measures separate
+within-cluster and between-cluster values better and therefore which measures will be more useful in clustering. the
+results show that for jaccard and sokal measures the values overlap to a large degree, whereas pearson and yule
+measures provide better results. adding the second step –
+pearson correlation in this example – to the similarity measure separates within-cluster and between-cluster values better. that suggests that extending similarities in this way is
+not only necessary step for some subsequent algorithms such
+as k-means but also a useful technique with better performance.
+for data coming from real systems we do not know the
+ground truth and thus we can only compare the similarity measures to each other. to evaluate how similar two
+measures are we take all similarity values for all item pairs
+and computed correlation coefficient. figure 3 shows results
+for two data sets which are good representatives of overall results. pearson and cohen measures are highly correlated (> 0.98) across all data sets and have nearly the same
+values (although not exactly the same). larger differences
+(but only up to 0.1) can be found typically when one of the
+values in the agreement matrix is small and that happens
+only for poorly correlated items with the resulting similarity value around 0. the second pair of highly correlated
+measures is ochiai and jaccard, which are both asymmetric
+with respect to the agreement matrix. the correlation between these two pairs of measures vary depending on data
+set and in some cases drops up to 0.5. because of this high
+correlation within these pairs we further report results only
+
+for pearson and jaccard measures. yule measure is usually
+similar to pearson measure (correlation usually around 0.9).
+the main difference is that the yule measure spreads values
+more evenly across the interval [-1, 1]. sokal is the most
+outlying measure with no correlation or small correlation
+(usually < 0.6) with all other measures.
+figure 4 shows the effect of the second levels of item similarity on the pearson measure (results for other measures
+are analogical). the euclid distance as second level similarity brings larger differences (lower correlation) than pearson
+correlation. the correlations for large data sets such as math
+garden are usually high (> 0.9) and conversely the lowest
+correlations are found in results for small data sets. this
+suggests that the second level of similarity is more significant, and thus potentially more useful, where only limited
+amount of data is available.
+czech 1 (adjectives)
+
+czech 2
+
+matmat: numbers
+
+6
+matmat: addition
+
+math garden: addition
+
+math garden: multiplic.
+
+figure 4: correlations of pearson measure and pearson with different second levels.
+finally, we evaluate the quality of the similarity measures
+according to the performance of the subsequent clustering.
+from the two considered clustering methods we used the hierarchical clustering in this comparison because it naturally
+works with similarity measure and does not require metric
+space. the other two methods have similar result with same
+conclusions. table 3 and figure 5 show results. although
+the results are dependent on the specific data set and the
+used clustering algorithm, there is quite clear general conclusion. pearson and yule measures provide better results20
+
+1223
+
+correlation
+
+882
+
+data set
+czech 1 (adjectives)
+czech 2
+matmat: numbers
+matmat: addition
+math garden: addition
+math garden: multiplic.
+
+336
+63
+68
+
+20
+
+sample size
+
+figure 6: stability of similarity measure (yule) for
+real-world data sets. data set was sampled, split
+to halves and pearson correlation was computed for
+similarity values. numbers on the right side indicate
+thousands of answers in data sets.
+
+figure 5: the quality of clustering for different measures used in the second step of item similarity. top:
+simulated data with 5 correlated skills. bottom:
+czech grammar with 7 manually determined clusters.
+than jaccard and sokal, i.e., for the considered task the
+later two measures are not suitable. the pearson is usually
+slightly better than yule but the choice between them seems
+not to be fundamental (which is not surprising given that
+they are highly correlated). the results also show that the
+“second step” is always useful. the result for simulated data
+favor euclidean distance over pearson but there are almost
+no differences for real-world data.
+
+3.3
+
+do we have enough data?
+
+in machine learning the amount of available data often is
+more important than the choice of a specific algorithm [2].
+our results suggest that once we choose a suitable type of
+similarity measure (e.g., pearson, cohen, or yule), the differences between these measures are not fundamental, the
+more important issue becomes the size of available data.
+specifically, for a given data set we want to know whether
+the data are sufficiently large so that the computed item
+similarities are meaningful and stable. this issue can be explored by analyzing confidence intervals for computed similarity values. as a simple approach to analysis of similarity stability we propose the following approach: we split
+the available data into two independent halves (in a learner
+stratified manner), for each half we compute the item similarities, and we compute the correlation of the resulting item
+similarities.
+
+we can also perform this computation for artificially reduced
+data sets – this shows how the stability of results increases
+with the size of data. figure 6 shows this kind of analysis
+for our data (real-world data sets). we clearly see large differences among individual data sets. math garden data set
+contains large number of answers and only a few items, the
+results show excellent stability, clearly in this case we have
+enough data to analyze item similarities. for the czech
+grammar data set we have large number of answers, but
+these are divided among relatively large number of items.
+the results show a reasonably good stability, the data are
+usable for analysis, but clearly more data can bring improvement. for matmat data the stability is poor, to draw solid
+conclusions about item similarities we need more data.
+
+3.4 response time utilization
+the incorporation of response time information to similarity measure can change the meaning of similarity. figure 7
+gives such example and shows projection of items from matmat practicing number sense. similar items according to
+measures using only correctness of answers tend to be items
+with the same graphical representation in the system. on
+the other hand, similar items according to measures using
+also response time are usually items practicing close numbers.
+we used this method also on data sets from math garden,
+which are much larger. in this case the use of response
+times has only small impact on the computed item similarities (correlations between 0.9 and 0.95). however, the use of
+response times influences how quickly does the computation
+converge, i.e., how much data do we need. to explore this
+we consider as the ground truth the average of computed
+similarity matrices with and without response times for the
+whole data set. then we used smaller samples of the data
+set, used them to compute item similarities and checked the
+agreement with this ground truth. figure 8 shows the difference between speed of convergence of measure with and
+without response time utilization. results shows that the
+measure which use addition information from response time
+converges to ground truth much faster. this result suggests
+that the use of response time can improve clustering or visualizations when only small number of answers are available.21
+
+table 3: comparison of similarity measures for one real-world data (with sampled students) set and simulated
+data sets with c knowledge components and l learners. the values provide the adjusted rand index (with
+0.95 confidence interval) for a hierarchical clustering computed based on the specific similarity measure. the
+top result for every data set is highlighted.
+czech 1 (c=7)
+
+l = 50, c = 5
+
+l = 100, c = 5
+
+l = 200, c = 5
+
+l = 100, c = 2
+
+l = 100, c = 10
+
+0.32 ± 0.02
+0.31 ± 0.03
+0.31 ± 0.03
+0.15 ± 0.06
+0.43 ± 0.01
+0.32 ± 0.02
+0.41 ± 0.03
+0.32 ± 0.03
+
+0.26 ± 0.04
+0.06 ± 0.03
+0.19 ± 0.04
+0.11 ± 0.02
+0.45 ± 0.05
+0.36 ± 0.05
+0.39 ± 0.05
+0.38 ± 0.05
+
+0.48 ± 0.05
+0.15 ± 0.04
+0.43 ± 0.05
+0.18 ± 0.03
+0.80 ± 0.06
+0.65 ± 0.07
+0.73 ± 0.06
+0.72 ± 0.06
+
+0.84 ± 0.05
+0.29 ± 0.08
+0.77 ± 0.07
+0.25 ± 0.05
+0.98 ± 0.01
+0.94 ± 0.04
+0.96 ± 0.02
+0.97 ± 0.02
+
+0.77 ± 0.12
+0.32 ± 0.18
+0.60 ± 0.15
+0.12 ± 0.11
+0.95 ± 0.03
+0.89 ± 0.11
+0.92 ± 0.03
+0.94 ± 0.04
+
+0.34 ± 0.04
+0.09 ± 0.02
+0.31 ± 0.03
+0.14 ± 0.02
+0.67 ± 0.04
+0.43 ± 0.03
+0.55 ± 0.04
+0.55 ± 0.05
+
+correlation with ground truth
+
+pearson
+jaccard
+yule
+sokal
+pearson → euclid
+yule → euclid
+pearson → pearson
+yule → pearson
+
+without
+response times
+with
+
+sample size
+
+figure 7: projection of items practicing number
+sense from matmat system. left: measure based
+only correctness. right: measure using response
+time. opacity corresponds to the number value of
+the item and color corresponds to the graphical representation of the task.
+
+4. discussion
+our focus is the automatic computation of item similarities
+based on learners’ performance data. these similarities can
+be then used in further analysis of an item relations such as
+an item clustering or a visualization. this outlines direction
+for future work in which methods using the item similarities
+should be studied in more detail. compared to alternative
+approaches that have been proposed for the task (e.g., matrix factorizations, neural networks), the item similarity approach is rather straightforward, easy to realize, and it can
+be easily combined with other sources of information about
+items (text of items, expert opinion). for these reasons the
+item similarity approach should be used at least as a baseline
+in proposals for more complex methods like deep knowledge
+tracing [26].
+the most difficult step in this approach is the choice of a
+similarity measure. once we make a specific choice, the realization of the approach is easy. our results provide some
+guidelines for this choice. pearson, yule, and cohen measures lead to significantly better results than ochiai, sokal,
+and jaccard measures. it is also beneficial to use the second
+step of item similarity (e.g., the euclidean distance over vec-
+
+figure 8: the speed of convergence to ground truth
+for measures with and without response time on
+math garden addition data set.
+
+tors of item similarities). the exact choice of details does not
+seem to make fundamental difference (e.g., pearson versus
+yule in the first step, the euclidean distance versus pearson correlation in the second step). the pearson correlation coefficient is a good “default choice”, since it provides
+quite robust results and is applicable in several settings and
+steps. it also has the pragmatic advantage of having fast,
+readily available implementation in nearly all computational
+environments, whereas measures like yule may require additional implementation effort.
+the amount of data available is the critical factor for the success of automatic analysis of item relations. a key question
+for practical applications is thus: “do we have enough data
+to use automated techniques?” in this work we used several
+specific methods for analysis of this question, but the issue
+requires more attention – not just for the item similarity
+approach, but also for other methods proposed in previous
+work. for example previous work on deep knowledge tracing [26], which studies closely related issues, states only that
+deep neural networks require large data without providing
+any specific quantification what ‘large’ means. the necesssary quantity of data is, of course, connected to the quality
+of data – some data sources are more noisy than other, e.g.,
+answers from voluntary practice contain more noise than answers from high-stakes testing. an important direction for
+future work is thus to compare model based and item simi-22
+
+larity approaches while taking into account the ‘amount and
+quality of data available’ issue.
+
+5.
+
+references
+
+[1] r. s. baker. stupid tutoring systems, intelligent
+humans. international journal of artificial
+intelligence in education, 26(2):600–614, 2016.
+[2] m. banko and e. brill. scaling to very very large
+corpora for natural language disambiguation. in proc.
+of association for computational linguistics, pages
+26–33, 2001.
+[3] t. barnes. the q-matrix method: mining student
+response data for knowledge. in educational data
+mining workshop, 2005.
+[4] w.-h. chen and d. thissen. local dependence
+indexes for item pairs using item response theory.
+journal of educational and behavioral statistics,
+22(3):265–289, 1997.
+[5] s.-s. choi, s.-h. cha, and c. c. tappert. a survey of
+binary similarity and distance measures. journal of
+systemics, cybernetics and informatics, 8(1):43–48,
+2010.
+[6] f. coomans, a. hofman, m. brinkhuis, h. l. van der
+maas, and g. maris. distinguishing fast and slow
+processes in accuracy-response time data. plos one,
+11(5):e0155149, 2016.
+[7] m. deshpande and g. karypis. item-based top-n
+recommendation algorithms. acm transactions on
+information systems (tois), 22(1):143–177, 2004.
+[8] m. c. desmarais. mapping question items to skills
+with non-negative matrix factorization. acm
+sigkdd explorations newsletter, 13(2):30–36, 2012.
+[9] m. c. desmarais and r. s. baker. a review of recent
+advances in learner and skill modeling in intelligent
+learning environments. user modeling and
+user-adapted interaction, 22(1-2):9–38, 2012.
+[10] m. c. desmarais, b. beheshti, and p. xu. the
+refinement of a q-matrix: assessing methods to
+validate tasks to skills mapping. in proc. of
+educational data mining, pages 308–311, 2014.
+[11] c. desrosiers and g. karypis. a comprehensive survey
+of neighborhood-based recommendation methods. in
+recommender systems handbook, pages 107–144.
+springer, 2011.
+[12] h. finch. comparison of distance measures in cluster
+analysis with dichotomous data. journal of data
+science, 3(1):85–100, 2005.
+[13] j. friedman, t. hastie, and r. tibshirani. the
+elements of statistical learning, volume 1. springer
+series in statistics springer, berlin, 2001.
+[14] d. a. jackson, k. m. somers, and h. h. harvey.
+similarity coefficients: measures of co-occurrence and
+association or simply measures of occurrence?
+american naturalist, pages 436–453, 1989.
+[15] a. k. jain. data clustering: 50 years beyond k-means.
+pattern recognition letters, 31(8):651–666, 2010.
+[16] s. klinkenberg, m. straatemeier, and h. van der
+maas. computer adaptive practice of maths ability
+using a new item response model for on the fly ability
+and difficulty estimation. computers & education,
+57(2):1813–1824, 2011.
+
+[17] k. r. koedinger, a. t. corbett, and c. perfetti. the
+knowledge-learning-instruction framework: bridging
+the science-practice chasm to enhance robust student
+learning. cognitive science, 36(5):757–798, 2012.
+[18] y. koren and r. bell. advances in collaborative
+filtering. recommender systems handbook, pages
+145–186, 2011.
+[19] a. s. lan, a. e. waters, c. studer, and r. g.
+baraniuk. sparse factor analysis for learning and
+content analytics. journal of machine learning
+research, 15(1):1959–2008, 2014.
+[20] s.-f. m. liang and l.-w. tzeng. assessing suitability
+of similarity coefficients in measuring human mental
+models. in network of ergonomics societies
+conference, pages 1–5. ieee, 2012.
+[21] j. nižnan, r. pelánek, and j. řihák. using problem
+solving times and expert opinion to detect skills. in
+proc. of educational data mining, pages 434–434,
+2014.
+[22] j. nižnan, r. pelánek, and j. řihák. student models
+for prior knowledge estimation. in proc. of
+educational data mining, pages 109–116, 2015.
+[23] m. o’connor and j. herlocker. clustering items for
+collaborative filtering. in proc. of the acm sigir
+workshop on recommender systems, volume 128. uc
+berkeley, 1999.
+[24] y.-j. park and a. tuzhilin. the long tail of
+recommender systems and how to leverage it. in proc.
+of recommender systems, pages 11–18. acm, 2008.
+[25] r. pelánek and j. řihák. properties and applications
+of wrong answers in online educational systems. in
+proc. of educational data mining, 2016.
+[26] c. piech, j. bassen, j. huang, s. ganguli, m. sahami,
+l. j. guibas, and j. sohl-dickstein. deep knowledge
+tracing. in advances in neural information processing
+systems, pages 505–513, 2015.
+[27] w. m. rand. objective criteria for the evaluation of
+clustering methods. journal of the american
+statistical association, 66(336):846–850, 1971.
+[28] j. rihák. use of time information in models behind
+adaptive system for building fluency in mathematics.
+in proc. of educational data mining, 2015.
+[29] b. m. sarwar, g. karypis, j. konstan, and j. riedl.
+recommender systems for large-scale e-commerce:
+scalable neighborhood formation using clustering. in
+proc. of computer and information technology,
+volume 1, 2002.
+[30] e. şenyürek and h. polat. effects of binary similarity
+measures on top-n recommendations. anadolu
+university journal of science and technology – a
+applied sciences and engineering, 14(1):55–65, 2013.
+[31] n. x. vinh, j. epps, and j. bailey. information
+theoretic measures for clusterings comparison: is a
+correction for chance necessary? in proc. of machine
+learning, pages 1073–1080. acm, 2009.
+[32] m. j. warrens. on association coefficients for 2× 2
+tables and properties that do not depend on the
+marginal distributions. psychometrika, 73(4):777–789,
+2008.

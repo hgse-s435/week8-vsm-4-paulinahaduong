@@ -1,0 +1,795 @@
+31
+
+analysis of problem-solving behavior in open-ended
+scientific-discovery game challenges
+aaron bauer
+
+awb@cs.washington.edu
+
+jeff flatten
+
+jflat06@cs.washington.edu
+
+zoran popović
+
+zoran@cs.washington.edu
+
+center for game science, computer science and engineering
+university of washington
+seattle, wa 98195, usa
+
+abstract
+
+problem-solving skills in creative, open-ended domains are both
+important and little understood. these domains are generally illstructured, have extremely large exploration spaces, and require
+high levels of specialized skill in order to produce quality solutions.
+we investigate problem-solving behavior in one such domain, the
+scientific-discovery game foldit. our goal is to discover differentiating patterns and understand what distinguishes high and low levels
+of problem-solving skill. to address the challenges posed by the
+scale, complexity, and ill-structuredness of foldit solver behavior
+data, we devise an iterative visualization-based methodology and use
+this methodology to design a concise, meaning-rich visualization of
+the problem-solving process in foldit. we use this visualization to
+identify key patterns in problem-solving approaches, and report how
+these patterns distinguish high-performing solvers in this domain.
+
+keywords
+
+problem solving; scientific-discovery games; visualization
+
+1.
+
+introduction
+
+as efforts in scalable online education expand, interest continues
+to increase in moving beyond small, highly constrained tasks, such
+as multiple choice or short answer questions, and incorporating
+creative, open-ended activities [7, 14]. existing research supports
+this move, showing that problem-based learning can enhance students’ problem-solving and metacognitive skills [11]. scaling such
+activities poses significant challenges, however, in terms of both assessment and feedback. it will be vital to devise scalable techniques
+not only to assess students’ final products, but also to understand
+their progress through complex and heterogeneous problem-solving
+spaces. these techniques will apply to a broad range of education
+settings, from purely online programs like udacity’s nanodegrees
+to more traditional settings where new standards like the common
+core emphasize strategic problem solving.
+a growing body of work has found that educational and serious
+games are fertile ground for assessing students’ capabilities and
+problem-solving skills [6, 10]. our work continues this general
+line of inquiry by examining creative, problem-solving behavior
+among players in the scientific-discovery game foldit. by modeling
+the functions of proteins, the workhorses of living cells, foldit
+challenges players, hereafter referred to as solvers, to resolve the
+shape of proteins as a 3d puzzle. these puzzles are completely
+open and often under-specified, making it a highly suitable setting
+in which to gain insight into student progress through complex
+solution spaces. in the foldit scientific-discovery community, the
+focus is on developing people from novices to experts that are
+eventually capable of solving protein structure problems that are
+
+currently unsolved by the scientific community. in fact, solutions
+produced in foldit have led to three results published in nature [3,
+5, 16]. foldit is an attractive learning space domain because its
+solvers are capable of contributing to state-of-the-art biochemistry
+results, and the vast majority of best performing solvers had no
+exposure to biochemistry prior to joining foldit community. hence,
+solver behavior in foldit represents development of highly effective
+problem-solving in an open-ended domain over long time horizons.
+in this work, we identify six strategic patterns employed by foldit
+solvers and show how these patterns differentiate between successful
+and less successful solvers. these patterns cover instances where
+solvers investigate multiple hypotheses, explore more greedily or
+more inquisitively, try to escape local optima, and make structured
+use of the manual or automated tools available in foldit.
+the aspects of the foldit environment that make it an attractive
+setting in which to study problem solving also present significant
+challenges. problems in foldit share many of the properties jonassen
+attributes to design problems, which they describe as “among the
+most complex and ill-structured kinds of problems that are encountered in practice” [13]. these properties include a vague goal with
+few constraints (in foldit, the goal is often entirely open-ended:
+find a good configuration of the protein), answers that are neither
+right or wrong, only better or worse, and limited feedback (in foldit,
+real-time feedback and solution evaluation are limited to a single
+numerical score corresponding to the protein’s current energy state,
+and solvers frequently must progress through many low-scoring
+states to reach a good configuration; more nuanced feedback from
+biochemists is sometimes available, but on a timescale of weeks).
+the ill-structured nature of problems posed in foldit necessarily
+deprives us of the structures, such as clear goal states and straightforward relationships between intermediate states and goal states,
+that typically form the basis of existing detailed and quantitative
+analyses of problem-solving behavior.
+the size and complexity of foldit’s problem space presents another
+major challenge. even though the logs of solver interactions consist
+only of regular snapshots of a solver’s current solution (along with
+attendant metadata), the record of a single solver’s performance on
+a given problem frequently consists of thousands of such snapshots
+(which in turn are just a sparse sampling of the actual solving process). furthermore, the nature of the solution state, the configuration
+of hundreds of components in continuous three-dimensional space,
+renders collapsing the state space by directly comparing solution
+states impractical. compounding the size of the problem space is
+the complexity of the actions available to foldit solvers. in addition
+to manual manipulation of the protein configuration, solvers can
+invoke various low-level automated optimization routines (some32
+
+of which run until the solver terminates them) and place different
+kinds of constraints on the protein configuration (rubber bands in
+foldit parlance) that restrict its modification in a variety of ways.
+solvers can also deploy many of these tools programmatically via
+lua scripts called recipes. taken together these challenges of illstructuredness, size, and complexity threaten to make analysis of
+high-level problem-solving behavior in foldit intractable.
+to overcome these obstacles, we devise a visualization-based methodology capable of producing tractable representations of foldit solvers’
+problem-solving behavior while maintaining the key encodings necessary for analysis of high-level strategic behavior. a process of
+iterative summarization forms the core of this methodology, and
+ensures that the transformations applied to the raw data do not
+elide structures potentially relevant to understanding solvers’ unique
+strategic behavior. using this methodology, we examine solver activity logs from 11 foldit puzzles, representing 970 distinct solvers and
+nearly 3 million solution snapshots. leveraging metadata present
+in the solution snapshots, we represent solving behavior as a tree,
+and apply our methodology to visualize a summarized tree showing
+where they branched off to investigate multiple hypotheses, how
+they employed some of the automated tools available to them, and
+other salient problem-solving behavior. we use these depictions to
+determine key distinguishing features of this exploration process.
+we subsequently use these features to better understand the patterns
+of expert-level problem solving.
+our work focuses on the following research questions: (1) how
+can we visually represent an open-ended exploration towards a
+high-quality solution in a large, ill-structured problem space? (2)
+what are the key patterns of problem-solving behavior exhibited
+by individuals?, and (3) what are the key differences along these
+patterns between high-performing and lower-performing solvers in
+an open-ended domain like foldit? in addressing these questions we
+find that high-performing solvers explore the solution space more
+broadly. in particular, they pursue more hypotheses and actively
+avoid getting stuck in local minima. we also found that both highand lower-performing solvers have similar proportion of manual and
+automated tool actions, indicating that better performance on openended challenges stems from the quality of the action intermixing
+rather than aggregate quantity.
+
+2.
+
+related work
+
+while automated grading has mostly been explored for well-specified
+tasks where the correct answer has a straightforward and concise
+description, some previous work has developed techniques for more
+complex activities. some achieve scalability through a crowdsourcing framework such as udacity’s system for hiring external
+experts as project reviewers [14]. other work has demonstrated
+automated approaches that leverage machine learning to enable scalable grading of more complex assignments. for example, geigle et
+al. describe an application of online active learning to minimize the
+training set a human grader must produce [7] when automatically
+grading an assignment where students must analyze medical cases.
+our work does not focus on grading problem-solving behavior, but
+instead approaches the issue of scalability at a more fundamental
+level: understanding fine-grained problem-solving strategies and
+how they contribute to success in an open-ended domain.
+a robust body of prior work has addressed the challenge of both
+visualizing and gleaning insight from player activity in educational
+and serious games. andersen et al. developed playtracer, a general method for visualizing players’ progress through a game’s
+
+state space when a spatial relationship between the player and the
+virtual environment is not available [1]. wallner and kriglstein provide a thorough review of visualization-based analysis of gameplay
+data [21]. prior work has analyzed gameplay data without visualization as well. falakmasir et al. propose a data analysis pipeline
+for modeling player behavior in educational games. this system
+can produce a simple, interpretable model of in-game actions that
+can predict learning outcomes [6]. our work differs in its aims from
+this prior work. we do not seek to develop a general visualization
+technique, but instead to design and leverage a domain-specific
+visualization to analyze problem-solving behavior. we are also
+not predicting player behavior, nor modeling players in terms of
+low-level actions, but rather identifying higher-level strategy use.
+the work most similar to ours is that which focuses on problemsolving behavior, including both the long-running efforts in educational psychology to develop general theories and more recent
+work data-driven on understanding the problem-solving process.
+our formulation of solving behavior in foldit as a search through
+a problem space follows from classic information-processing theories of problem solving (e.g., [9, 19]). gick reviews research on
+both problem-solving strategies and the differences in strategy use
+between experts and novices [8]. our work complements the existing literature by focusing on understanding problem solving in
+the little-studied domain of scientific-discovery games, and on the
+ill-structured problems present in foldit. our findings on the differences in strategy use between high- and lower-performing solvers in
+foldit are consistent with the consensus in the literature that expert’s
+knowledge allows them to effectively use strategies that are poorly
+or infrequently used by less-skilled solvers. we also contribute a
+granular understanding of the specific strategies and differences at
+work in the foldit domain.
+significant recent work has investigated problem-solving behavior
+in educational games and intelligent tutoring systems using a variety
+of techniques. tóth et al. used clustering to characterize problemsolving behavior on tasks related to understanding a system of linear
+structural equations. the clusters distinguished between students
+that used a vary-one-thing-at-a-time strategy (both more and less
+efficiently) and those that used other strategies [20]. through a
+combination of automated detectors, path analysis, and classroom
+studies, rowe et al. investigated the relationship between a set
+of six strategic moves in a newtonian physics simulation game
+and performance on pre- and post-assessments. they found that
+the use of some moves mediated the relationship between prior
+achievement and post scores [18]. eagle et al. discuss several applications of using interaction networks to visualize and categorize
+problem-solving behavior in education games and intelligent tutoring systems. these networks offer insight for hint generation
+and a flexible method for visualizing student work in rule-using
+problem solving environments [4] . using decision trees to build
+separate models for optimal and non-optimal student performance,
+malkiewich et al. gained insight into how learning environments
+can encourage elegant problem solving [17]. our primary contribution is to extend analysis of problem-solving behavior to a more
+complex and open-ended domain that those studied in similar previous work. the size and complexity of foldit’s problem space,
+the volume of data necessary to capture exploration in this space,
+and the ill-structured nature of the foldit problems all pose unique
+challenges. we devise a visualization-based methodology focused
+on iterative summarization, and successfully apply it to identify key
+problem-solving patterns exhibited by foldit solvers.33
+
+3.
+
+foldit
+
+foldit is a scientific-discovery game that crowdsources protein folding. it presents solvers with a 3d representation of a protein and
+tasks them with manipulating it into the lowest energy configuration. each protein posed to the solvers is called a puzzle. solvers’
+solutions to each puzzle are scored according to their energy configuration, and solvers compete to produce the highest scoring results.
+
+figure 1: the foldit interface. foldit solvers use a variety of
+tools to interactively reshape proteins. in this figure, a solver
+uses rubber bands to pull together two sheets, long flat regions
+of the protein.
+solvers have many tools at their disposal when solving foldit puzzles. they can manipulate and constrain the structure in various
+ways, employ low-level automated optimization (e.g., a wiggle tool
+makes small, rapid, local adjustments to try and improve the score),
+and trigger solver-created automated scripts called recipes that can
+programmatically use the other tools. there is, however, a subset of
+the basic actions that cannot be used by recipes. we will call these
+manual-only actions. previous work analyzing solver behavior in
+foldit has focused primarily on recipe use and dissemination [2] and
+recipe authoring [15].
+foldit has several different types of puzzles for solvers to solve. in
+this work, we focus on the most common type of puzzle, prediction
+puzzles. these are puzzles in which biochemists know the amino
+acids that compose the protein in question, but do not know how
+the particular protein folds up in 3d space. this is in contrast to
+design puzzles in which solvers insert and delete which amino acids
+compose the protein to satisfy a variety of scientific goals, including
+designing new materials and targeting problematic molecules in
+diseases. we focus on prediction puzzles in this work to simplify
+our analysis by having a consistent objective (i.e., maximize score)
+across the problem-solving behavior we analyze.
+
+4.
+
+methodology
+
+prior work has demonstrated the power of visualization to support
+understanding of problem-solving behavior (e.g., [12]). hence, we
+devise a methodology capable of producing concise, meaning-rich
+visualizations of the problem-solving process in foldit, and then
+leverage these visualizations to identify key patterns of solver behavior. we are specifically interested in how solvers navigate from
+a puzzle’s start state to a high-quality solution, what states they
+pass through in between, and what other avenues they explored.
+
+since solving a foldit puzzle can be represented as a directed search
+through a problem space, the clear encoding of parent-child relationships between nodes offered by a tree make it well-suited for
+visualizing these aspects of the solving process.
+the scale of the foldit data necessitates significant transformation
+of the raw data in order to render concise visualizations. without
+any transformation, meaningful patterns are overwhelmed by sparse,
+repetitive data and would be far more challenging to identify. while
+there are many existing techniques for large-scale tree visualization,
+we find clear benefits to developing a visualization tailored to the
+foldit domain. specifically, preserving the semantics of our visual
+encoding is crucial for allowing us to connect patterns in the visualization to concrete strategic behavior in foldit. to accomplish this,
+the process by which concise visualization are constructed must
+be carefully designed to maintain these links. hence, we devise a
+design methodology focused on iterative summarization.
+this process begins by visualizing the raw data. this is followed
+by iteratively building and refining a set of transformations to summarize the raw data while preserving meaning. the design of these
+transformations should be guided by frequently occurring structures.
+that is, those structures that the transformations can condense without eliding structures corresponding to unique strategic behavior.
+in parallel to this iterative design, a set of visual encodings are developed to represent the solving process as richly as possible. key
+to this entire process is frequent consultation with domain experts,
+in our case experts on foldit and its community. by applying this
+iterative methodology for several cycles, we designed a domainspecific visualization that we use to identify patterns of strategic
+behavior among foldit solvers. we follow up on these patterns with
+computational investigation, and quantify their application by highand lower-performing solvers.
+
+4.1
+
+data
+
+for our analysis, we selected 11 prediction puzzles spanning the
+range of time for which the necessary data is available. though
+foldit has been in continuous use since 2010, the data necessary to
+track a solver’s progress through the problem space has only been
+collected since mid-2015. our chosen dataset represents 970 unique
+solvers and nearly 3 million solution snapshots. these 11 puzzles are
+just a small subset of the available foldit data. we chose a subset of
+similar puzzles (i.e., a subtype of relatively less complex prediction
+puzzles) in order to make common solving-behavior patterns easier
+to identify. the size of the subset was also guided by practical
+constraints, as each puzzle constitutes a large amount of data (20-60
+gb for the data from all players on a single puzzle).
+the data logged by foldit primarily consists of snapshots of solver
+solutions as they play, stored as text files using the protein data
+bank (pdb) format. these snapshots include the current protein
+pose, a timestamp, the solution’s score, the number of times the
+solver has invoked each action and recipe, and a record of the intermediate states that led up to the solution at the time of the snapshot.
+this record, or solution history, is a list of unique identifiers each
+corresponding to a previous solution state. this list is extended
+every time the solver undoes an action or reloads a previous solution.
+hence, by comparing the histories of two snapshots from the same
+solver, we can answer questions about their relationship (e.g., does
+one snapshot represent the predecessor of another; where did two
+related snapshots diverge). the key relationship for the purposes of
+this analysis is the direct parent-child relationship, which we use to
+generate trees that represent a solver’s solving process.34
+
+4.2
+
+visualizing solution trees
+
+we applied our methodology to our chosen subset of foldit data to
+design a visualization of an individual’s problem-solving process
+as a solution tree. several key principles guided this design. first,
+since our goal is to discover key patterns, the visualization needs
+to highlight distinctly different strategies and approaches. these
+differences cannot be buried amidst enormous structures, nor destroyed by graph transformations. second, the visualization must
+depict the closeness of each step to the ultimate solution in both time
+and quality to give a sense of the solver’s progression. third, the
+solver’s use of automation in the form of recipes should be apparent
+since the use of automation is an important part of foldit.
+the fundamental organization of the visualization is that each node
+corresponds to a solution state encountered while solving. using the
+solution history present in the logged snapshots of solver solutions,
+we establish parent-child relationships between solutions. if solution
+β is a child of solution α, it indicates that β was generated when
+the solver performed actions on α. one crucial limitation, however,
+is that a snapshot of the solver’s current solution is captured far less
+often (only once every two minutes) than the solver takes actions.
+this means that our data is sparsely distributed along a solution’s
+history going back to the puzzle’s starting state. hence, when naively
+constructing the tree from the logged solution histories, it ends up
+dominated by vast quantities of nodes with no associated data.
+we address this issue by performing summarization on the solution
+trees, condensing them into concise representations amenable to
+analysis for important features. this summarization takes place
+in two stages. the first stage trims out nodes that (1) do not have
+corresponding data and (2) have zero children. this eliminates
+large numbers of leaf nodes that we are unable to reason about
+given that we lack the corresponding data. this stage also combines
+sequences of nodes each with only one child into a single node. for
+the median tree, this stage reduced the number of nodes by an order
+of magnitude from over 12,000 nodes to about 1,600.
+the second stage consists of four phases, each informed by our
+observations of common patterns in trees produced by the first stage
+that would benefit from summarization. the first phase, called
+prune, focuses on simplifying uninteresting branches. we observed
+many of the branches preserved by the first stage were small, with
+at most three children, and only continued the tree from one of
+those children. prune removes the leaf children of these branches
+from the tree. collapse, the second phase, transforms each of the
+sequences of single-child nodes left behind after prune into single
+nodes. the third phase, condense, targets another common pattern
+where a sequence of branches feed into each other, with a child of
+each branch the parent of the next branch. these sequences are
+summarized into a single node labeled cascade along with the
+depth (number of branches) and width (average branching factor)
+of the summarized branches. see figure 2 for an example of the
+features summarized by these three phases. the final phase, clean,
+targets the ubiquitous empty nodes (i.e., nodes for which we lack
+associated data) shown in black in figure 2. we eliminate them by
+merging them with their parent node, doing so repeatedly until they
+all have been merged into nodes that contain data. in addition to
+making the trees more concise, this step allows us to reason more
+fully over the trees since all nodes are guaranteed to contain data.
+this second stage of summarization further reduced the number of
+nodes in the median tree by another order of magnitude to about
+300 nodes. summarization similarly reduces the space required to
+store the data by two orders of magnitude.
+
+figure 2: a solution tree after only the first stage of summarization. the non-black node color represents the score of the
+solution at that node (red is worse). the black nodes are empty
+in that we do not have solution data corresponding to that node.
+this figure also shows examples of the features targeted by the
+second summarization stage: prune and collapse eliminate long
+chains like the one on the right, and condense combines sequences of branches like those going down to left in single cascade nodes.
+child-parent relationships are not the only part of the data we visually encoded in the solution trees. nodes are colored on a continuous
+gradient from red to blue according to the score of the solution represented by that node (red is low-scoring, blue is high-scoring). the
+best-scoring node is highlighted as a yellow star. edges are colored
+on a continuous gradient from light to dark green according to the
+time the corresponding transition took place, and the children of
+each node are arranged left to right in chronological order. finally,
+use of automation via recipes is an important aspect of problemsolving in foldit. since the logged solution snapshots contain a
+record of which recipes have been used at that point, we can use this
+to annotate nodes where a recipe was triggered. the annotations
+consist of the id of that recipe (a 4 to 6 digit number) and the number
+of times it was started.
+one major weakness in the data available to us is the lack of a consistent way to determine when the execution of a recipe ended (some
+recipes save and restore, possibly being responsible for multiple
+nodes in the graph beyond where they were triggered). we partially
+address this by further annotating a node with the label manual
+whenever the solver took a manual-only action at that node. this
+indicates that no previously triggered recipe continued past that node
+because no recipe could have performed the manual-only action.
+since nodes in the summarized trees can represent many individual
+steps, it is possible for them to have several of these recipe and
+manual action annotations.
+
+5.
+
+results
+
+using visualized solution trees for a large set of solvers across our
+sample of 11 puzzles, we identify a set of six prominent patterns in
+solvers’ problem-solving behavior. these patterns do not encompass
+all solving behavior in foldit, but instead capture key instances of
+strategic behavior in three categories: exploration, optimization, and
+human-computer collaboration. future work is needed to generate
+a comprehensive survey of the strategic patterns in these and other
+categories. in this analysis, our focus is on identifying a small,
+diverse set of commonly occurring patterns to both provide initial35
+
+insight into problem-solving behavior, and to demonstrate the potential of our approach. in addition to identification, we also perform
+a quantitative comparison of how these patterns are employed by
+high-performing and lower-performing solvers to gain an understanding of how these patterns contribute to success in an open-end
+environment like foldit.
+
+5.1
+
+has a high-scoring node with a low-scoring child, and then chooses
+to explore from the low-scoring child. the solver was willing to
+ignore the short-term drop in score to try and reach a more beneficial
+state in the long-term. figure 5 gives an example of this pattern.
+
+problem-solving patterns
+
+exploration. foldit solvers are confronted with a highly discon-
+
+tinuous solution space with many local optima, creating a trade-off
+between narrowly focusing their efforts or taking the time to explore
+a broader range of possibilities. in our first two patterns, we examine the broader exploration side of this trade-off at two different
+scales. taking the macro-scale first, we identify a pattern where
+solvers make significant progress on distinct branches of the tree
+(see figure 3 for an example). we interpret this pattern as the solver
+investigating multiple hypotheses about the puzzle solution, using
+multiple instances of the game client or foldit’s save and restore features to deeply explore them all. we call this the multiple hypotheses
+pattern.
+
+figure 5: an example of the optima escape pattern. the solver
+transitions from a relatively high-scoring (i.e., blue) state in the
+upper left to a low-scoring (i.e., red) state. what makes this
+an example of the pattern is that exploration from the lowscoring state. in this case, the perseverance paid off as the
+solver reaches even higher-scoring states in the lower right.
+in the other direction, we identify the greedy pattern in which solvers
+exclusively explore from the best-scoring of the available options.
+obviously, some amount of greedy exploration is necessary in order
+to refine solutions, but in its extreme form deserves recognition
+as a pattern with significant potential impact on problem-solving
+success. naturally, these two patterns do not cover all the ways
+solvers explore the problem space, but they do characterize specific
+strategic behavior of interest in this analysis.
+
+figure 3: an example of the multiple hypotheses pattern. the
+two hypotheses branch out one of the nodes at the top and continue to the left (a) and right (b).
+at the micro-scale, solvers very frequently generate a large number
+of possible next steps (i.e., a branch with a large number of children),
+but most often proceed to explore only one of them further. this is
+natural given the iterative refinement needed to successfully participate in foldit. hence, solvers that exhibit a pattern of much more
+frequently exploring multiple local possibilities demonstrate an unusual effort to explore more broadly. we call this the inquisitive
+pattern. figure 4 shows an example of this behavior.
+
+figure 6: an example of the repeated recipe pattern. at three
+points in this solution tree snippet, the solver applies recipe
+49233 to every child of a node.
+
+human-computer collaboration. human-computer collabo-
+
+figure 4: an example of the inquisitive pattern. note how frequently multiple children of the same node are explored when
+compared to the tree in figure 3.
+
+optimization. navigating the extremely heterogeneous solution
+
+space is the primary challenge in foldit, so we look closely at how
+solvers attempt to optimize their solutions, digging deeper into
+solvers’ approach to exploration than the previous two patterns.
+we identify two related patterns describing solvers’ fine-grained
+approach to optimization. the solution spaces of foldit puzzles
+contain numerous local optima that solvers must escape, and we
+identify an optima escape pattern highly suggestive of a deliberate
+attempt to escape a local optima. this pattern occurs when a solver
+
+ration is a vital part of foldit, and managing the trade-off between
+automation and manual intervention is a key feature of solving
+foldit puzzles. we identify two patterns that each focus on one
+side of this trade-off. the first, the manual pattern, corresponds to
+extended sections of exclusively manual exploration. since recipe
+use is very common, extended manual exploration represents a significant investment in the manual intervention side of the trade-off.
+limitations with foldit logging data prevent us from capturing all
+the manual exploration (i.e., it is not always possible to determine
+whether an action was performed by a solver manually or triggered
+as part of an automated recipe), but what can be captured is still an
+important dimension of variance among problem-solving behavior.
+our final pattern concerns recipe use. some solvers apply a recipe
+to every child of a node periodically throughout their solution tree,
+using it as a clean-up or refinement step before continuing on (see
+figure 6). we call this the repeated recipe pattern. recipe use is
+very diverse and frequently doesn’t display any specific structure,
+making this pattern interesting for its regimented way of managing
+some of the automation while solving.36
+
+figure 7: the number of hypotheses pursued in each solution
+tree for high- and lower-performing solvers. high-performing
+solvers frequently pursue two or more hypotheses, whereas
+lower-performing solvers most often pursue just one. red circles show the distribution of individual solvers.
+
+5.2
+
+problem-solving patterns and
+solver performance
+
+to understand how the patterns we identify relate to skillful problemsolving in an open-ended domain like foldit, we compare their use
+among high-performing solvers to that among lower-performing
+solvers. specifically, we analyze the occurrence of these patterns in
+the 15 best-scoring solutions from each puzzle and compare that to
+the occurrence in solutions from each puzzle ranked from 36th to
+50th. though it varies somewhat between puzzles, in general the
+solutions ranked 36th to 50th represent a middle ground in terms
+of quality. they fall outside the puzzle’s state-of-the-art solutions,
+but remain well above the least successful efforts. throughout these
+comparisons we use non-parametric mann-whitney u tests with
+α = 0.008 confidence (bonferroni correction for six comparisons,
+α = 0.05/6), as our data is not normally distributed. for each test,
+we report the test statistic u, the two-tailed significance p, and the
+rank-biserial correlation measure of effect size r. in addition, since
+some of the metrics we compute may not apply to all solution trees
+(e.g., the tree contains no branches where the inquisitive pattern
+can be evaluated), we report the number of solvers involved in the
+comparison n for each test (the full sample is n = 330).
+we find high-performing solvers explore more broadly than lowerperforming solvers. for the multiple hypotheses pattern, highperforming solvers pursued significantly more hypotheses than
+lower-performing solvers (u = 10569, p = 0.000014, r = 0.217,
+n = 330) (see figure 7). for the inquisitive pattern, we compute
+the proportion of each solver’s exploration that matches the pattern
+(i.e., of all the branches in a solver’s solution tree, in what fraction of them did the solver explore more than one child) and find
+high-performing solvers explore inquisitively more often than lowerperforming solvers (u = 9343, p = 0.000295, r = 0.231, n = 313)
+
+figure 8: the proportion of all the branches in a solver’s solution tree in which the solver explored more than one child
+for high- and lower-performing solvers. red circles show the
+distribution of individual solvers.
+(see figure 8).
+we also find high-performing solvers work harder to avoid local
+optima. for the optima escape pattern, we compute the number of times this behavior occurs in each solution and find that
+high-performing solvers engage in this behavior more than lowerperforming solvers (u = 11183.5, p = 0.00185, r = 0.173, n = 330)
+(see figure 9). for the greedy pattern, we compute the proportion of each solver’s exploration that matches the pattern (i.e., of
+all the branches in a solver’s solution tree, in what fraction of
+them did the solver only explore the best-scoring child). while
+high-performing solvers engaged in greedy optimization less often
+than lower-performing solvers, the difference was not significant
+(u = 9079, p = 0.0158, r = −0.163, n = 295) (see figure 10).
+finally, we find no significant difference between high- and lowerperforming solvers in the frequency they manually explore and
+employ recipes. for the manual pattern, we compute the number of
+manual exploration sections in each solution and find no significant
+difference between high- and lower-performing solvers (u = 13334,
+p = 0.789, r = 0.014, n = 330). for the repeated recipe pattern,
+we computed the median frequency of recipe use along all paths
+in the solution (i.e., for each path from the root to a leaf, in what
+fraction of the nodes did the solver trigger at least one recipe) and
+though lower-performing solvers used recipes more frequently, the
+difference between high- and lower-performing solvers was not
+significant (u = 11342, p = 0.0140, r = −0.157, n = 329).
+
+6.
+
+discussion
+
+the results from our analysis of our solution tree visualizations illuminate some key problem-solving patterns exhibited by individual
+foldit solvers. namely, how broadly an individual explores, both
+on a macro- and micro-scale, how actively an individual avoids37
+
+figure 9: the number of times in each solution a solver engages in optima escape behavior for high- and lower-performing
+solvers. red circles show the distribution of individual solvers.
+
+local optima by engaging in less greedy optimization and actively
+pursuing locally suboptimal lines of inquiry, and how an individual
+manages the interplay between automation and manual intervention.
+comparing high- and lower-performing solvers in their application of these patterns suggests that skillful problem-solving in an
+open-end domain like foldit involves broader exploration and more
+conscious avoidance of local minima. this finding that a key feature
+of high-skill solving behaviors is not being enamored by the current
+best solution and possessing strategies for avoiding myopic thinking
+had implications for the strategies that should be taught to develop
+successful problem solvers. further work is required on other large
+open-ended domains to confirm this trend.
+the finding that solvers of different skill use greedy exploration,
+manual exploration, and automation in similar amounts suggests
+skillful deployment of non-greedy exploration, automation, and
+manual intervention takes place at a more fine-grained level than
+overall quantity. though this work focuses on the presence or
+absence of specific solving behavior, the timing and sequencing of
+strategic moves are likely to be critical to success. further work is
+needed to investigate what differentiates effective and ineffective
+use of specific solving strategies.
+the foldit dataset itself presented significant challenges for our
+analysis, and we addressed these through an iterative visualizationbased methodology. this process served as a design method for
+generating a visual grammar to describe a complex problem-solving
+process. we do not study the generalization of this approach to
+other datasets and domains in this work, but the prerequisites for
+its application to other open-ended problem-solving domains can
+be concisely enumerated: (1) the logs of solver activity establish
+clear temporal relationships between solution states such that those
+states can be visualized as a progression through the solution space,
+
+figure 10: the proportion of all the branches in a solver’s solution tree in which the solver explored only the best-scoring
+child for high- and lower-performing solvers. the fact that the
+median for both categories of solver is above 0.5 indicates that
+this pattern in an important part of refining solutions in foldit.
+red circles show the distribution of individual solvers.
+(2) the solution state or associated metadata is amenable to visual
+encoding, so that the visualized progressions can represent finegrained details of the solving process, and (3) deep problem-solving
+domain expertise is available to provide the necessary context for
+interpreting and summarizing the visualized structures.
+our chosen subset of foldit data represents only a small fraction
+of the total available data. in particular, we limited our analysis
+to a sample of similar prediction puzzles, and compared specific
+ranges of high- and lower-performing solvers. though these choices
+are well-motivated, it is an important question for future work as
+to whether our results hold across different datasets and groups of
+comparison. more broadly, foldit supports numerous variations
+on the prediction and design puzzle archetypes, which offers an
+exciting opportunity to study problem solving across a number of
+related contexts with varying goals, constraints, inputs, and tools.
+
+7.
+
+conclusion
+
+gaining a better understanding of key patterns in problem-solving
+behavior in complex, open-ended environments is important for deploying this kind of activity in an educational setting at scale. in this
+work, we identified six key patterns in problem-solving behavior
+among solvers of foldit. the protein folding challenges in foldit
+present rich, completely open, heterogeneous solution spaces, making them a compelling domain in which to analyze these patterns.
+to facilitate the identification of these patterns, we used an iterative
+methodology to design visualizations of solvers’ problem-solving
+activity as solution trees. the size and complexity of the foldit data
+required us to develop domain-specific techniques to summarize the
+solution trees and render them tractable for analysis while preserving the salient problem-solving behaviors. finally, we compared the38
+
+occurrence of the patterns we identified between high- and lowerperforming solvers. we found that high-performing solvers explore
+more broadly and more aggressively avoid local optima. we also
+found that both categories of solvers employ automation and manual
+intervention in similar quantities, inviting future work to study how
+these tools are used at a more fine-grained level.
+we have only scratched the surface in our analysis of a subset of
+foldit data. two integral aspects of the foldit environment are
+not within the scope of this work: collaboration and expert feedback. we only considered solutions produced by individual solvers,
+but foldit solver can also take solutions produced by others and
+try and improve them. this collaborative framework may involve
+specialization and unique solving strategies, and deserves careful
+study. expert feedback comes into play for design puzzles, where
+biochemists will select a small number of the solutions to try and
+synthesize in the lab. experts will also impose additional constraints
+on future design puzzles to try and guide solutions toward more
+promising designs. the interaction of these channels for expert
+feedback and problem-solving behavior is an important topic for
+future research. also outside the scope of this work is how individual solvers change their problem-solving behavior over time. many
+solvers have been participating in the foldit community for many
+years, and studying how their behavior evolves could yield insights
+into the acquisition of high-level problem-solving skills.
+looking more broadly at the impact of this work, our methodology
+and analysis can serve as a first step toward discovering the scaffolding necessary to develop high-level problem-solving skills. these
+results could contribute to a hint generation system, where solvers
+could be guided toward known effective strategies, or a meta-planner
+component in foldit that could tailor the parameters of particular
+puzzles to optimize the quality of the scientific results. in all of
+these cases, this work contributes to the necessary foundational
+understanding of the problem-solving behavior involved.
+
+8.
+
+acknowledgements
+
+this work was supported by the national institutes of health grant
+1uh2ca203780, rosettacommons, and amazon. this material
+is based upon work supported by the national science foundation
+under grant no. 1629879.
+
+9.
+
+[6]
+
+[7]
+
+[8]
+[9]
+[10]
+
+[11]
+[12]
+
+[13]
+[14]
+[15]
+
+[16]
+
+references
+
+[1] e. andersen, y.-e. liu, e. apter, f. boucher-genesse, and
+z. popović. gameplay analysis through state projection. in
+proceedings of the fifth international conference on the
+foundations of digital games, pages 1–8. acm, 2010.
+[2] s. cooper, f. khatib, i. makedon, h. lu, j. barbero, d. baker,
+j. fogarty, z. popović, et al. analysis of social gameplay
+macros in the foldit cookbook. in proceedings of the 6th
+international conference on foundations of digital games,
+pages 9–14. acm, 2011.
+[3] s. cooper, f. khatib, a. treuille, j. barbero, j. lee,
+m. beenen, a. leaver-fay, d. baker, z. popović, et al.
+predicting protein structures with a multiplayer online game.
+nature, 466(7307):756–760, 2010.
+[4] m. eagle, d. hicks, b. peddycord iii, and t. barnes.
+exploring networks of problem-solving interactions. in
+proceedings of the 5th conference on learning analytics and
+knowledge. acm, 2015.
+[5] c. b. eiben, j. b. siegel, j. b. bale, s. cooper, f. khatib,
+
+[17]
+
+[18]
+[19]
+[20]
+
+[21]
+
+b. w. shen, b. l. stoddard, z. popovic, and d. baker.
+increased diels-alderase activity through backbone
+remodeling guided by foldit players. nature biotechnology,
+30(2):190–192, 2012.
+m. h. falakmasir, j. p. gonzalez-brenes, g. j. gordon, and
+k. e. dicerbo. a data-driven approach for inferring student
+proficiency from game activity logs. in proceedings of the
+third (2016) acm conference on learning@ scale, pages
+341–349. acm, 2016.
+c. geigle, c. zhai, and d. c. ferguson. an exploration of
+automated grading of complex assignments. in proceedings of
+the third (2016) acm conference on learning@ scale, pages
+351–360. acm, 2016.
+m. l. gick. problem-solving strategies. educational
+psychologist, 21(1-2):99–120, 1986.
+j. g. greeno. natures of problem-solving abilities. handbook
+of learning and cognitive processes, 5:239–270, 1978.
+e. harpstead, c. j. maclellan, k. r. koedinger, v. aleven,
+s. p. dow, and b. myers. investigating the solution space of
+an open-ended educational game using conceptual feature
+extraction. in proceedings of the 6th conference on
+educational data mining, 2013.
+w. hung, d. h. jonassen, r. liu, et al. problem-based
+learning. handbook of research on educational
+communications and technology, 3:485–506, 2008.
+m. johnson, m. eagle, and t. barnes. invis: an interactive
+visualization tool for exploring interaction networks. in
+proceedings of the 6th conference on educational data
+mining, 2013.
+d. h. jonassen. toward a design theory of problem solving.
+educational technology research and development,
+48(4):63–85, dec 2000.
+d. a. joyner. expert evaluation of 300 projects per day. in
+proceedings of the third (2016) acm conference on
+learning@ scale, pages 121–124. acm, 2016.
+f. khatib, s. cooper, m. d. tyka, k. xu, i. makedon,
+z. popović, and d. baker. algorithm discovery by protein
+folding game players. proceedings of the national academy
+of sciences, 108(47):18949–18953, 2011.
+f. khatib, f. dimaio, s. cooper, m. kazmierczyk, m. gilski,
+s. krzywda, h. zabranska, i. pichova, j. thompson,
+z. popović, et al. crystal structure of a monomeric retroviral
+protease solved by protein folding game players. nature
+structural & molecular biology, 18(10):1175–1177, 2011.
+l. malkiewich, r. s. baker, v. shute, s. kai, and l. paquette.
+classifying behavior to elucidate elegant problem solving in
+an educational game. in proceedings of the 9th conference on
+educational data mining, 2016.
+e. rowe, r. s. baker, and j. asbell-clarke. strategic game
+moves mediate implicit science learning. in proceedings of
+the 8th conference on educational data mining, 2015.
+h. a. simon. information-processing theory of human
+problem solving. handbook of learning and cognitive
+processes, 5:271–295, 1978.
+k. tóth, h. rölke, s. greiff, and s. wüstenberg. discovering
+students’ complex problem solving strategies in educational
+assessment. in proceedings of the 7th conference on
+educational data mining, 2014.
+g. wallner and s. kriglstein. visualization-based analysis of
+gameplay data–a review of literature. entertainment
+computing, 4(3):143–155, 2013.

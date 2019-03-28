@@ -1,0 +1,1335 @@
+47
+
+grade prediction with temporal course-wise influence
+zhiyun ren
+
+computer science
+george mason university
+4400 university drive,
+fairfax, va 22030
+
+zren4@gmu.edu
+
+xia ning
+
+computer & information
+science
+indiana university - purdue
+university indianapolis
+420 university blvd,
+indianapolis, in 46202
+
+huzefa rangwala
+
+computer science
+george mason university
+4400 university drive,
+fairfax, va 22030
+
+rangwala@cs.gmu.edu
+
+xning@cs.iupui.edu
+
+abstract
+there is a critical need to develop new educational technology applications that analyze the data collected by universities to ensure that students graduate in a timely fashion
+(4 to 6 years); and they are well prepared for jobs in their
+respective fields of study. in this paper, we present a novel
+approach for analyzing historical educational records from
+a large, public university to perform next-term grade prediction; i.e., to estimate the grades that a student will get
+in a course that he/she will enroll in the next term. accurate next-term grade prediction holds the promise for better student degree planning, personalized advising and automated interventions to ensure that students stay on track
+in their chosen degree program and graduate on time. we
+present a factorization-based approach called matrix factorization with temporal course-wise influence that incorporates course-wise influence effects and temporal effects for
+grade prediction. in this model, students and courses are
+represented in a latent “knowledge” space. the grade of a
+student on a course is modeled as the similarity of their latent representation in the “knowledge” space. course-wise
+influence is considered as an additional factor in the grade
+prediction. our experimental results show that the proposed
+method outperforms several baseline approaches and infer
+meaningful patterns between pairs of courses within academic programs.
+
+keywords
+next-term grade prediction, course-wise influence, temporal
+effect, latent factor
+
+1. introduction
+data analytics is at the forefront of innovation in several
+of today’s popular educational technologies (edtech) [17].
+currently, one of the grand challenges facing higher education is the problem of student retention and graduation [19].
+there is a critical need to develop new edtech applications
+
+that analyze the data collected by universities to ensure that
+students graduate in a timely fashion (4 to 6 years), and they
+are well prepared for jobs in their respective fields of study.
+to this end, several universities deploy a suite of software
+and tools. for example, degree planners 1 assist students
+in deciding their majors or fields of study, choosing the sequence of courses within their chosen major and providing
+advice for achieving career and learning objectives. early
+warning systems [27] inform advisors/students of progress,
+and additionally provide cues for intervention when students
+are at the risk of failing one or more courses and dropping
+out of their program of study. in this work, we focus on the
+problem of next-term grade prediction where the goal is to
+predict the grade that a student is expected to obtain in a
+course that he/she may enroll in the next term (future).
+in the past few years, several algorithms have been developed to analyze educational data, including matrix factorization (mf) algorithms inspired from recommender system
+research. mf methods decompose the student-course (or
+student-task) grade matrix into two low-rank matrices, and
+then the prediction of the grade for a student on an untaken
+course is calculated as the product of the corresponding vectors in the two decomposed matrices [22, 11]. traditional
+mf algorithms have shown a strong ability to deal with
+sparse datasets [14] and their extensions have incorporated
+temporal and dynamic information [12]. in our setting, we
+consider that a student’s knowledge is continuously being
+enriched while taking a sequence of courses; and it is important to incorporate this dynamic influence of sequential
+courses within our models. therefore, we present a novel
+approach referred as matrix factorization with temporal
+course-wise influence (mftci) model to predict next term
+student grades. mftci considers that a student’s grade on
+a certain course is determined by two components: (i) the
+student’s competence with respect to each course’s topics,
+content and requirement, etc., and (ii) student’s previous
+performance over other courses. we performed a comprehensive set of experiments on various datasets. the experimental results show that the proposed method outperforms
+several state-of-the-art methods. the main contributions of
+our work in this paper are as follows:
+1. we model and incorporate temporal course-wise influence in addition to matrix factorization for grade
+1
+http://www.blackboard.com/mobilelearning/planner.aspx48
+
+prediction. our experimental results demonstrate significant improvement from course-wise influence.
+2. our model successfully captures meaningful coursewise influences which correlate to the course content.
+3. the learned influences between pairs of courses help
+in understanding pre-requisite structures within programs and tuning academic program chains.
+
+2. related work
+over the past few years, several methods have been developed to model student behavior and academic performance [2, 9], and they gain improvement of learning outcomes [21]. methods influenced by recommender system
+(rs) research [1], including collaborative filtering (cf) [18]
+and matrix factorization [13], have attracted increasing attention in educational mining applications which relate to
+student grade prediction [32] and in-class assessment prediction [8]. sweeney et. al. [31, 30] performed an extensive study of several recommender system approaches including svd, svd-knn and factorization machine (fm) to
+predict next-term grade performance. inspired by contentbased recommendation [20] approaches, polyzou et. al. [23]
+addressed the future course grade prediction problem with
+three approaches: course-specific regression, student-specific
+regression and course-specific matrix factorization. moreover, neighborhood-based cf approaches [25, 4, 6] predict
+grades based on the student similarities, i.e., they first identify similar students and use their grades to estimate the
+grades of the students with similar profiles.
+in order to capture the changing of user dynamics over time
+in rs, various dynamic models have been developed. many
+of such models are based on matrix factorization and state
+space models. sun et. al. [28, 29] model user preference
+change using a state space model on latent user factors, and
+estimate user factors over time using noncausal kalman filters. similarly, chua et.al. [5] apply linear dynamical systems (lds) on non-negative matrix factorization (nmf)
+to model user dynamics. ju et. al. [12] encapsulate the
+temporal relationships within a non-negative matrix formulation. zhang et. al. [34] learn an explicit transition
+matrix over the latent factors for each user, and estimate
+the user and item latent factors and the transition matrices within a bayesian framework. other popular methods
+for dynamic modeling include time-weighting similarity decaying [7], tensor factorization [33] and point processes [16].
+the method proposed in this paper tackle the challenges of
+next-term grade prediction which relates to the evolvement
+of student knowledge over taking a sequence of courses. our
+key contribution involves how we incorporate the temporal
+course-wise relationships within a mf approach. additionally, the proposed approach learns pairwise relationships between courses that can help in understanding pre-requisite
+structures within programs and tuning academic program
+chains.
+
+3. preliminaries
+3.1 problem statement and notations
+formally, student-course grades will be represented by a series of matrices {g1 , g2 , ..., gt } for t terms. each row
+of gt represents a student, each column of gt represents a
+
+t
+course, and each value in gt , denoted as gs,c
+, represents a
+t
+grade that student s got on course c in term t (gs,c
+∈ (0, 4],
+t
+gs,c = 0 indicates that student s did not take the course c in
+term t. we add a small value to failing grade to distinguish
+0 score from such situation.). student-course
+p grades up to
+the tth term will be represented by gt = ti=1 gi with size
+of n × m, where n is the number of students and m is the
+number of courses. given the database of (student, course,
+grade) up to term (t − 1) (i.e., gt −1 ), the next-term grade
+prediction problem is to predict grades for each student on
+courses they might enroll in the next term t . to simplify
+the notations, if not specifically stated in this paper, we will
+t
+use gs,c to denote gs,c
+. our testing set is then (student,
+course, grade) triples in the tth term, represented by matrix
+gt . rows from the grade matrices representing a student s
+will simply be represented as g(s, :) and the specific courses
+that student has a grade for in this row can be given by
+c0 ∈ g(s, :).
+
+in this paper, all vectors (e.g., uts and vc ) are represented
+by bold lower-case letters and all matrices (e.g., a) are represented by upper-case letters. column vectors are represented by having the transpose supscriptt , otherwise by default they are row vectors. a predicted/approximated value
+is denoted by having a ˜ head.
+
+4. methods
+4.1 mf with temporal course-wise influence
+we consider the student s’ grade on a certain course c, denoted as gs,c , as determined by two factors. the first factor
+is the student s’ competence with respect to the course c’s
+topics, content and requirement. this is modeled through
+a latent factor model, in which s’ competence is captured
+using a size-k latent factor us , c’s topics and contents are
+captured using a size-k latent factor vc in the same latent
+space as us . then the competence of s over c is modeled
+by the “similarity” between us and vc via their dot product
+(i.e., uts vc ).
+the second factor is the previous performance of student s
+over other courses. we hypothesize that if course c0 has a
+positive influence on course c, and student s achieved a high
+grade on c0 , then s tends to have a high grade on c. under
+this hypothesis, we model this second factor as a product
+between the performance of student on a previous “related”
+course where the pairwise course relationships are learned
+in our formulation. note that we consider this pairwise
+course influence as time independent, i.e., the influence of
+one course over another does not change over time. however, the impact from previous performance/grades can be
+modeled using a decay function over time. taking these two
+factors, the estimated grade is given as follows:
+g̃s,c = uts vc
+p
++ e−α
+|
+
++ e−2α
+|c0 ∈gt −1 (s,:)
+
+p
+
+a(c0 , c)gs,c0
+
+|gt −1 (s, :)|
+{z
+∆(t −1)
+
+c00 ∈gt −2 (s,:)
+
+00
+
+(1)
+
+a(c , c)gs,c00
+
+|gt −2 (s, :)|
+{z
+∆(t −2)
+
+}
+
+,
+
+}
+
+49
+
+in which a(c0 , c) is the influence of c0 on c, gt −1 (s, :)/gt −2 (s, :
+) is the subset of courses out of all courses that s has taken in
+the first/second previous terms, |gt −1 (s, :)|/|gt −2 (s, :)| is
+the number of such taken courses. e−α /e−2α denote the
+time-decay factors. in equation 1, we consider previous
+two terms. more previous terms can be included with even
+stronger time-decay factors. given the grade estimation as
+in equation 1, we formulate the grade prediction problem
+for term t as the following optimization problem,
+min
+
+u,v,a
+
+γ
+1x
+(gs,c − g̃s,c )2 + (ku k2f + kv k2f )
+2 s,c
+2
++ τ kak∗ + λkak`1
+
+×
+
+e−α
+g
+|gt −1 (s,:)| s,ci
+e−2α
+g
+|g
+(s,:)| s,ci
+t −2
+
+(if ci is taken in term t − 1)
+
+(if ci is taken in term t − 2)]
+
+min τ kz1 k∗ +
+z1
+
+ρ
+ka − z1 k2f + ρ(tr(u1t (a − z1 )))
+2
+
+we apply the admm [3] technique for equation 2 by reformulating the optimization problem as follows,
+γ
+1x
+(gs,c − g̃s,c )2 + (ku k2f + kv k2f )
+2 s,c
+2
+
++τ kz1 k∗ + λkz2 k`1
+ρ
++ (ka − z1 k2f + ka − z2 k2f )
+2
++ρ(tr(u1t (a − z1 )))
+
+(4)
+
+the closed-form solution of this problem is
+z1 = s τρ (a + u1 )
+
+(5)
+
+where sα (x) is a soft-thresholding function that shrinks the
+singular values of x with a threshold α, that is,
+sα (x) = u diag((σ − α)+ )v t
+
+4.1.1 optimization algorithm of mftci
+
+s.t.,
+
+s,cj
+
+(
+
+step 3: update z1 and z2 . for z1 , the problem becomes
+
+where u and v are the latent non-negative student factors
+and course factors, respectively; kak∗ is the nuclear norm
+of a, which will induce an a of low rank; and kak`1 is the
+`1 norm of a, which will introduce sparsity in a. in addition, the non-negativity constraint on a is to enforce only
+positive influence across courses.
+
+u,v,a,u1 ,u2 ,z1 ,z2
+
+a(ci , cj ) = a(ci , cj ) − lr × [ρ(a(ci , cj ) − z1 (ci , cj ))
++ ρ(a(ci , cj ) − z2 (ci , cj )) + ρu1 (ci , cj ) + ρu2 (ci , cj )
+x
+−
+(gs,cj − g̃s,cj )
+
+(3)
+with projection into [0, +∞), where lr is a learning rate.
+
+s.t., a ≥ 0
+
+min
+
+using the gradient descent, the elements in a can be updated as follows.
+
+where x = u σv
+and
+
+t
+
+(6)
+
+is the singular value decomposition of x,
+(x)+ = max(x, 0).
+
+for z2 , the problem becomes
+ρ
+min λkz2 k`1 + ka − z2 k2f + ρ(tr(u2t )(a − z2 ))
+z2
+2
+
+(7)
+
+(8)
+
+the closed-form solution is
+z2 = e λ (a + u2 )
+ρ
+
++ρ(tr(u2t (a − z2 )))
+
+(9)
+
+where eα (x) is a soft-thresholding function that shrinks the
+values in x with a threshold α, that is,
+
+a≥0
+
+eα (x) = (x − α, 0)+
+
+(10)
+
+where z1 and z2 are two auxiliary variables, and u1 and u2
+are two dual variables. all the variables are solved via an
+alternating approach as follows.
+
+where ()+ is defined as in equation 7.
+
+step 1: update u and v . fixing all the other variables and
+
+step 4: update u1 and u2 . u1 and u2 are updated based
+on standard admm updates:
+
+solving for u and v , the problem becomes a classical matrix
+factorization problem:
+min
+u,v
+
+x
+1x
+γ x
+(fs,c − uts vc )2 + (
+kus k22 +
+kvc k22 )
+2 s,c
+2 s
+c
+
+(2)
+
+where fs,c = gs,c − ∆(t − 1) − ∆(t − 2) (see eq 1). the
+matrix factorization problem can be solved using alternating
+minimization.
+
+step 2: update a. fixing all the other variables and solving for a, the problem becomes
+min
+a
+
+s.t.,
+
+ρ
+1x
+(gs,c − g̃s,c )2 + (ka − z1 k2f + ka − z2 k2f )
+2 s,c
+2
+
++ρ(tr(u1t (a − z1 ))) + ρ(tr(u2t (a − z2 )))
+a≥0
+
+u1 = u1 + (a − z1 );
+
+u2 = u2 + (a − z2 )
+
+(11)
+
+in addition, we conduct computational complexity analysis
+of mftci and put it in appendix.
+
+5. experiments
+5.1 dataset description
+we evaluated our method on student grade records obtained
+from george mason university (gmu) from fall 2009 to
+spring 2016. this period included data for 23,013 transfer
+students and 20,086 first-time freshmen (non-transfer i.e.,
+students who begin their study at gmu) across 151 majors
+enrolled in 4,654 courses.
+specifically, we extracted data for six large and diverse majors for both non-transfer and transfer students. these majors include: (i) applied information technology (ait), (ii)50
+
+table 1: dataset descriptions
+major
+ait
+biol
+ceie
+cpe
+cs
+psyc
+total
+
+non-transfer students
+#s
+#c
+#(s,c)
+239
+453
+5,739
+1,448
+990
+33,527
+393
+642
+9,812
+340
+649
+7,710
+908
+818
+18,376
+911
+874
+22,598
+4,239 1,115 97,762
+
+transfer students
+#s
+#c
+#(s,c)
+982
+465
+14,396
+1,330
+833
+22,691
+227
+305
+4,538
+91
+219
+1,614
+480
+464
+7,967
+1504
+788
+24,661
+4,614 1,019 75,867
+
+#s, #c and #s-c are number of students, courses and student-course
+pairs in educational records across the 6 majors from fall 2009 to
+spring 2016, respectively.
+
+fall 2009 to fall 2015
+
+fall 2009 to spring 2015
+
+fall 2009 to fall 2014
+
+spring 2015
+
+spring 2016
+
+fall 2015
+training set:
+test set:
+
+figure 1: different experimental protocols
+
+biology (biol), (iii) civil, environmental and infrastructure engineering (ceie), (iv) computer engineering (cpe)
+(v) computer science (cs) and (vi) psychology (psyc).
+table 1 provides more information about these datasets.
+
+5.2
+
+experimental protocol
+
+to assess the performance of our next-term grade prediction
+models, we trained our models on data up to term t − 1
+and make predictions for term t . we evaluate our method
+for three test terms, i.e., spring 2016, fall 2015 and spring
+2015. as an example, for evaluating predictions for term
+fall 2015, data from fall 2009 to spring 2015 is considered
+as training data and data from fall 2015 is testing data.
+datasets. figure 1 shows the three different train-test splits.
+
+define a tick to denote the difference between two consecutive letter grades (e.g., c+ vs c or c vs c-). to assess the
+performance of our grade prediction method, we convert the
+predicted grades into their closest letter grades and compute the percentage of predicted grades with no error (or
+0-ticks), within 1-tick and within 2-ticks denoted by pct0 ,
+pct1 and pct2 , respectively. for the problem of course selection and degree planning, courses predicted within 2 ticks
+can be considered sufficiently correct. we name these metrics as percentage of tick accuracy (pta).
+
+5.4
+
+baseline methods
+
+we compare the performance of our proposed method to the
+following baseline approaches.
+
+5.4.1
+
+matrix factorization
+
+matrix factorization is known to be successful in predicting ratings accurately in recommender systems [26]. this
+approach can be applied directly on next-term grade prediction problem by considering student-course grade matrix as
+a user-item rating matrix in recommender systems. based
+on the assumption that each course and student can be represented in the same low-dimensional space, corresponding
+to the knowledge space, two low-rank matrices containing
+latent factors are learned to represent courses and students
+[30]. specifically, the grade a student s will achieve on a
+course c is predicted as follows:
+g̃s,c = µ + ps + qc + uts vc
+
+(12)
+n
+
+where µ is a global bias term, ps (p ∈ r ) and qc (q ∈
+rm ) are the student and course bias terms (in this case, for
+student s and course c), respectively, and us (u ∈ rk×n )
+and vc (v ∈ rk×m ) are the latent factors for student s and
+course c, respectively.
+
+5.4.2
+
+matrix factorization without bias (mf0 )
+
+we only considered the student and course latent factors to
+predict the next-term grades. therefore, the grade a student
+s will achieve on a course c is calculated as follows:
+g̃s,c = uts vc
+
+5.3
+
+evaluation metrics
+
+we use root mean squared error (rmse) and mean
+absolute error (mae) as metrics for evaluation, and are
+defined as follows:
+sp
+2
+s,c∈gt (gs,c − g̃s,c )
+,
+rm se =
+|gt |
+p
+s,c∈gt |gs,c − g̃s,c |
+m ae =
+|gt |
+
+where gs,c and g̃s,c are the ground truth and predicted grade
+for student s on course c, and gt is the testing set of (student, course, grade) triples in the tth term. normally, in
+next-term grade prediction problem, mae is more intuitive
+than rmse since mae is a straightforward method which
+calculates the deviation of errors directly while rmse has
+implications such as penalizing large errors more.
+for our dataset, a student’s grade can be a letter grade (i.e.
+a, a-, . . . , f). as done previously by polyzou et. al. [24] we
+
+5.4.3
+
+(13)
+
+non-negative matrix factorization (nmf) [15]
+
+we add non-negative constraints on matrix u and matrix v
+in equation 13. the non-negativity constraints allows mf
+approaches to have better interpretability and accuracy for
+non-negative data [10].
+
+6. results and discussion
+6.1 overall performance
+table 2 presents the comparison of pct0 , pct1 and pct2 for
+non-transfer students for the three terms considered as test:
+spring 2016, fall 2015 and spring 2015. we observe that the
+mftci model outperforms the baselines across the different
+test sets. on average, mftci outperforms the mf, mf0
+and nmf methods by 34.18%, 11.59% and 4.08% in terms of
+pct0 , 16.64%, 7.96% and 4.03% in terms of pct1 , and 2.10%,
+3.00% and 1.98% in terms of pct2 , respectively. we observe
+similar results for transfer students as well (not included
+here for brevity).51
+
+table 2: comparison performance with pta (%)
+methods
+mf
+mf0
+nmf
+mftci
+
+spring 2016
+fall 2015
+spring 2015
+pct0 (↑) pct1 (↑) pct2 (↑) pct0 pct1 pct2 pct0 pct1 pct2
+13.25
+27.71
+58.02 12.05 26.63 58.89 13.03 26.09 54.83
+16.52
+31.65
+57.46 15.51 30.03 55.64 15.53 29.53 54.94
+13.21
+27.04
+57.18 15.33 30.12 56.15 15.56 29.23 54.93
+19.78 35.52 61.44 19.71 35.16 60.12 18.56 32.78 58.80
+
+i) “↑” indicates the higher the better. ii) reported values of pct0 , pct1 and pct2 are percentages. iii) best performing methods are highlighted with bold.
+
+0.70
+
+table 3 presents the performance of the baselines and mftci
+model for the three different terms of both non-transfer and
+transfer students using rmse and mae as evaluation metrics. the mftci model consistently outperforms the baselines across the different datasets in terms of mae. in addition, the results shows that mf0 , nmf and mftci tend
+to have better performance for spring 2016 term than fall
+2015 term. similar trend is observed between fall 2015 term
+and spring 2015 term. this suggests that mftci is likely
+to have better performance with more information in the
+training set.
+
+6.2
+
+analysis on individual majors
+
+we divide non-transfer students based on their majors and
+test the baselines and mftci model on each major, separately. table 4 shows the comparison of pct0 , pct1 and
+pct2 on different majors. the results show that mftci has
+the best performance for almost all the majors. among all
+the results, mftci has the highest accuracy when predicting grades for psyc and biol students for which we have
+more student-course pairs in the training set.
+
+6.3
+
+effects from previous terms on mftci
+
+in order to see the influence of number of previous terms
+considered in mftci, we run our model with only ∆(t − 1)
+in equation 1. this method is represented as mftcip1 .
+figure 2 shows the comparison results of mae for six subsets of data which are reported in table 3, where “ntr”
+stands for non-transfer students and “tr” stands for transfer students. the results show that mftci consistently
+outperforms mftcip1 on all datasets. this suggests that
+considering two previous terms is necessary for achieving
+good prediciton results. moreover, since we consider that
+the student’s knowledge is modeled using an exponential
+decaying function over time, we do not include the influence
+from the third previous term in our model as its influence
+for the grade prediction is negligible in comparison to the
+previous two terms.
+
+6.4
+
+visualization of course influence
+
+to interpret what is captured in the course influence matrix
+a (see eq 1), we extract the top 20 values with the corresponding course names (and topics) for analysis. figure 3
+and 4 show the captured pairwise course influences for cs
+and ait majors, respectively. each node corresponds to
+one course which is represented by the shortened course’s
+name. we can notice from the figures that most influences
+reflect content dependency between courses. for example,
+in the cs major, “object oriented programming” course
+has significant influence on performance of “low-level pro-
+
+mftcip1
+mftci
+
+mae
+
+0.68
+0.66
+0.64
+0.62
+0.60
+
+figure 2:
+mftci
+
+ntr spring ntr fall ntr spring tr spring tr fall tr spring
+2016
+2015
+2015
+2016
+2015
+2015
+
+comparison performance for mftcip1 and
+
+gramming” course (the former one is also the latter one’s
+prerequisite course); “linear algebra” and “discrete mathematics” have influence on each other; “formal methods &
+models” course has influence on “analysis of algorithms”
+course. in case of the ait major, both “introductory it”
+course and “introductory computing” course have influence
+on “it problem & programming” course; “multimedia &
+web design” course has influence on both “applied it programming” course and “it in the global economy” course.
+gmu has a sample schedule of eight-term courses for each
+major in order to guide undergraduate students to finish
+their study step by step based on the level, content and
+difficulty of courses 2 . among the identified relationships
+shown in figures 3 and 4 we found 17 and 13 of the cs and
+ait courses influences in the guide map, respectively. the
+rest of the identified influences are among other general electives but required courses (e.g., “public speaking” course),
+or specific electives pertaining to the major (e.g., “research
+methods” course). this shows that our model learns meaningful course-wise influences and successfully uses it to improve mf model.
+figure 5 shows the identified course influences for the biol,
+ceie, cpe and psyc majors. these identified course-wise
+influences seem to capture similarity of course content.
+
+7.
+
+conclusion and future work
+
+we presented a matrix factorization with temporal coursewise influence (mftci) model that integrates factorization
+models and the influence of courses taken in the preceding
+terms to predict student grades for the next term.
+we evaluate our model on the student educational records
+from fall 2009 to spring 2016 collected from george ma2
+
+http://catalog.gmu.edu52
+
+table 3: comparison performance with rmse and mae.
+methods
+mf
+mf0
+nmf
+mftci
+
+spring 2016
+rmse mae
+0.999 0.754
+0.929 0.714
+1.020 0.769
+0.928 0.685
+
+non-transfer students
+fall 2015
+spring
+rmse mae
+rmse
+1.037 0.786
+1.023
+0.977 0.752
+1.014
+0.967 0.746
+1.000
+0.982 0.717
+1.012
+
+2015
+mae
+0.784
+0.778
+0.771
+0.750
+
+spring
+rmse
+0.925
+0.893
+0.906
+0.887
+
+2016
+mae
+0.688
+0.668
+0.683
+0.636
+
+transfer students
+fall 2015
+rmse mae
+0.921 0.686
+0.944 0.705
+0.932 0.701
+0.927 0.662
+
+research methods
+
+western history
+
+0.563
+object oriented programming
+
+computer ethics
+
+0.691
+0.3661
+
+0.4953
+
+data structures
+0.4313
+digital electronics
+
+0.4314
+
+introductory programming
+0.4264
+
+formal methods & models
+
+analytic geometry & calculus
+
+0.3526
+0.3646
+
+reading & writng
+
+0.4199
+public speaking
+
+0.3797
+
+0.3691
+
+0.536
+
+0.3852
+
+low-level programming
+
+0.4392
+
+spring 2015
+rmse mae
+0.985 0.732
+1.011 0.765
+0.979 0.746
+1.000 0.721
+
+0.3512
+
+linear algebra
+
+0.6033
+advanced composition
+
+0.4122 0.4929
+
+discrete mathematics
+
+0.3512
+analysis of algorithms
+
+figure 3: identified course influences for cs major
+
+table 4: comparison performance for different majors
+methods
+mf
+mf0
+pct0
+nmf
+mftci
+mf
+mf0
+pct1
+nmf
+mftci
+mf
+mf0
+pct2
+nmf
+mftci
+
+ait
+18.71
+19.45
+19.77
+22.30
+37.95
+37.21
+36.79
+39.64
+67.02
+66.17
+66.70
+66.70
+
+biol ceie cpe
+cs psyc
+18.00 15.99 12.99 15.98 20.18
+22.10 16.70 14.21 16.47 22.12
+22.16 17.01 14.32 16.61 22.17
+24.24 16.80 14.32 17.32 25.83
+35.43 31.47 27.86 31.53 39.41
+39.68 31.87 27.97 30.51 39.63
+39.74 31.67 27.19 30.43 39.36
+40.87 32.38 27.53 31.78 42.29
+67.78 58.66 52.28 56.91 71.01
+67.54 58.35 50.72 56.24 67.74
+67.54 58.55 51.17 56.17 67.79
+68.25 58.76 52.94 58.18 68.29
+
+son university. the dataset in this study contains both
+non-transfer and transfer students from six different majors. our experimental evaluation shows that mftci consistently outperforms the different state-of-the-art methods.
+moreover, we analyze the effects from previous terms on
+mftci, and we make the conclusion that it is necessary
+to consider two previous terms. in addition, we visualize
+the patterns learned between pairs of courses. the results
+strongly demonstrate that the learned course influences correlate with the course content within academic programs.
+in the future, we will explore incorporation of additional constraints over the the pairwise course influence matrix, such
+as prerequisite information, compulsory and elective provision of a course. we will explore using the course influence
+
+information to build a degree planner for future students.
+
+8.
+
+acknowledgments
+
+funding was provided by nsf grant, 1447489.
+
+appendix
+a. computational complexity analysis
+the computational complexity of mftci is determined by
+the four steps in the alternating approach as described above.
+to update u and v as in equation 2 using gradient descent method via alternating minimization, the computational complexity is o(niteruv (k × ns,c + k × m + k × n)) =
+o(niteruv (k×ns,c )) (typically ns,c ≥ max(m, n)), where ns,c
+is the total number of student-course dyads, n is the number of students, m is the number of courses, k is the latent
+dimensions of u and v , and niteruv is the number of iterations. to update a as in equation 3 using gradient descent
+method, the computational complexity is upper-bounded by
+ns,c
+)), where ncc is the number of course pairs
+o(nitera (ncc × m
+ns,c
+that have been taken by at least one student, m
+is the average number of students for a course, which upper bounds
+the average number of students who co-take two courses,
+and nitera is the number of iteractions. essentially, to update a, we only need to update a(ci , cj ) where ci and cj
+have been co-taken by some students. for a(ci , cj ) where
+ci and cj have never been taken together, they will remain
+0. to update z1 as in equation 4, a singular value decomposition is involved and thus its computational complexity
+is upper bounded by o(m3 ). to update z2 as in equation 8, the computational complexity is o(m2 ). to update53
+
+calculus & applications
+
+composition
+
+0.2262
+
+0.2753
+
+introductory computing
+
+0.2523
+
+computer hardware
+
+public speaking
+
+0.31
+
+0.2317 0.2624
+
+multimedia & web design
+0.2602
+
+0.3392
+
+western history
+
+0.2248
+
+discrete mathematics for it
+
+0.2453
+applied it
+
+0.2461
+
+0.276
+
+it in the global economy
+
+0.2675 0.3012
+
+information security
+
+0.3033
+
+it problem & programming
+
+introductory statistics
+
+0.226
+
+database fundamentals
+
+0.2456
+
+applied it programming
+
+0.2393
+
+introductory it
+
+it problem & object oriented techniques
+
+0.2217
+advanced composition
+
+figure 4: identified course influences for ait major
+
+introductory engineering
+general chemistry i
+
+cell structure & function
+
+biostatistics
+
+0.6901
+0.6581
+
+1.5541
+
+0.7832
+
+1.1224
+
+1.1074
+0.5888
+
+organic chemistry i
+
+general chemistry ii
+
+computer graphics
+
+0.6835
+
+0.6277 0.7009
+
+chemistry for engineers
+
+0.8673
+
+0.6068
+
+organic chemistry lab i
+
+organic chemistry lab ii
+
+physics lab i
+
+physics i
+
+0.9025
+
+0.6707
+
+0.5658
+
+0.6046
+
+physics ii
+
+microeconomic
+
+calculus ii
+
+0.8467
+
+0.7125
+
+0.5907
+
+calculus i
+
+0.5345
+physics i
+
+biology of microorganisms
+
+(a) identified course influences for biol major
+
+(b) identified course influences for ceie major
+
+statistics in psychology
+
+composition i
+
+social psychology
+
+0.3382 0.4064
+introductory engineering
+0.0556
+calculus iii
+
+0.0478
+0.0682
+
+university physics i
+0.0436
+
+physics lab i
+
+linear algebra
+
+calculus i
+0.0509
+
+0.0675
+
+calculus ii
+0.0548
+
+0.0495
+
+university physics ii
+
+0.0611
+introductory programming
+
+0.6269
+
+cognitive psychology
+
+0.4069
+
+0.4037
+research in psychology
+
+0.4545
+abnormal psychology
+
+0.389
+composition ii
+
+0.385
+0.4304
+
+0.4898
+
+0.0397
+physics lab ii
+
+(c) identified course influences for cpe major
+
+physiological psychology
+
+(d) identified course influences for psyc major
+
+figure 5: identified course influences for different majors
+
+u1 and u2 as in equation 11, the computational complexity
+is o(m2 ). thus, the computational complexity for mtfci
+ns,c
+) + m3 + m2 ))
+is o(niter(niteruv (k × ns,c ) + nitera (ncc × m
+ns,c
+= o(niter(niteruv (k×ns,c )+nitera (ncc × m )+m3 )), where
+niter is the number of iterations for the four steps. although the complexity is dominated by m3 due to the svd
+on a + u1 , since n (i.e., the number of courses) is typically
+not large, the run time will be more dominated by ns,c (i.e.,
+the number of student-course dyads).
+
+b.
+
+references
+
+[1] charu c. aggarwal. recommender systems: the
+textbook. springer publishing company, incorporated,
+
+1st edition, 2016.
+[2] rsjd baker et al. data mining for education.
+international encyclopedia of education, 7:112–118,
+2010.
+[3] stephen boyd, neal parikh, eric chu, borja peleato,
+and jonathan eckstein. distributed optimization and
+statistical learning via the alternating direction
+r in
+method of multipliers. foundations and trends
+machine learning, 3(1):1–122, 2011.
+[4] hana bydžovská. are collaborative filtering methods
+suitable for student performance prediction? in
+portuguese conference on artificial intelligence, pages
+425–430. springer, 2015.54
+
+[5] freddy chong tat chua, richard j oentaryo, and
+ee-peng lim. modeling temporal adoptions using
+dynamic matrix factorization. in 2013 ieee 13th
+international conference on data mining, pages
+91–100. ieee, 2013.
+[6] tristan denley. course recommendation system and
+method, january 10 2013. us patent app. 13/441,063.
+[7] yi ding and xue li. time weight collaborative
+filtering. in proceedings of the 14th acm international
+conference on information and knowledge
+management, cikm ’05, pages 485–492, new york,
+ny, usa, 2005. acm.
+[8] asmaa elbadrawy, scott studham, and george
+karypis. personalized multi-regression models for
+predicting students performance in course activities.
+umn cs, pages 14–011, 2014.
+[9] wu he. examining studentsâăź online interaction in
+a live video streaming environment using data mining
+and text mining. computers in human behavior,
+29(1):90–102, 2013.
+[10] ngoc-diep ho. nonnegative matrix factorization
+algorithms and applications. phd thesis, école
+polytechnique, 2008.
+[11] chein-shung hwang and yi-ching su. unified
+clustering locality preserving matrix factorization for
+student performance prediction. iaeng int. j.
+comput. sci, 42(3):245–253, 2015.
+[12] bin ju, yuntao qian, minchao ye, rong ni, and
+chenxi zhu. using dynamic multi-task non-negative
+matrix factorization to detect the evolution of user
+preferences in collaborative filtering. plos one,
+10(8):e0135090, 2015.
+[13] yehuda koren, robert bell, and chris volinsky.
+matrix factorization techniques for recommender
+systems. computer, 42(8):30–37, august 2009.
+[14] yehuda koren, robert bell, chris volinsky, et al.
+matrix factorization techniques for recommender
+systems. computer, 42(8):30–37, 2009.
+[15] daniel d lee and h sebastian seung. algorithms for
+non-negative matrix factorization. in advances in
+neural information processing systems, pages 556–562,
+2001.
+[16] dixin luo, hongteng xu, yi zhen, xia ning,
+hongyuan zha, xiaokang yang, and wenjun zhang.
+multi-task multi-dimensional hawkes processes for
+modeling event sequences. in proceedings of the 24th
+international conference on artificial intelligence,
+ijcai’15, pages 3685–3691. aaai press, 2015.
+[17] rabab naqvi. data mining in educational settings.
+pakistan journal of engineering, technology &
+science, 4(2), 2015.
+[18] xia ning, christian desrosiers, and george karypis.
+a comprehensive survey of neighborhood-based
+recommendation methods. in francesco ricci, lior
+rokach, and bracha shapira, editors, recommender
+systems handbook, pages 37–76. springer, 2015.
+[19] michelle parker. advising for retention and
+graduation. 2015.
+[20] michael j. pazzani and daniel billsus. the adaptive
+web. chapter content-based recommendation
+systems, pages 325–341. springer-verlag, berlin,
+
+heidelberg, 2007.
+[21] alejandro peña-ayala. educational data mining: a
+survey and a data mining-based analysis of recent
+works. expert systems with applications,
+41(4):1432–1462, 2014.
+[22] štefan pero and tomáš horváth. comparison of
+collaborative-filtering techniques for small-scale
+student performance prediction task. in innovations
+and advances in computing, informatics, systems
+sciences, networking and engineering, pages 111–116.
+springer, 2015.
+[23] agoritsa polyzou and george karypis. grade
+prediction with models specific to students and
+courses. international journal of data science and
+analytics, pages 1–13, 2016.
+[24] agoritsa polyzou and george karypis. grade
+prediction with models specific to students and
+courses. international journal of data science and
+analytics, pages 1–13, 2016.
+[25] sanjog ray and anuj sharma. a collaborative
+filtering based approach for recommending elective
+courses. in international conference on information
+intelligence, systems, technology and management,
+pages 330–339. springer, 2011.
+[26] francesco ricci, lior rokach, bracha shapira, and
+paul b kantor. recommender systems handbook.,
+2011.
+[27] jill m simons. a national study of student early
+alert models at four-year institutions of higher
+education. eric, 2011.
+[28] john z sun, dhruv parthasarathy, and kush r
+varshney. collaborative kalman filtering for dynamic
+matrix factorization. ieee transactions on signal
+processing, 62(14):3499–3509, 2014.
+[29] john z sun, kush r varshney, and karthik subbian.
+dynamic matrix factorization: a state space
+approach. in 2012 ieee international conference on
+acoustics, speech and signal processing (icassp),
+pages 1897–1900. ieee, 2012.
+[30] mack sweeney, jaime lester, and huzefa rangwala.
+next-term student grade prediction. in big data (big
+data), 2015 ieee international conference on, pages
+970–975. ieee, 2015.
+[31] mack sweeney, huzefa rangwala, jaime lester, and
+aditya johri. next-term student performance
+prediction: a recommender systems approach. arxiv
+preprint arxiv:1604.01840, 2016.
+[32] nguyen thai-nghe, lucas drumond, artus
+krohn-grimberghe, and lars schmidt-thieme.
+recommender system for predicting student
+performance. procedia computer science,
+1(2):2811–2819, 2010.
+[33] liang xiong, xi chen, tzu-kuo huang, jeff
+schneider, and jaime g. carbonell. temporal
+collaborative filtering with bayesian probabilistic
+tensor factorization, pages 211–222. 2010.
+[34] chenyi zhang, ke wang, hongkun yu, jianling sun,
+and ee-peng lim. latent factor transition for
+dynamic collaborative filtering. in sdm, pages
+452–460. siam, 2014.

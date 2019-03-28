@@ -1,0 +1,1002 @@
+103
+
+epistemic network analysis and topic modeling for chat
+data from collaborative learning environment
+zhiqiang cai
+
+brendan eagan
+
+nia m. dowell
+
+the university of memphis
+365 innovation drive, suite 410
+memphis, tn, usa
+
+university of wisconsin-madison
+1025 west johnson street
+madison, wi, usa
+
+the university of memphis
+365 innovation drive, suite 410
+memphis, tn, usa
+
+zcai@memphis.edu
+
+eaganb@gmail.com
+
+niadowell@gmail.com
+
+james w. pennebaker
+
+david w. shaffer
+
+arthur c. graesser
+
+university of texas-austin
+116 inner campus dr stop g6000
+austin, tx, usa
+
+university of wisconsin-madison
+1025 west johnson street
+madison, wi, usa
+
+the university of memphis
+365 innovation drive, suite 403
+memphis, tn, usa
+
+pennebaker@utexas.edu
+
+dws@education.wisc.edu
+
+art.graesser@gmail.com
+
+abstract
+this study investigates a possible way to analyze chat data from
+collaborative learning environments using epistemic network
+analysis and topic modeling. a 300-topic general topic model
+built from tasa (touchstone applied science associates) corpus was used in this study. 300 topic scores for each of the 15,670
+utterances in our chat data were computed. seven relevant topics
+were selected based on the total document scores. while the aggregated topic scores had some power in predicting students’
+learning, using epistemic network analysis enables assessing the
+data from a different angle. the results showed that the topic
+score based epistemic networks between low gain students and
+high gain students were significantly different (𝑡 = 2.00). overall,
+the results suggest these two analytical approaches provide complementary information and afford new insights into the processes
+related to successful collaborative interactions.
+
+keywords
+chat; collaborative learning; topic modeling; epistemic network
+analysis
+
+1. introduction
+collaborative learning is a special form of learning and interaction
+that affords opportunities for groups of students to combine cognitive resources and synchronously or asynchronously participate in
+tasks to accomplish shared learning goals [15; 20]. collaborative
+learning groups can range from a pair of learners (called a dyad),
+to small groups (3-5 learners), to classroom learning (25-35 learners), and more recently large-scale online learning environments
+with hundreds or even thousands of students [5; 22]. the collaborative process provides learners with a more efficient learning
+experience and improves learners’ collaborative learning skills,
+which are critical competencies for students [14]. members in a
+team are different in many ways. they have their own experience,
+knowledge, skills, and approaches to learning. a student in a col-
+
+laborative learning environment can take other students’ views
+and ideas about the information provided in the learning material.
+the ideas coming out of the team can then be integrated as a
+deeper understanding of the material, or a better solution to a
+problem.
+traditional collaborative learning occurred in the form of face to
+face group discussion or problem solving. as the internet and
+learning technologies develop, online collaborative learning environments come out and are playing more and more important
+roles. for example, moocs (massive open online courses) have
+drawn massive number of learners. learners in moocs are connected by the internet and can easily interact with each other using
+various types of tools, such as forums, blogs and social networks
+[23]. these digitized environments make it possible to track the
+learning processes in collaborative learning environments in
+greater detail.
+communication is one of the main factors that differentiates collaborative learning from individual learning [4; 6; 9]. as such,
+chats from collaborative learning environments provide rich data
+that contains information about the dynamics in a learning process. understanding massive chat data from collaborative learning
+environments is interesting and challenging. many tools have
+been invented and used in chat data analysis, such as liwc (linguistic inquiry and word count) [12], coh-metrix [10], and topic
+modeling, just to name a few. epistemic network analysis (ena)
+has been playing a unique role in analyzing chat data from epistemic games [18]. ena is rooted in a specific theory of learning:
+the epistemic frame theory, in which the collection of skill,
+knowledge, identity, value and epistemology (skive) forms an
+epistemic frame. a critical theoretical assumption of ena is that
+the connections between the elements of epistemic frames are
+critical for learning, not their presence in isolation. the online
+ena toolkit allows users to analyze chat data by comparing the
+connections within the epistemic networks derived from chats.
+ena visualization displays the clustering of learners and groups
+and the network connections of individual learners and groups.
+ena requires coded data which has traditionally relied on hand
+coded data sets or classifiers that rely on regular expression mapping. combining topic modeling with ena will provide a new
+mode of preparing data sets for analysis using ena.
+in this study, we used a combination of topic modeling and ena
+to analyze chat data to see if we could detect differences between
+the connections made by students with high learning gains versus
+students with low learning gains. incorporating topic modeling104
+
+with ena will make the analytic tool more fully automated and of
+greater use to the research community.
+
+2. related work
+chats have two obvious features. first, they appear in the form of
+text. therefore, any text analysis tool may have a role in chat
+analysis. second, chats come from individuals’ interaction, which
+reflects social dynamics between participants. therefore, a combination of text analysis and social network analysis should be
+helpful in understanding underlying chat dynamics. for instance,
+tuulos et al. [21] combined topic modeling with social network
+analysis in chat data analysis. they found that topic modeling can
+help identify the receiver of chats (the person who a chat is given
+to).
+in a similar effort, scholand et al. [16] combined liwc and social
+network analysis to form a method called “social language network analysis” (slna). the social networks were formed by
+counting the number of times chat occurred between any two
+participants. based on the counts, participants were clustered into
+a tree structure, representing the level of subgroups the participants belong to. liwc was then used to get the text features of
+chats. it was found that, some liwc features were significantly
+different between in group conversations and out of group conversations.
+researchers have also recently explored the advantages of combining sna (social network analysis) with deeper level computational linguistic tools, like coh-metrix. coh-metrix computes
+over 100 text features. the five most important coh-metrix features are: narrativity, syntax simplicity, word concreteness, referential cohesion and deep cohesion. dowell and colleagues [8]
+explored the extent to which characteristics of discourse diagnostically reveals learners’ performance and social position in
+moocs. they found that learners who performed significantly
+better engaged in more expository style discourse, with surface
+and deep level cohesive integration, abstract language, and simple
+syntactic structures. however, linguistic profiles of the centrally
+positioned learners differed from the high performers. learners
+with a more significant and central position in their social network
+engaged using a more narrative style discourse with less overlap
+between words and ideas, simpler syntactic structures and abstract
+words. an increasing methodological contribution of this work
+highlights how automated linguistic analysis of student interactions can complement social network analysis (sna) techniques
+by adding rich contextual information to the structural patterns of
+learner interactions.
+
+final sample. within the population, 50.5% of the sample identified as caucasian, 22.2% as hispanic/latino, 15.4% as asian
+american, 4.4% as african american, and less than 1% identified
+as either native american or pacific islander.
+course details and procedure. students were told that they
+would be participating in an assignment that involved a collaborative discussion on personality disorders and taking quizzes. students were told that their assignment was to log into an online
+educational platform specific to the university at a specified time,
+where they would take quizzes and interact via web chat with one
+to four random group members. students were also instructed
+that, prior to logging onto the educational platform, they would
+have to read material on personality disorders. after logging into
+the system, students took a 10 item, multiple choice pretest quiz.
+this quiz asked students to apply their knowledge of personality
+disorders to various scenarios and to draw conclusions based on
+the nature of the disorders. the following is an example of the
+types of quiz questions students were exposed to:
+
+
+
+
+
+jacob was diagnosed with narcissistic personality disorder. why might dr. simon think this was the wrong
+diagnosis?
+dr. level has measured and described his 10 mice of
+varying ages in terms of their length (cm) and weight
+(g). how might he describe them on these characteristics using a dimensional approach?
+danielle checks her facebook page every hour. does
+danielle have narcissistic personality disorder?
+
+after completing the quiz, they were randomly assigned to other
+students who were waiting to engage in the chatroom portion of
+the task. when there were at least 2 students and no more than 5
+students (m = 4.59), individuals were directed to an instant messaging platform that was built into the educational platform. the
+group chat began as soon as someone typed the first message and
+lasted for 20 minutes. the chat window closed automatically after
+20 minutes, at which time students took a second 10 multiplechoice question quiz. each student contributed 154.0 words on
+average (sd = 104.9) in 19.5 sentences (sd = 12.5). as a group,
+discussions were about 714.8 words long (sd = 235.7) and 90.6
+sentences long (sd = 33.5).
+an excerpt of a collaborative interaction chat in a chat room is
+shown below in table 1. (student names have been changed):
+table 1. an excerpt of a collaborative interaction chat
+student
+
+chat text
+
+in another study, dowell et al. [7] showed that students’ linguistic
+characteristics, namely higher degrees of narrativity and deep
+cohesion, are predictive of their learning. that is, students engaged in deep cohesive interactions performed better.
+
+art
+
+ok cool, everyone's here. sooo first question
+
+art
+
+ok so the certain characteristics to be considered to
+have a personality disorder?
+
+in the present research, we explore collaborative interaction chat
+data using the combination of topic modeling and epistemic network analysis. while previous studies focused on the relationship
+between language features and social network connections, our
+study focuses on prediction learning performance by semantic
+network connections students make in chats.
+
+shaffer
+
+alright sooo first question: based on these criteria describe several reasons why a psychologist might not
+label someone with grandiose thoughts as having narcissistic personality disorder?
+
+shaffer
+
+hahaha never mind
+
+shaffer
+
+that was the second question.
+
+3. methods
+
+art
+
+lol its all good
+
+shaffer
+
+okay so certain characteristics: doesn't it have to be like
+a stable thing?
+
+carl
+
+i think the main thing about having a disorder is that its
+disruptive socially and/or makes the person a danger to
+himself or others
+
+participants. participants were enrolled in an introductory-level
+psychology course taught in the fall semester of 2011 at a large
+university in the usa. while 854 students participated in this
+course, some minor data loss occurred after removing outliers and
+those who failed to complete the outcome measures. the final
+sample consisted of 844 students. females made up 64.3% of this105
+
+vasile
+
+yes, stable over time
+
+shaffer
+
+yeah, and it also mentioned it can't be because of drugs
+
+art
+
+also they have to have like unrealistic fantasies
+
+nia
+
+yeah and not normal in their culture
+
+carl
+
+no drugs or physical injury
+
+vasile
+
+begins in early adulthood or adolescence
+
+shaffer
+
+i think that covers them? haha
+
+art
+
+ok, so arrogance doesn't just define it, they have to have
+most of these characteristics
+
+art
+
+yeah i think we got them
+
+shaffer
+
+is it most or is it like 6?
+
+from the above excerpt, we can see several obvious things. first,
+the lengths of the utterances varied from one single word to multiple sentences. this needs to be considered in text analysis because some methods work only for longer texts. for example,
+coh-metrix usually works well for texts with more than 200
+words. topic modeling also needs enough length to reliably infer
+topic scores. second, the number of utterances each participant
+gave were different. from how much and what a member said, we
+can see each member played a different role in that chat. third,
+the ordered sequence of the utterances forms a time series. understanding and visualizing the underlying discourse dynamics are
+important for meaning making with this type of data.
+the data set contained 15,670 utterances, pretest scores (the first
+quiz) and post test scores (the second quiz) for 844 students,
+grouped in 182 chat rooms. each chat room had 2 to 5 students,
+4.73 by average. the average speech turns each student gave was
+18.2 and the average speech turns in each room was 86.1.
+the average pretest score was 36.01% correct and the average
+post-test scores 45.73% correct. paired sample test shows that the
+post-test is significantly higher (𝑡 = 14.13, 𝑁 = 844). we computed the learning gain of each student, using the formula
+𝑔𝑎𝑖𝑛 =
+
+𝑝𝑜𝑠𝑡𝑡𝑒𝑠𝑡 𝑠𝑐𝑜𝑟𝑒 − 𝑝𝑟𝑒𝑡𝑒𝑠𝑡 𝑠𝑐𝑜𝑟𝑒
+1−𝑝𝑟𝑒𝑡𝑒𝑠𝑡 𝑠𝑐𝑜𝑟𝑒
+
+.
+
+for all students (𝑁 = 844), the average learning gain is 0.11,
+59.5% had positive learning gains above 0.1. 16.5% had the same
+scores and 23% had negative learning gains. not surprisingly,
+students who had lower pretest scores had higher learning gains
+because they had greater potential to learn. figure 1 shows the
+average learning gain as function of pretest score.
+
+0.6
+0.4
+
+this data set has been analyzed in multiple studies. cade et al. [3]
+analyzed the cohesion of the chats and found that deep cohesion
+of the chats predicts the students feeling of power and connectedness to the group. dowell et al. [7] found that some coh-metrix
+measures predicts learning. coh-metrix measures describe common textual features that are not content specific. for example,
+cohesion is about how text segments are semantically linked to
+each other, which has nothing to do with what the text content is
+about. in this study, we use topic modeling to provide content
+dependent features and use epistemic network analysis to explore
+how the topics were associated in the chats.
+
+4. topic modeling
+topic modeling has been widely used in text analysis to find what
+topics are in a text and what proportion/amount of each topic is
+contained. latent dirichlet allocation (lda) [2; 24] is one of the
+most popular methods for topic modeling. lda uses a generative
+process to find topic representations. lda starts from a large
+document set 𝐷 = {𝑑1 , 𝑑2 , ⋯ , 𝑑𝑚 }. a word list 𝑊 =
+{𝑤1 , 𝑤2 , ⋯ , 𝑤𝑛 } is then extracted from the document set. lda
+assumes that the document set contains a certain number of topics,
+say, k topics. each document has a probability distribution over
+the k topics and each topic has a probability distribution over the
+given list of words. when a document was composed, each word
+that occurred in a document was assumed to be drawn based on
+the document-topic probability and the topic-word probability.
+for a given corpus (document set) and a given number of topics
+k, lda can compute the topic assignment of each word in each
+document.
+for a given topic, the word probability distribution can be easily
+computed from the number of times each word was assigned to
+the given topic. the beauty of topic modeling is that the “top
+words” (words with highest probabilities in a topic) usually give a
+meaningful interpretation of a topic. the distributions are the
+underlying representation of the topics. the top words are usually
+used to show what topics are contained in the corpus.
+by counting the number of words assigned to each topic, a topic
+proportion score can be computed for each document on each
+topic. the topic proportion scores then become a document feature that can be used in further analysis. however, the proportion
+scores are based on the statistical topic assignment of words.
+when documents are very short, such as most utterances in our
+chat data, the topic proportion scores won’t be reliable. cai et al.
+[4] argued that alternative ways to compute document topic scores
+are possible.
+
+4.1 tasa topic model
+
+0.2
+0.0
+-0.2
+
+for students with pretest scores less than 50% correct (n=624),
+the average learning gain is 0.88, 69.7% had positive learning
+gains, 15.7% had the same scores and 14.6% had negative learning gains.
+
+.00 .10 .20 .30 .40 .50 .60 .70 .80
+
+-0.4
+-0.6
+figure 1. average learning gain as a function of pretest score.
+
+although our chat data set contained 15,670 utterances, the utterances were short and the corpus is not large enough to build a
+reliable topic model. to get a reliable model, we used a well
+known corpus provided by tasa (touchstone applied science
+associates). this corpus contained documents on seven known
+categories, including business, health, home economics, industrial
+arts, language arts, science and social studies. our content topic,
+personality disorders, is obviously in the health category. of
+course, not all topics in tasa are relevant to our study. therefore, after building up the model, we need to select relevant topics. we will cover that in the next sub-section.106
+
+there are a total of 37,651 documents in tasa corpus, each of
+which is about 250 words long. before we ran lda, we filtered
+out very high frequency words and very low frequency words.
+high frequency words, such as “the”, “of”, “in”, etc., won’t contain much topic information. rare words won’t contribute to
+meaningful statistics. 28,483 words (it might be better to say
+“terms”) were left after filtering. a model with 300 topics was
+constructed by lda.
+
+4.2 topic score computation and topic selection
+from the tasa topic model, we computed the word-topic probabilities based on the number of times a word was assigned to each
+of the 300 topics. thus, each word is represented by a 300 dimensional probability distribution vector. for each chat in our chat
+corpus, we simply summed up the word probability vectors for the
+words appeared in each chat. that gave us 300 topic scores for
+each chat. recall that, the chats were associated with a reading
+material and two quizzes. while the students were free to talk
+about anything, the content of the reading material and the quizzes
+set up the main chat topics, that is, personality disorders.
+
+topic score
+1400
+1200
+1000
+800
+600
+
+200
+0
+0
+
+20
+
+40
+
+60
+
+figure 2. sorted topic scores for topic selection.
+the first thing we needed to do then was to investigate whether or
+not the “hot” topics from the computation made sense. to find
+that out, we computed the sum of all topic scores over all chats.
+the topics were sorted according the total topic score. the hottest
+topic had a total score higher than 1300, much higher than the
+second highest (less than 900). by examining the top words, this
+topic is about “illness”, which is highly relevant to personality
+disorders. six hot topics scored in the range from 600 to 900.
+they are about “outdoors”, “biology”, “people/social”, “education” and “healthcare”. the top words are listed below.
+
+
+
+
+
+
+
+
+
+“illness”, “biology”, “psychology” and “healthcare” are the topics
+the learning materials involved. “education” topic is about the
+education environment where the chat happened. “outdoor” and
+“people/social” are off-task topics.
+to get an idea about whether or not the topic scores were related
+to the learning gain, we aggregated the scores by person and computed the correlation between the total topic score and the learning
+gain for each topic. we were only interested in looking at the
+students with larger potential to learn, so we removed the data
+with pretest score greater than or equal to 0.5, leaving 624 students out of 844. the results (table 1) showed that all topics were
+significantly correlated to learning gain. it doesn’t seem to be
+great, because that seems to suggest that, whatever topic a student
+talked about, more a student talked, larger gain the student obtained. the real reason is that in the aggregation, all topic scores
+were summed up. therefore, all topic scores were influenced by
+the chat length. so the correlation in table 2 basically showed the
+chat length effect.
+table 2. correlation between total topic scores and learning
+gain (n=624, pretest<0.5)
+
+400
+
+
+
+
+
+person, animal, mental, response, positive, stress, personality, subject, reaction
+people/social: joe, pete, mr, charlie, dad, frank, billy,
+tony, jerry, 'll, mom, 'd, going, 're, got, boys, looked,
+asked, paper, go
+education: students, teacher, teachers, child, children,
+student, school, education, schools, learning, parents,
+tests, test, program, teaching, behavior, skills, reading,
+team, information
+healthcare: patient, doctor, health, hospital, medical,
+dr, patients, nurse, disease, doctors, team, care, office,
+nursing, drugs, medicine, services, dental, diseases, help
+
+illness: health, disease, patient, body, diseases, medical,
+stress, mental, physical, heart, doctor, problems, cause,
+person, patients, exercise, illness, problem, nurse,
+healthy
+outdoors: dog, energy, plants, earth, car, light, food,
+heat, words, animals, music, rock, language, children,
+air, uncle, city, sun, women, plant
+biology: cells, cell, genes, chromosomes, traits, color,
+organisms, sex, egg, species, gene, body, male, female,
+parents, nucleus, eggs, sperm, organism, sexual
+psychology: behavior, learning, theory, environment,
+feelings, sexual, physical, social, sex, human, research,
+
+topic
+
+post-test
+
+pretest
+
+gain
+
+illness
+
+.183**
+
+.116**
+
+.132**
+
+outdoors
+
+.216**
+
+.133**
+
+.154**
+
+biology
+
+.159**
+
+.125**
+
+.105**
+
+psychology
+
+.182**
+
+.096*
+
+.140**
+
+people/social
+
+.115**
+
+.022
+
+.107**
+
+education
+
+.175**
+
+.118**
+
+.121**
+
+healthcare
+
+.157**
+
+.130**
+
+.097*
+
+to remove the chat length effect, the simplest way is to divide all
+scores by the number of words (terms) in each chat. however, in
+this study, to be consistent with subsequent analysis, we normalized the topic scores to topic proportion scores by dividing each
+topic score for each utterance by the sum of all seven topic scores
+of the same utterance.
+the results (table 3) showed that the topic “people/social” had a
+significant negative correlation to learning gain. others were not
+significant but were in the direction we would expect. “illness”,
+“biology”, “psychology” and “healthcare” were positively correlated with gain scores, while “outdoors” and “people/social” topics were negatively correlated with gains scores. we observed
+almost no correlation for the “education” topic. this seems to
+indicate that the aggregated topic scores have limited power in
+predicting learning. therefore, we used ena to examine the connections or association of these topics in the students discourse to107
+
+develop a predictive model of learning gains based on the use of
+these topics.
+table 3. correlation between normalized topic proportion
+scores and learning gain (n=624, pretest<0.5)
+topic
+
+post-test
+
+pretest
+
+gain
+
+illness
+
+.099*
+
+0.077
+
+0.067
+
+outdoors
+
+-0.063
+
+-0.043
+
+-0.044
+
+biology
+
+.085*
+
+0.054
+
+0.063
+
+psychology
+
+0.067
+
+0.019
+
+0.058
+
+people/social
+
+-.127**
+
+-0.076
+
+-.083*
+
+education
+
+0.027
+
+0.056
+
+-0.002
+
+healthcare
+
+0.073
+
+.096*
+
+0.027
+
+5. epistemic network analysis
+ena measures the connections between elements in data and
+represents them in dynamic network models. ena creates these
+network models in a metric space that enables the comparison of
+networks in terms of (a) difference graph that highlights how the
+weighted connections of one network differ from another; and (b)
+statistics that summarize the weighted structure of network connections, enabling comparisons of many networks at once.
+ena was originally developed to model cognitive networks involved in complex thinking. these cognitive networks represent
+associations between knowledge, skills, habits of mind of individual learners or groups of learners. in this study, we used ena to
+construct network models. for each individual student, we constructed an ena network using the selected seven topic scores for
+each utterance the student contributed to the group.
+
+5.1 process
+while the process of creating ena models is described in more
+detail elsewhere (e.g. [11; 17-19]), we will briefly describe how
+ena models are created based on topic modeling. here we defined network nodes as the seven topics identified from the topic
+model. we defined the connections between nodes, or edges, as
+the strength of the co-occurrence of topics within a moving stanza
+window (msw) of size 5 [19]. to model connections between
+topics we used the products of the topic scores summed across all
+chats in the msw. that is, for each topic, the topic scores are
+summed across all 5 chats in the msw. then ena computed the
+product of the summed topic loadings for each pair topics to
+measure the strength of their co-occurrence. for example, if the
+sum of the topics scores across five chats was 0.5 for “illness”, 0.3
+for “psychology”, and 0.2 for “healthcare”, these scores would
+result in three co-occurrences, “illness-psychology”, “illnesshealthcare”, and “psychology-healthcare”, with scores of 0.15,
+0.1, and 0.06, respectively.
+next ena created adjacency matrices for each student that quantified the co-occurrences of topics within the students’ discourse
+in the context of their chat group. subsequently, the adjacency
+matrices were then treated as vectors in a high dimensional space,
+where each dimension corresponds to co-occurrence of a pair of
+topics. the vectors were then normalized to unit vectors. notice
+that the normalization removed the effect of chat length embedded
+in the topic scores. a singular value decomposition (svd) was
+then performed for dimensional reduction. ena then projected a
+vector for each student into a low dimensional space that maximizes the variance explained in the data. finally, the nodes of the
+
+networks, which in this case correspond to the seven selected
+topics generated from tasa corpus, were placed in the low dimensional space. the topic nodes were placed using an optimization algorithm such that the overall distances between centroids
+(centers of the mass of the networks) and the corresponding projected student locations was minimized. a critical feature of ena
+is that these node placements are fixed, that is, the nodes of each
+network are in the same place for all units in the analysis. this
+fixing of the location of the nodes allows for meaningful comparisons between networks in terms of their connection patterns
+which allow us to interpret the metric space. as a result, ena
+produced two coordinated representations: (1) the location of each
+student in a projected metric space, in which all units of analysis
+included in the model were located, and (2) weighted network
+graphs for each student, which explained why the student was
+positioned where it was in the space.
+ena also allows us to compare the mean network graphs and
+mean position in ena space between different groups of students. in this study, we only considered the students with high
+potential to learn, i.e., the 624 students with pretest score < 0.5
+(50% correct). among these students, we compared the networks
+of low learning gain students (gain<-0.1, 𝑁=194) with the networks of high learning gain students (gain>0.43, 𝑁=105). we
+compared these groups using difference network graph, which
+was formed by subtracting the edge weights of the mean discourse
+network for the low gain group students from the mean discourse
+network from the high gain group. this difference network graph
+shows us which topic connections are stronger for each group. in
+addition, we conducted a t-test to test the difference between
+group means.
+
+5.2 results
+figure 3 shows mean discourse networks for students with low
+gain scores (left, red), students with high gain scores (right, blue),
+and a difference network graph (center) that shows how the discourse patterns of each group differs. students with low gains had
+stronger connections between the “people/social” topic and all
+other topics except for “illness”. more importantly, the connection that was the strongest for low gain students compared to high
+gain students was between “people/social” and “outdoors”. students with high gain scores made stronger connections between
+the topics of “illness”, “psychology”, “healthcare”, “biology”, and
+“education”.
+table 4. comparison of centroids between low gain and high
+gain students, 𝒑 = 𝟎. 𝟎𝟒𝟕, 𝒕 = 𝟐. 𝟎𝟎
+n
+
+mean
+
+sd
+
+high gain
+
+105
+
+0.033
+
+0.220
+
+low gain
+
+194
+
+-0.048
+
+0.322
+
+figure 4 shows centroids, or the centers of mass, of individual
+students’ discourse networks and their means with low gain score
+students in red and high gain score students in blue. the differences between these two groups were significant on the x dimensions (see table 4). this means that the differences we saw in
+figure 2 and described above are statistically significant. in other
+words, the high learning gain students’ discourse was more towards the right side of the ena space and the low learning gain
+students’ discourse was more towards the left side. that indicates
+that the discourse of students with high learning gains made more
+connections between on-task topics (“illness”, “psychology”,
+“healthcare”, “biology”, and “education”), while the discourse of108
+
+low gain students made more connections between off-task topics
+(“people/social” and “outdoors”).
+
+6. discussion
+ena makes it possible to visualize the chat dynamics to help
+researchers gain deeper understanding of what is going on in a
+collaborative learning environment. differences in what topics
+students connect in discourse can predict learning outcomes. previous use of ena has relied on human coded data or use of regular expressions to classify data. utilizing topic modeling can lead
+to fully automated ena, making it more accessible to a wider
+group of researchers and allows ena to be used with more and
+larger data sets.
+the fact that the epistemic network predicts learning validates
+further application of ena. for example, the turn by turn chat
+dynamics can be plotted as trajectories in the 2-d space, where the
+
+topics are placed. investigating the trajectory patterns and their
+relationship to learning or socio-affective components are interesting future research directions.
+we used a general topic model in this study. many studies in the
+literature used lda for topic modeling on relatively small corpora. this causes two problems. 1) lda topic models built upon
+small corpora are not reliable, because lda requires large number documents with relatively large size for each document. inadequate corpus can result in misleading results. 2) using a topic
+model that is not common would result in arbitrary interpretation.
+for example, the representation of “illness” from different corpus
+could be very different. therefore, it is hard to compare the claims
+made to “illness” across different studies. using a reliable, common topic models will set up a common language for different
+studies.
+
+figure 3: mean discourse networks for students with low gain scores (left, red), students with high gain scores (right, blue), and a
+difference network graph (center).
+chat utterances are too short. the statistical inference algorithm
+contains a high degree of randomness for short documents. as an
+extreme example, an utterance with a single word, would result in
+inferred topic proportion scores with “1” on one topic and “0” on
+others. the problem is that, this “1” was assigned to a topic with
+certain degree of uncertainty. that is, the topic this “1” was assigned to could be any topic. while aggregated analysis may not
+be sensitive to such uncertainty, detailed utterance by utterance
+analysis would suffer from it.
+our method of computing topic scores is based on the topic probability distribution over each word. we treat the topic distribution
+of each word as a vector. when computing the topic score, the
+simple sum of all word vectors gives scores to all topics. as we
+have pointed out, the summation algorithm will have a length
+effect. therefore, when such topic scores are used, removing
+length effects through normalization is necessary. in this article,
+we did not use weighted sum as suggested in cai et al. [4]. comparing the effect of different weighting is beyond the scope of this
+paper.
+figure 4: discourse network centroids low gain score students
+red, high gain score students blue.
+topic scores for documents are usually inferred from topic models. while for longer documents, the topic scores can be used in
+many applications (e.g., text clustering [1]), the inferred topic
+proportion scores won’t be useful for analyzing chats if we need
+to treat each utterance as a unit of analysis. it is not useful because
+
+when a general topic model is used, selecting topics relevant to
+the specific analysis becomes important. our approach was to
+look at the total scores of utterances and find the “hot” topics by
+sorting the total topic scores. in our study, we had a quickly decreasing curve that helped us to select topics. we believe this
+would be the case for most studies using a model containing far
+more topics than the topics contained in the target data.109
+
+although our study started with topic modeling to capture the
+“what” in the chats, the association networks constructed in the
+epistemic network analysis actually turned the “what” into a
+“how”: how the topics in the chats associated with each other.
+this is conceptually similar to the cohesion features dowell [7]
+and cade [3] used.
+topic modeling emphasizes content words. when a topic model is
+built, stop words are usually removed. an interesting question is,
+what if we do the opposite: keep stop words and remove content
+words? pennebaker (e.g., [13]) laid foundational work in this direction. the liwc tool pennebaker and his colleagues created
+provides over a hundred text measures by counting non-content
+words. liwc measures could provide different features to epistemic network analysis and reveal different aspects of the chat
+dynamics.
+
+7. acknowledgments
+the research on was supported by the national science foundation (drk-12-0918409, drk-12 1418288), the institute of education sciences (r305c120001), army research lab (w911inf12-2-0030), and the office of naval research (n00014-12-c0643; n00014-16-c-3027). any opinions, findings, and conclusions or recommendations expressed in this material are those of
+the authors and do not necessarily reflect the views of nsf, ies,
+or dod. the tutoring research group (trg) is an interdisciplinary research team comprised of researchers from psychology,
+computer science, and other departments at university of memphis (visit http://www.autotutor.org).
+
+8. references
+[1]
+
+alghamdi, r. and alfalqi, k. 2015. a survey of topic
+modeling in text mining. ijacsa) international journal
+of advanced computer science and applications. 6, 1
+(2015), 147–153.
+
+[2]
+
+blei, d.m., edu, b.b., ng, a.y., edu, a.s., jordan, m.i.
+and edu, j.b. 2003. latent dirichlet allocation. journal
+of machine learning research. 3, (2003), 993–1022.
+
+[3]
+
+cade, w.l., dowell, n.m.m. and pennebaker, j. 2014.
+modeling student socioaffective responses to group
+interactions in a collaborative online chat environment.
+proceedings of the 7th international conference on
+educational data mining (edm). 2, 21 (2014), 399–400.
+
+[4]
+
+[5]
+
+cai, z., li, h., graesser, a.c. and hu, x. 2016. can
+word probabilities from lda be simply added up to
+represent documents ? proceedings of the 9th
+international conference on educational data mining.
+(2016), 577–578.
+von davier, a.a. and halpin, p.f. 2013. collaborative
+problem-solving and the assessment of cognitive skills:
+psychometric considerations. ets research report
+series. december (2013), 36 p.
+
+[6]
+
+dillenbourg, p. and traum, d. 2006. sharing solutions:
+persistence and grounding in multimodal collaborative
+problem solving. the journal of the learning sciences.
+15, 1 (2006), 121–151.
+
+[7]
+
+dowell, n., cade, w. , tausczik, y., pennebaker, j., and
+graesser, a. 2014. what works: creating adaptive and
+intelligent systems for collaborative learning support.
+springer international publishing switzerland. (2014),
+124–133.
+
+[8]
+
+dowell, n.m.m., skrypnyk, s., joksimović, s., graesser,
+
+a., dawson, s., gašević, d., hennis, t. a., vries, p. de
+and kovanović, v. 2015. modeling learners ’ social
+centrality and performance through language and
+discourse. educational data mining - edm’15 (2015),
+250–257.
+[9]
+
+fiore, s.m., rosen, m. a., smith-jentsch, k. a., salas, e.,
+letsky, m. and warner, n. 2010. toward an
+understanding of macrocognition in teams: predicting
+processes in complex collaborative contexts. human
+factors. 52, 2 (2010), 203–224.
+
+[10]
+
+graesser, a.c., mcnamara, d.s., louwerse, m.m. and
+cai, z. 2004. coh-metrix: analysis of text on cohesion
+and language. behavior research methods, instruments,
+& computers. 36, 2 (2004), 193–202.
+
+[11]
+
+li, h., samei, b., olney, a., graesser, a. and shaffer, d.
+2014. question classification in an epistemic game.
+international conference on intelligent tutoring
+systems. (2014).
+
+[12]
+
+pennebaker, j.w., boyd, r.l., jordan, k. and blackburn,
+k. 2015. the development and psychometric properties
+of liwc2015. austin, tx: university of texas at austin.
+(2015).
+
+[13]
+
+pennebaker, j.w., chung, c.k., frazee, j. and lavergne,
+g.m. 2014. when small words foretell academic
+success : the case of college admissions essays.
+(2014), 1–10.
+
+[14]
+
+rosen, y. 2014. assessing collaborative problem
+solving through computer agent technologies.
+encyclopedia of information science and technology. 9,
+november (2014), 94–102.
+
+[15]
+
+sawyer, r.k. 2014. the new science of learning. the
+cambridge handbook of the learning sciences. 1–18.
+
+[16]
+
+scholand, a.j., tausczik, y.r. and pennebaker, j.w.
+2010. assessing group interaction with social language
+network analysis. lecture notes in computer science
+(including subseries lecture notes in artificial
+intelligence and lecture notes in bioinformatics). 6007
+lncs, (2010), 248–255.
+
+[17]
+
+shaffer, d.w. 2006. epistemic frames for epistemic
+games. computers and education. 46, 3 (2006), 223–
+234.
+
+[18]
+
+shaffer, d.w., hatfield, d., svarovsky, g.n., nash, p.,
+nulty, a., bagley, e., frank, k., rupp, a.a. and
+mislevy, r.j. 2009. epistemic network analysis: a
+prototype for 21st-century assessment of learning.
+international journal of learning and media. 1, 2
+(2009), 33–53.
+
+[19]
+
+siebert-evenstone, a.l., arastoopour, g., collier, w.,
+swiecki, z., ruis, a.r. and shaffer, d.w. 2016. in
+search of conversational grain size: modeling semantic
+structure using moving stanza windows. international
+conference of the learning sciences. (2016).
+
+[20]
+
+slavin, r.e. 1995. cooperative learning: theory,
+research and practice (2nd ed.). the nature of learning.
+(1995), 208.
+
+[21]
+
+tuulos, v.h. and tirri, h. 2004. combining topic
+models and social networks for chat data mining.
+proceedings of the 2004 ieee/wic/acm international
+conference on web intelligence. october (2004), 206–110
+
+213.
+[22]
+[23]
+
+whitepaper, a.r. 2014. what happens when we learn
+together. (2014).
+yousef, a.m.f., chatti, m.a., schroeder, u., wosnitza,
+m. and jakobs, h. 2014. a review of the state-of-theart. proceedings of the 6th international conference on
+
+computer supported education - csedu2014. (2014),
+9–20.
+[24]
+
+wang z., qiu b., bai, w., chuan, s. and le, y. 2014.
+collapsed gibbs sampling for latent dirichlet
+allocation on spark. jmlr: workshop and conference
+proceedings. 2004 (2014), 17–28.

@@ -1,0 +1,1285 @@
+71
+
+efficient feature embeddings for student classification
+with variational auto-encoders
+severin klingler
+
+dept. of computer science
+eth zurich, switzerland
+
+kseverin@inf.ethz.ch
+
+rafael wampfler
+
+dept. of computer science
+eth zurich, switzerland
+
+wrafael@inf.ethz.ch
+
+barbara solenthaler
+
+dept. of computer science
+eth zurich, switzerland
+
+sobarbar@inf.ethz.ch
+
+abstract
+gathering labeled data in educational data mining (edm)
+is a time and cost intensive task. however, the amount
+of available training data directly influences the quality of
+predictive models. unlabeled data, on the other hand, is
+readily available in high volumes from intelligent tutoring
+systems and massive open online courses. in this paper, we
+present a semi-supervised classification pipeline that makes
+effective use of this unlabeled data to significantly improve
+model quality. we employ deep variational auto-encoders
+to learn efficient feature embeddings that improve the performance for standard classifiers by up to 28% compared
+to completely supervised training. further, we demonstrate
+on two independent data sets that our method outperforms
+previous methods for finding efficient feature embeddings
+and generalizes better to imbalanced data sets compared
+to expert features. our method is data independent and
+classifier-agnostic, and hence provides the ability to improve
+performance on a variety of classification tasks in edm.
+
+keywords
+semi-supervised classification, variational auto-encoder, deep
+neural networks, dimensionality reduction
+
+1.
+
+introduction
+
+building predictive models of student characteristics such
+as knowledge level, learning disabilities, personality traits
+or engagement is one of the big challenges in educational
+data mining (edm). such detailed student profiles allow
+for a better adaptation of the curriculum to the individual
+needs and is crucial for fostering optimal learning progress.
+in order to build such predictive models, smaller-scale and
+controlled user studies are typically conducted where detailed information about student characteristics are at hand
+(labeled data). the quality of the predictive models, however, inherently depends on the number of study participants, which is typically on the lower side due to time and
+budget constraints. in contrast to such controlled user studies, digital learning environments such as intelligent tutoring
+systems (its), educational games, learning simulations, and
+massive open online courses (moocs) produce high volumes
+of data. these data sets provide rich information about student interactions with the system, but come with no or only
+little additional information about the user (unlabeled data).
+
+tanja käser
+
+graduate school of education
+stanford university, usa
+
+tkaeser@stanford.edu
+markus gross
+
+dept. of computer science
+eth zurich, switzerland
+
+grossm@inf.ethz.ch
+
+semi-supervised learning bridges this gap by making use of
+patterns in bigger unlabeled data sets to improve predictions
+on smaller labeled data sets. this is also the focus of this
+paper. these techniques are well explored in a variety of
+domains and it has been shown that classifier performance
+can be improved for, e.g., image classification [15], natural language processing [28] or acoustic modeling [21]. in
+the education community, semi-supervised classification has
+been used employing self-training, multi-view training and
+problem-specific algorithms. self-training has e.g. been applied for problem-solving performance [22]. in self-training,
+a classifier is first trained on labeled data and is then iteratively retrained using its most confident predictions on unlabeled data. self-training has the disadvantage that incorrect predictions decrease the quality of the classifier. multiview training uses different data views and has been explored
+with co-training [27] and tri-training [18] for predicting prerequisite rules and student performance, respectively. the
+performance of these methods, however, largely depends on
+the properties of the different data views, which are not yet
+fully understood [34]. problem-specific semi-supervised algorithms have been used to organize learning resources in
+the web [19], with the disadvantage that they cannot be
+directly applied for other classification tasks.
+recently, it has been shown (outside of the education context) that variational auto-encoders (vae) have the potential to outperform the commonly used semi-supervised classification techniques. vae is a neural network that includes
+an encoder that transforms a given input into a typically
+lower-dimensional representation, and a decoder that reconstructs the input based on the latent representation. hence,
+vaes learn an efficient feature embedding (feature representation) using unlabeled data that can be used to improve the performance of any standard supervised learning
+algorithm [15]. this property greatly reduces the need for
+problem-specific algorithms. moreover, vaes feature the
+advantage that the trained deep generative models are able
+to produce realistic samples that allow for accurate data
+imputation and simulations [23], which makes them an appealing choice for edm. inspired by these advantages, and
+the demonstrated superior classifier performance in other
+domains as in computer vision [16, 23], this paper explores
+vae for student classification in the educational context.72
+
+we present a complete semi-supervised classification pipeline
+that employs deep vaes to extract efficient feature embeddings from unlabeled student data. we have optimized the
+architecture of two different networks for educational data a simple variational auto-encoder and a convolutional variational auto-encoder. while our method is generic and hence
+widely applicable, we apply the pipeline to the problem of
+detecting students suffering from developmental dyscalculia
+(dd), which is a learning disability in arithmetics. the large
+and unlabeled data set at hand consists of student data of
+more than 7k students and we evaluate the performance of
+our pipeline on two independent small and labeled data sets
+with 83 and 155 students. our evaluation first compares the
+performance of the two networks, where our results indicate
+superiority of the convolutional vae. we then apply different classifiers to both labeled data sets, and demonstrate
+not only improvements in classification performance of up to
+28% compared to other feature extraction algorithms, but
+also improved robustness to class imbalance when using our
+pipeline compared to other feature embeddings. the improved robustness of our vae is especially important for
+predicting relatively rare student conditions - a challenge
+that is often met in edm applications.
+
+2.
+
+background
+
+in the semi-supervised classification setting we have access
+to a large data set xb without labels and a much smaller
+labeled data set xs with labels ys . the idea behind semisupervised classification is to make use of patterns in the
+unlabeled data set to improve the quality of the classifier
+beyond what would be possible with the small data set
+xs alone. there are many different approaches to semisupervised classification including transductive svms, graphbased methods, self-training or representation learning [35].
+in this work we focus on learning an efficient encoding z =
+e(x) for x ∈ xb of the data domain using the unlabeled
+data xb only. this learnt data transformation e(·) - the
+encoding - is then applied to the labeled data set xs . wellknown encoders include principle component analysis (pca)
+or kernel pca (kpca). pca is a dimensionality reduction
+method that finds the optimal linear transformation from
+an n-dimensional to a k-dimensional space (given a meansquared error loss). kernel pca [24] extends pca allowing
+non-linear transformations into a k-dimensional space and
+has, among others, been successfully used for novelty detection in non-linear domains [11]. recently, variational autoencoders (vae) have outperformed other semi-supervised
+classification techniques on several data sets [15]. vae combine variational inference networks with generative models
+parametrized by deep neural networks that exploit information in the data density to find efficient lower dimensional
+representations (feature embeddings) of the data.
+auto-encoder. an auto-encoder or autoassociator [2] is a
+neural network that encodes a given input into a (typically
+lower dimensional) representation such that the original input can be reconstructed approximately. the auto-encoder
+consists of two parts. the encoder part of the network takes
+the n -dimensional input x ∈ rn and computes an encoding z = e(x) while the decoder d reconstructs the input
+based on the latent representation x̂ = d(z). if we train
+a network using the mean squared error loss and the network consists of a single linear hidden layer of size k, e.g.
+
+e(x) = w1 x + b1 and d(z) = w2 z + b2 for weights
+w1 ∈ rk×n and w2 ∈ rn ×k and offsets b1 ∈ rk and
+b2 ∈ rn , the autoencoder behaves similar to pca in that
+the network learns to project the input into the span of
+the k first principle components [2]. for more complex networks with non-linear layers multi-modal aspects of the data
+can be learnt. auto-encoders can be used in semi-supervised
+classification tasks because the encoder can compute a feature representation z of the original data x. these features
+can then be used to train a classifier. the learnt feature
+embedding facilitates classification by clustering related observations in the computed latent space.
+variational auto-encoder. variational auto-encoders [15]
+are generative models that combine bayesian inference with
+deep neural networks. they model the input data x as
+pθ (x|z) = f (x; z, θ)
+
+p(z) = n (z|0, i)
+
+(1)
+
+where f is a likelihood function that performs a non-linear
+transformation with parameters θ of z by employing a deep
+neural network. in this model the exact computation of
+the posterior pθ (z|x) is not computationally tractable. instead, the true posterior is approximated by a distribution
+qφ (z|x) [16]. this inference network qφ (z|x) is parametrized
+as a multivariate normal distribution as
+qφ (z|x) = n (z|µφ (x), diag(σφ2 (x))),
+
+(2)
+
+σφ2 (x)
+
+where µφ (x) and
+denote vectors of means and variance
+respectively. both functions µφ (·) and σφ2 (·) are represented
+as deep neural networks. hence, variational autoencoders
+essentially replace the deterministic encoder e(x) and decoder d(z) by a probabilistic encoder qφ (z|x) and decoder
+pθ (x|z). direct maximization of the likelihood is computationally not tractable, therefore a lower bound on the likelihood has been derived [16]. the learning task then amounts
+to maximizing this variational lower bound
+eqφ (z|x) [log pθ (x|z)] − kl [qφ (z|x)||p(z)] ,
+
+(3)
+
+where kl denotes the kullback-leibler divergence. the
+lower bound consists of two intuitive terms. the first term
+is the reconstruction quality while the second one regularizes the latent space towards the prior p(z). we perform
+optimization of this lower bound by applying a stochastic
+optimization method using gradient back-propagation [14].
+
+3.
+
+method
+
+in the following we introduce two networks. first, a simple
+variational auto-encoder consisting of fully connected layers to learn feature embeddings of student data. these encoders have shown to be powerful for semi-supervised classification [15], and are often applied due to their simplicity.
+second, an advanced auto-encoder that combines the advantages of vae with the superiority of asymmetric encoders.
+this is motivated by the fact that asymmetric auto-encoders
+have shown superior performance and more meaningful feature representations compared to simple vae in other domains such as image synthesis [29].
+student snapshots. there are many applications where
+we want to predict a label yn for each student n within an
+its based on behavioral data xn . these labels typically
+relate to external variables or properties of a student, such73
+
+simple student auto-encoder (s-sae)
+𝑞𝜙 𝒛 𝒙)
+
+x
+
+sampling connection
+
+x
+
+fc
+
+fully connected layer
+
+con
+con
+con
+
+fc
+
+network connection
+
+fc
+
+𝜎
+
+𝑧
+
+con
+con
+con
+
+𝜇
+
+fc
+
+fc
+
+x
+
+cnn student auto-encoder (cnn-sae)
+𝑞𝜙 𝒛 𝒙)
+
+𝑝𝜃 𝒙 𝒛)
+
+𝜇
+𝜎
+
+𝑝𝜃 𝒙 𝒛)
+lstm
+
+fc
+
+lstm
+
+fc
+
+𝑧
+
+lstm recurrent lstm
+
+x
+
+con
+
+convolutional layer
+
+figure 1: network layouts for our simple student auto-encoder (left) using only fully connected layers and our
+improved cnn student auto-encoder (right) using convolutions for the encoder and recurrent lstm layers
+for the decoder. in contrast to standard auto-encoders, the connections to the latent space z are sampled
+(red dashed arrows) from a gaussian distribution.
+
+as age, learning disabilities, personality traits, learner types,
+learning outcome etc. similar to knowledge tracing (kt)
+we propose to model the data xn = {xn1 , . . . , xnt } as a
+sequence of t observations. in contrast to kt we store f
+different feature values xnt ∈ rf for each element in the
+sequence, where t denotes the tth opportunity within a task.
+this allows us to simultaneously store data from multiple
+tasks in xnt , e.g. xn1 stores all features for student n that
+were observed during the first task opportunities. for every task in an its we can extract various different features
+that characterize how a student n was approaching the task.
+these features include performance, answer times, problem
+solving strategies, etc. we combine this information into a
+student snapshot xn ∈ rt ×f , where t is the number of task
+opportunities and f is the number of extracted features.
+simple student auto-encoder (s-sae). our simple variational autoencoder is following the general design outlined
+in section 2 and is based on the student snapshot representation. for ease of notation we use x := vec(xn ), where
+vec(·) is the matrix vectorization function to represent the
+student snapshot of student n. the complete network layout is depicted in figure 1, left. the encoder and decoder
+networks consist of l fully connected layers that are implemented as an affine transformation of the input followed by
+a non-linear activation function β(·) as xl = β(wl xl−1 +bl ),
+where l is the layer index and wl and bl are a weight matrix
+and offset vector of suitable dimensions. typical choices for
+β(·) include tanh, rectified linear units or sigmoid functions
+[6]. to produce latent samples z we sample from the normal
+distribution (see equation (2)) using re-parametrization [16]
+z = µφ (x) + σφ (x),
+
+(4)
+
+where  ∼ n (0, 1), to allow for back-propagation of gradients. for pθ (x|z) (see (1)) any suitable likelihood function can be used. we used a gaussian distribution for all
+presented examples. note that the likelihood function is
+parametrized by the entire (non-linear) decoder network.
+the training of variational auto-encoders can be challenging
+as stochastic optimization was found to set qφ (z|x) = p(z)
+in all but vanishingly rare cases [3], which corresponds to a
+local maximum that does not use any information from x.
+we therefore add a warm-up phase that gradually gives the
+regularization term in the target function more weight:
+eqφ (z|x) [log pθ (x|z)] − α kl [qφ (z|x)||p(z)] ,
+
+(5)
+
+where α ∈ [0, 1] is linearly increased with the number of
+epochs. the warm-up phase has been successfully used
+for training deep variational auto-encoders [25]. furthermore, we initialize the weights of the dense layer computing
+log(σφ2 (x)) to 0 (yielding a variance of 1 at the beginning of
+the training). this was motivated by our observations that if
+we employ standard random weight initialization techniques
+(glorot-norm, he-norm [9]) we can get relatively high initial
+estimates for the variance σφ2 (x), which due to the sampling
+leads to very unreliable samples z in the latent space. the
+large variance in sampled points in the latent space leads to
+bad convergence properties of the network.
+cnn student auto-encoder (cnn-sae). following
+the recent findings in computer vision we present a second,
+more advanced network that typically outperforms simpler
+vae. in [29], for example, these asymmetric auto-encoders
+resulted in superior reconstruction of images as well as more
+meaningful feature embeddings. a specific kind of convolutional neural network was combined with an auto-encoder,
+being able to directly capture low level pixel statistics and
+hence to extract more high-level feature embeddings.
+inspired by this previous work, we combine an asymmetric
+auto-encoder (and a decoder that is able to capture low level
+statistics) with the advantages of variational auto-encoders.
+figure 1, right, shows our combined network. we employ
+multiple layers of one-dimensional convolutions to parametrize
+the encoder qφ (z|x) (again we assume a gaussian distribution, see (2)). the distribution is parametrized as follows:
+µφ (x) = wµ h + bµ
+log(σφ2 (x)) = wσ h + bσ
+h = convl (x) = β(wl ∗ convl−1 (x)),
+
+where ∗ is the convolution operator, wl , wµ , wσ are weights
+of suitable dimensions, β(·) is a non-linear activation function and l denotes the layer depth. further, conv0 (x) = x.
+we keep the standard variational layer (see (4)) while changing the output layer to a recurrent layer using long term
+short term units (lstm). recurrent layers have successfully been used in auto-encoders before, e.g. in [5]. lstm
+were very successful for modeling temporal sequences because they can model long and short term dependencies between time steps. every lstm unit receives a copy of the
+sampled points in latent-space, which allows the lstm network to combine context information (point in the latent74
+
+feature
+selection
+
+naive bayes
+logistic regression
+svm
+
+labels
+
+𝑞𝜙 𝒛 𝒙)
+
+feature
+embedding
+
+labeled
+data
+
+𝑝𝜃 𝒙 𝒛)
+
+encoder
+unlabeled
+data
+
+𝑞𝜙 𝒛 𝒙)
+
+feature
+embedding
+
+unlabeled
+data
+
+semi-supervised classification pipeline
+encoder
+decoder
+
+use trained encoder
+
+figure 2: pipeline overview. we train the variational auto-encoder on a large unlabeled data set. the trained
+encoder of the auto-encoder can be used to transform other data sets into an expressive feature embedding.
+based on this feature embedding we train different classifiers to predict the student labels.
+
+space) with the sequence information (memory unit in the
+lstm cell). using lstm cells the decoder pθ (x|z) assumes
+a gaussian distribution and is parametrized as follows:
+µθt (z) = wµz · lstmt (z) + bµz
+
+4.1 experimental setup
+
+2
+log(σθt
+(z)) = wσz · lstmt (z) + bσz ,
+2
+where µθt (z) and σθt
+(z) are the tth components of µθ (z) and
+σθ2 (z), respectively, lstmt (·) denotes the tth lstm cell and
+w∗ and b∗ denote suitable weight and offset parameters.
+
+feature selection. vae provide a natural way for performing feature selection. the inference network qφ (z|x)
+infers the mean and variance for every dimension zi . therefore, the most informative dimension zi has the highest kl
+divergence from the prior distribution p(zi ) = n (0, 1) while
+uninformative dimensions will have a kl divergence close to
+0 [10]. the kl divergence of zi to p(zi ) is given by
+kl [qφ (zi |x)||p(zi )] = − log(σi ) +
+
+1
+σi2 µ2i
+− ,
+2
+2
+
+sets since their distribution of dd and non-dd children differs: the first study has approximately 50% dd, while the
+second one includes 5% dd (typical prevalence of dd).
+
+(6)
+
+where µi and σi are the inferred parameter for the gaussian
+distribution qφ (zi |x). feature selection proceeds by keeping
+the k dimensions zi with the largest kl divergence.
+semi-supervised classification pipeline. the encoder
+and the decoder of the variational auto-encoder can be used
+independently of each other. this independence allows us
+to take the trained encoder and map new data to the learnt
+feature embedding. figure 2 provides an overview of the
+entire pipeline for semi-supervised classification. in a first
+unsupervised step we train a vae on unlabeled data. the
+learnt encoder qφ (z|x) is then used to transform labeled data
+sets to the feature embedding. we finally apply our feature
+selection step that considers the relative importance of the
+latent dimensions as previously described. we then train
+standard classifiers (logistic regression, naive bayes and
+support vector machine) on the feature embeddings.
+
+4. results
+we evaluated our approach for the specific example of detecting developmental dyscalculia (dd), which is a learning
+disability affecting the acquisition of arithmetic skills [33].
+based on the learnt feature embedding on a large unlabeled
+data set the classifier performance was measured on two independent, small and labeled data sets from controlled user
+studies. we refer to them as balanced and imbalanced data
+
+all three data sets were collected from calcularis, which is
+an intelligent tutoring system (its) targeted at elementary
+school children suffering from dd or exhibiting difficulties
+in learning mathematics [13]. calcularis consists of different
+games for training number representations and calculation.
+previous work identified a set of games that are predictive
+of dd within calcularis [17]. since timing features were
+found to be one of the most relevant indicators for detecting
+dd [4] and to facilitate comparison to other feature embedding techniques we limited our analysis to log-normalized
+timing features, for which we can assume normal distribution [30]. therefore, we evaluated our pipeline on the subset of games from [17] for which meaningful timing features
+could be extracted and sufficient samples were available in all
+data sets (we used >7000 samples for training the vaes).
+since our pipeline currently does not handle missing data
+only students with complete data were included.
+timing features were extracted for the first 5 tasks in 5 different games. the selected games involve addition tasks
+(adding a 2-digit number to a 1-digit number with tencrossing; adding two 2-digit numbers with ten-crossing), number conversion (spoken to written numbers in the ranges 010 and 0-100) and subtraction tasks (subtracting a 1-digit
+number from a 2-digit number with ten-crossing). for every
+task we extracted the total answer time (time between the
+task prompt until the answer was entered) and the response
+time (time between the task prompt and the first input by
+the student). hence, each student is represented by a 50dimensional snapshot x (see section 3).
+unlabeled data set. the unlabeled data set was extracted
+using live interaction logs from the its calcularis. in total,
+we collected data from 7229 children. note that we have
+no additional information about the children such as dd or
+grade. we excluded all teacher accounts as well as log files
+that were < 20kb. since every new game in calcularis is
+introduced by a short video during the very first task, we
+excluded this particular task for all games.
+balanced data set. the first labeled data set is based
+on log files from 83 participants of a multi-center user study75
+
+conducted in germany and switzerland, where approximately
+half of the participants were diagnosed with dd (47 dd, 36
+control) [31]. during the study, children trained with calcularis at home for five times per week during six weeks and
+solved on average 1551 tasks. there were 28 participants
+in 2nd grade (9 dd, 19 control), 40 children in 3rd grade
+(23 dd, 17 control), 12 children in 4th grade (12 dd) and
+3 children in 5th grade (3 dd). the diagnosis of dd was
+based on standardized neuropsychological tests [31].
+imbalanced data set. the second labeled data set is from
+a user study conducted in the classroom of ten swiss elementary school classes. in total, 155 children participated, and
+a prevalence of dd of 5% could be detected (8 dd, 147 control). there were 97 children in 2nd grade (3 dd, 94 control)
+and 58 children in 3rd grade (5 dd, 53 control). the dd diagnosis was computed based on standardized tests assessing
+the mathematical abilities of the children [32, 7]. during the
+study, children solved 85 tasks directly in the classroom. on
+average, children needed 26 minutes to complete the tasks.
+implementation. the unlabeled data set was used to train
+the unsupervised vae for extracting compact feature embeddings of the data. based on the learnt data transformations we evaluated two standard classifiers: logistic regression (lr) and naive bayes (nb). we restricted our evaluation to simple classification models because we wanted to
+assess the quality of the feature embedding and not the quality of the classifier. more advanced classifiers typically perform a (sometimes implicit) feature transformation as part
+of their data fitting procedure. to represent at least one
+model that performs such an embedding we included support vector machine (svm) in all our results. all classifier
+parameters were chosen according to the default values in
+scikit-learn. note that we have additionally performed randomized cross-validated hyper-parameter search for all classifiers, which, however, resulted in marginal improvements
+only. because of that, and to keep the model simple and especially easily reproducible, we use the default parameter set
+in this work. for logistic regression we used l2 regularization with c = 1, for naive bayes we used gaussian distributions and for the svm rbf kernels and data point weights
+have been set inversely proportional to label frequencies. all
+results are cross-validated using 30 randomized training-test
+splits on the unlabeled data (test size 5%). the classification
+part of the pipeline is additionally cross-validated using 300
+label-stratified random training-test splits (test size 20%) to
+ensure highly reproducible classification results.
+network hyper-parameters were defined using the approach
+described in [1]. we increased the number of nodes per
+layer, the number of layers and the number of epochs until
+a good fit of the data was achieved. we then regularized
+the network using dropout [26] with increasing dropout rate
+until the network was no longer overfitting the data. activation and weight initialization have been chosen according to common standards: we employ the most common
+activation function, namely rectified linear activation units
+(relu) [20], for all activations. weight initialization was
+performed using the method by he et al. [9]. following this
+procedure, the following parameters were used for the ssae model: encoder and decoders used 3 layers of size 320.
+the cnn-sae model was parametrized as follows: 3 convo-
+
+lution layers with 64 convolution kernels and a filter length
+of 3. we used a single layer of lstm cells with 80 nodes.
+we used a batch size of 500 samples and batch normalization and dropout (r = 0.25) at every layer. the warm-up
+phase (see section 3) was set to 300 epochs. training was
+stopped after 1000 (s-sae) and 500 (cnn-sae) epochs.
+the number of latent units was set to 8 in accordance to
+previous work on detecting students with dd that used 17
+features but found that about half of the features were sufficient to detect dd with high accuracy [17]. when feature
+selection was applied we set the number of features to k = 4
+and thus we kept exactly half of the latent space features.
+all networks were implemented using the keras framework
+with tensorflowtm and optimized using adam stochastic
+optimization with standard parameters according to [14].
+
+4.2
+
+performance comparison
+
+our vae models are trained to extract efficient feature embeddings of the data. to assess the quality of these computed feature representations, we compare the classification
+performance of our method to previous techniques for finding efficient feature embeddings, as well as to feature sets
+optimized specifically for the task of predicting dd.
+network comparison. in a first experiment we compared
+the feature embeddings generated by our simple s-sae and
+our asymmetric cnn-sae with and without feature selection. figure 3 illustrates the average roc curves of our
+complete semi-supervised classification pipeline. our feature embeddings based on asymmetric cnn-sae clearly
+outperform the ones from the simple s-sae on both the
+imbalanced and the balanced data set for naive bayes (nb)
+and logistic regression (lr). for both models, feature selection improves the area under the roc curve (auc) for
+the imbalanced data set (cnn-sae: lr 4.2%, nb 6.3%;
+s-sae: lr 6.8%, nb: 1.6%), but has no effect for the balanced data set. we believe that this is due to the ability of
+the classifiers to distinguish useful features from noisy ones
+given enough samples. since the performance of the classifiers with feature selection (fs) is better or equal to no
+feature selection in each experiment, we used the cnn-sae
+fs model for all further evaluations.
+classification performance. in figure 4 we compare the
+classifier performance for different feature embeddings. we
+compare our method based on vae to two well-known methods for finding optimal feature embeddings, namely principle
+component analysis (pca, green) and kernel pca (kpca,
+red) [24]. for comparison and as a baseline for the performance of the different methods, we include direct classification results (gray), for which no feature embedding was
+computed. we used k = 8 (dimensionality of feature embedding) for all methods. the features extracted by our
+pipeline compare favorably to pca and kernel pca showing improvements in terms of auc of 28% for logistic regression and 23% for naive bayes on the imbalanced data
+set and an improvement of 3.75% for logistic regression
+and 7.5% for naive bayes on the balanced data set. by
+using simple classifiers, we demonstrated that our encoder
+learns an effective feature embedding. more sophisticated
+classifiers (such as svm with non-linear kernels) typically
+proceed by first embedding the input into a specific feature
+space that is different from the original space.76
+
+logistic regression
+
+1.0
+cnn-sae
+cnn-sae
+0.8 fs
+s-sae
+s-sae
+0.6 fs
+
+0.8
+
+true positive rate
+
+true positive rate
+
+1.0
+
+0.6
+0.4
+0.2
+0.0
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+cnn-sae
+cnn-sae fs
+s-sae
+s-sae fs
+
+0.4
+0.2
+0.0
+0.0
+
+1.0
+
+naive bayes
+
+false positive rate
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+false positive rate
+
+(a) imbalanced data set
+logistic regression
+
+1.0
+cnn-sae
+cnn-sae
+0.8 fs
+s-sae
+s-sae
+0.6 fs
+
+0.8
+
+true positive rate
+
+true positive rate
+
+1.0
+
+0.6
+0.4
+0.2
+0.0
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+false positive rate
+
+1.0
+
+naive bayes
+cnn-sae
+cnn-sae fs
+s-sae
+s-sae fs
+
+0.4
+0.2
+0.0
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+false positive rate
+
+(b) balanced data set
+figure 3: roc curves for the two proposed models with and without feature selection (fs). our
+asymmetric cnn-sae outperforms the simple ssae consistently with (blue) and without (purple)
+feature selection. feature selection improves performance only on the imbalanced data set.
+
+for the imbalanced data set the overall performance for
+svm is significantly lower for all embeddings. this is in line
+with previous work [12] showing that for imbalanced data
+sets, the decision boundaries of svms are heavily skewed
+towards the minority class resulting in a preference for the
+majority class and thus a high miss-classification rate for the
+minority class. indeed, we found that svm predicted only
+majority labels on the imbalanced data set. for the balanced data set our feature embedding shows improvements
+of 2.5% over alternative embeddings when using svm.
+further, table 1 shows the performance of all feature embeddings using three additional common classification metrics:
+root mean squared error (rmse), classification accuracy
+(acc.) and area under the precision recall curve (aupr).
+we statistically compared the classification metrics of our
+feature embedding to the best alternative feature embedding using an independent t-test and bonferroni correction
+for multiple tests (α = 0.05). our feature embedding significantly outperformed alternative embeddings for all classifiers on both the balanced and imbalanced data sets on most
+metrics. the main exception was the performance of svm
+on the imbalanced data set, which exhibited large variance
+for all feature embeddings and the worst overall classification performance (compared to the other classifiers).
+when comparing classification performance on the imbalanced and the balanced data sets we observed that our
+pipeline using vaes showed significant performance improvements compared to other methods for finding feature embeddings. while the unlabeled and the balanced data sets stem
+from an adaptive version of calcularis the imbalanced data
+was collected using a fixed task sequence. as our method
+shows larger improvements on the imbalanced data, we be-
+
+lieve cnn-sae learned an embedding that is robust beyond
+adaptive its. the relative improvements of our feature embeddings is smallest for svm on the balanced data set. we
+believe that this is due to ability of the svm to learn complex decision boundaries given sufficient data. however, the
+ability for complex decision boundaries renders svms more
+vulnerable to class imbalance, yielding performance at random level on the imbalanced data set.
+comparison to specialized models. recently, a specialized naive bayes classifier (s-nb) for the detection of
+developmental dyscalculia (dd) was introduced presenting
+a set of features optimized for the detection of dd [17].
+the development of s-nb including the set of features was
+based on the balanced data set used in this work. in comparison to s-nb, our approach relies on timing data only
+and the extracted features are independent of the classification task. we compared the performance of s-nb to our
+cnn-sae model on both data sets. for the balanced data
+set we found an auc of 0.94 for the specialized model (snb) compared to an auc of 0.86 for naive bayes using our
+feature embedding. on the imbalanced data set we found
+an auc of 0.67 for s-nb compared to an auc of 0.77 using logistic regression with our feature embedding. these
+findings demonstrate that while our feature embedding performs slightly worse on the balanced data set (for which the
+s-nb was developed), we significantly outperform s-nb by
+15% on the imbalanced data set, which suggests that our
+vae model automatically extracts feature embeddings that
+are more robust than expert features.
+robustness on sample size. ideally, a classifier’s performance should gracefully decrease as fewer data is provided.
+a good feature embedding allows a classifier to generalize
+well based on few labeled examples because similar samples
+are clustered together in the feature embedding. we therefore investigated the robustness of the different feature representations with respect to the training set size. for this we
+used the balanced data set where we varied the training set
+size between 7 (10% of the data) and 62 (90% of the data)
+by random label-stratified sub-sampling. figure 5 compares
+the auc of the different feature embeddings over different
+sizes of the training set. in case of naive bayes and logistic regression our embedding provides superior performance
+for all training set sizes. for large enough data sets svm
+using the raw feature data (direct, grey) is performing as
+well as using our embedding (cnn-sae, blue). however,
+for smaller data sets starting at 30 samples the performance
+of svm based on the raw features declines more rapidly
+compared to the svm based on our feature embedding.
+
+5.
+
+conclusion
+
+we adapted the recently developed variational auto-encoders
+to educational data for the task of semi-supervised classification of student characteristics. we presented a complete pipeline for semi-supervised classification that can be
+used with any standard classifier. we demonstrated that extracted structures from large scale unlabeled data sets can
+significantly improve classification performance for different
+labeled data sets. our findings show that the improvements
+are especially pronounced for small or imbalanced data sets.
+imbalanced data sets typically arise in edm when detecting
+relatively rare conditions such as learning disabilities. im-77
+
+ , p e d o d q f h g  g d w d  v h w
+
+ 1 d l y h  % d \ h v
+
+    
+ ' l u h f w
+     3 & $
+     . h u q h o  3 & $
+     & 1 1  6 $ (
+    
+    
+    
+    
+    
+
+ % d o d q f h g  g d w d  v h w
+
+ $ 8 &
+
+ $ 8 &
+
+ $ 8 &
+
+ / r j l v w l f  5 h j u h v v l r q
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+ , p e d o d q f h g  g d w d  v h w
+
+ v r x u f h
+
+ 6 9 0
+
+    
+ ' l u h f w
+     3 & $
+     . h u q h o  3 & $
+     & 1 1  6 $ (
+    
+    
+    
+    
+    
+
+ % d o d q f h g  g d w d  v h w
+
+ ' l u h f w
+ 3 & $
+ . h u q h o  3 & $
+ & 1 1  6 $ (
+
+ , p e d o d q f h g  g d w d  v h w
+
+ v r x u f h
+
+ % d o d q f h g  g d w d  v h w
+
+ v r x u f h
+
+logistic regression
+
+0
+
+10
+
+20
+
+30
+
+40
+
+50
+
+60
+
+70
+
+0.90
+direct
+0.85pca
+0.80kernel pca
+cnn-sae
+0.75
+0.70
+0.65
+0.60
+0.55
+0.50
+0
+10
+
+number of training samples
+
+naive bayes
+
+auc
+
+0.90
+0.85
+0.80
+0.75
+0.70
+0.65
+0.60
+0.55
+0.50
+
+auc
+
+auc
+
+figure 4: classification performance for different feature embeddings. our variational auto-encoder (blue)
+outperforms other embeddings by up to 28% (imbalanced data set) and by up to 7.5% (balanced data set).
+
+20
+
+30
+
+40
+
+50
+
+60
+
+70
+
+0.90
+direct
+0.85pca
+0.80kernel pca
+cnn-sae
+0.75
+0.70
+0.65
+0.60
+0.55
+0.50
+0
+10
+
+number of training samples
+
+svm
+direct
+pca
+kernel pca
+cnn-sae
+
+20
+
+30
+
+40
+
+50
+
+60
+
+70
+
+number of training samples
+
+figure 5: comparison of classifier performance on the balanced data for different training set sizes (moving
+average fitted to data points). the features automatically extracted by our variational auto-encoder (blue)
+maintain a performance advantage even if the training size shrinks to 7 samples (10% of the original size).
+
+table 1: comparison of our method to alternative embeddings. our approach using a variational auto-encoder
+(cnn-sae) significantly outperforms other approaches for most cases. the best score for each metric and
+classifier is shown in bold. *= statistically significant difference (t-test with bonferroni correction, α = 0.05).
+direct
+auc rmse
+
+aupr
+
+acc.
+
+pca
+auc rmse
+
+aupr
+
+acc.
+
+kernel pca
+auc rmse
+
+aupr
+
+acc.
+
+cnn-sae
+auc
+rmse
+
+aupr
+
+acc.
+
+imbalanced data set
+logistic regression
+naive bayes
+svm
+
+0.53
+0.51
+0.55
+
+0.27
+0.29
+0.25
+
+0.18
+0.23
+0.22*
+
+0.91
+0.91
+0.94
+
+0.54
+0.50
+0.40
+
+0.25
+0.29
+0.25
+
+0.17
+0.10
+0.08
+
+0.93
+0.90
+0.94
+
+0.61
+0.57
+0.42
+
+0.25
+0.28
+0.25
+
+0.16
+0.20
+0.09
+
+0.93
+0.91
+0.93
+
+0.78*
+0.70*
+0.59
+
+0.24*
+0.25*
+0.25
+
+0.28*
+0.24
+0.16
+
+0.94*
+0.93*
+0.94
+
+balanced data set
+logistic regression
+naive bayes
+svm
+
+0.80
+0.80
+0.81
+
+0.44
+0.49
+0.42
+
+0.82
+0.80
+0.84*
+
+0.73
+0.73
+0.75
+
+0.80
+0.77
+0.79
+
+0.42
+0.46
+0.43
+
+0.84
+0.77
+0.81
+
+0.73
+0.71
+0.73
+
+0.80
+0.76
+0.80
+
+0.42
+0.46
+0.43
+
+0.83
+0.76
+0.83
+
+0.75
+0.70
+0.73
+
+0.83*
+0.86*
+0.83
+
+0.40*
+0.38*
+0.40*
+
+0.84
+0.86*
+0.81
+
+0.77
+0.80*
+0.79*
+
+proved classification results with simple classifiers such as
+logistic regression might indicate that vaes learn feature
+embeddings that are interpretable by human experts. in
+the future we want to explore the learnt representations and
+compare it to traditional categorizations of students (skills,
+performance, etc.). additionally, we want to extend our
+results to include additional feature types and data reliability indicators to handle missing data. although we trained
+our networks on comparatively small sample sizes, the presented method scales (due to mini-batch learning) to much
+larger data sets (>100k users ) allowing the training of more
+complex vae. moreover, the generative model pθ (x|z) that
+is part of any vae can be used to produce realistic data
+samples [29]. up-sampling of the minority class provides a
+potential way to improve the decision boundaries for classi-
+
+fiers. in contrast to common up-sampling methods such as
+adasyn [8], vae-based sampling does not require nearest
+neighbor computations which makes them better applicable
+to small data sets. preliminary results for random subsets
+of the balanced data set showed improvements in auc by
+up-sampling based on vae of 2-3% compared to adasyn.
+while we applied our method to the specific case of detecting
+developmental dyscalculia, the presented pipeline is generic
+and thus can be applied to any educational data set and
+used for the detection of any student characteristic.
+acknowledgments. this work was supported by eth
+research grant eth-23 13-2.
+
+6.
+
+references78
+
+[1] y. bengio. practical recommendations for gradientbased training of deep architectures. in neural
+networks: tricks of the trade, pages 437–478. 2012.
+[2] y. bengio et al. learning deep architectures for ai.
+foundations and trends in machine learning, 2009.
+[3] s. r. bowman, l. vilnis, o. vinyals, a. dai,
+r. jozefowicz, and s. bengio. generating sentences
+from a continuous space. in proc. conll, pages
+10–21, 2016.
+[4] b. butterworth. dyscalculia screener. nelson
+publishing company ltd., 2003.
+[5] o. fabius and j. r. van amersfoort. variational
+recurrent auto-encoders. in proc. iclr, 2015.
+[6] i. goodfellow, y. bengio, and a. courville. deep
+learning. mit press, 2016.
+[7] j. haffner, k. baro, p. parzer, and f. resch.
+heidelberger rechentest: erfassung mathematischer
+basiskomptenzen im grundschulalter, 2005.
+[8] h. he, y. bai, e. a. garcia, and s. li. adasyn:
+adaptive synthetic sampling approach for imbalanced
+learning. in proc. ijcnn, pages 1322–1328, 2008.
+[9] k. he, x. zhang, s. ren, and j. sun. delving deep
+into rectifiers: surpassing human-level performance on
+imagenet classification. in proc. iccv, pages
+1026–1034, 2015.
+[10] i. higgins, l. matthey, x. glorot, a. pal, b. uria,
+c. blundell, s. mohamed, and a. lerchner. early
+visual concept learning with unsupervised deep
+learning. arxiv preprint arxiv:1606.05579, 2016.
+[11] h. hoffmann. kernel pca for novelty detection.
+pattern recognition, pages 863–874, 2007.
+[12] t. imam, k. ting, and j. kamruzzaman. z-svm: an
+svm for improved classification of imbalanced data. ai
+2006: advances in artificial intelligence, pages
+264–273, 2006.
+[13] t. käser, g.-m. baschera, j. kohn, k. kucian,
+v. richtmann, u. grond, m. gross, and m. von aster.
+design and evaluation of the computer-based training
+program calcularis for enhancing numerical cognition.
+frontiers in developmental psychology, 2013.
+[14] d. kingma and j. ba. adam: a method for stochastic
+optimization. proc. iclr, 2015.
+[15] d. p. kingma, s. mohamed, d. j. rezende, and
+m. welling. semi-supervised learning with deep
+generative models. in proc. nips, pages 3581–3589,
+2014.
+[16] d. p. kingma and m. welling. auto-encoding
+variational bayes. proc. iclr, 2014.
+[17] s. klingler, t. käser, a. busetto, b. solenthaler,
+j. kohn, m. von aster, and m. gross. stealth
+assessment in its - a study for developmental
+dyscalculia. in proc. its, pages 79–89, 2016.
+[18] g. kostopoulos, s. b. kotsiantis, and p. b. pintelas.
+predicting student performance in distance higher
+education using semi-supervised techniques. in proc.
+medi, pages 259–270, 2015.
+[19] i. labutov and h. lipson. web as a textbook:
+curating targeted learning paths through the
+heterogeneous learning resources on the web. in
+proc. edm, pages 110–118, 2016.
+[20] y. lecun, y. bengio, and g. hinton. deep learning.
+
+nature, pages 436–444, 2015.
+[21] h. liao, e. mcdermott, and a. senior. large scale
+deep neural network acoustic modeling with
+semi-supervised training data for youtube video
+transcription. in proc. asru, pages 368–373, 2013.
+[22] w. min, b. w. mott, j. p. rowe, and j. c. lester.
+leveraging semi-supervised learning to predict student
+problem-solving performance in narrative-centered
+learning environments. in proc. its, pages 664–665,
+2014.
+[23] d. j. rezende, s. mohamed, and d. wierstra.
+stochastic backpropagation and approximate
+inference in deep generative models. in proc. icml,
+pages 1278–1286, 2014.
+[24] b. schölkopf, a. smola, and k.-r. müller. kernel
+principal component analysis. in proc. icann, pages
+583–588, 1997.
+[25] c. k. sønderby, t. raiko, l. maaløe, s. k. sønderby,
+and o. winther. ladder variational autoencoders. in
+proc. nips, pages 3738–3746, 2016.
+[26] n. srivastava, g. e. hinton, a. krizhevsky,
+i. sutskever, and r. salakhutdinov. dropout: a simple
+way to prevent neural networks from overfitting.
+jmlr, pages 1929–1958, 2014.
+[27] v. tam, e. y. lam, s. fung, w. fok, and a. h. yuen.
+enhancing educational data mining techniques on
+online educational resources with a semi-supervised
+learning approach. in proc. tale, pages 203–206,
+2015.
+[28] j. turian, l. ratinov, and y. bengio. word
+representations: a simple and general method for
+semi-supervised learning. in proc. acl, pages
+384–394, 2010.
+[29] a. van den oord, n. kalchbrenner, l. espeholt,
+o. vinyals, a. graves, et al. conditional image
+generation with pixelcnn decoders. in proc. nips,
+pages 4790–4798, 2016.
+[30] w. j. van der linden. a lognormal model for response
+times on test items. journal of educational and
+behavioral statistics, 31(2):181–204, 2006.
+[31] m. von aster, l. rauscher, k. kucian, t. käser,
+u. mccaskey, and j. kohn. calcularis - evaluation of
+a computer-based learning program for enhancing
+numerical cognition for children with developmental
+dyscalculia, 2015. 62nd annual meeting of the
+american academy of child and adolescent
+psychiatry.
+[32] m. von aster, m. w. zulauf, and r. horn.
+neuropsychologische testbatterie für
+zahlenverarbeitung und rechnen bei kindern:
+zareki-r. pearson, 2006.
+[33] m. g. von aster and r. s. shalev. number
+development and developmental dyscalculia.
+developmental medicine & child neurology, pages
+868–873, 2007.
+[34] c. xu, d. tao, and c. xu. a survey on multi-view
+learning. neural comput. appl., pages 2031–2038,
+2013.
+[35] x. zhu. semi-supervised learning literature survey.
+technical report, university of wisconsin-madison,
+2006.

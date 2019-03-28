@@ -1,0 +1,1138 @@
+87
+
+generalizability of face-based mind wandering detection
+across task contexts
+angela stewart
+
+nigel bosch
+
+sidney k. d’mello
+
+university of notre dame
+384 fitzpatrick hall
+notre dame, in, 46556, usa
+
+university of illinois at urbanachampaign
+1205 west clark street
+urbana, il, 61801, usa
+
+university of notre dame
+118 haggar hall
+notre dame, in, 46556
+
+astewa12@nd.edu
+
+sdmello@nd.edu
+
+pnb@illinois.edu
+abstract
+we investigate generalizability of face-based detectors of mind
+wandering across task contexts. we leveraged data from two lab
+studies: one where 152 college students read a scientific text and
+another where 109 college students watched a narrative film. we
+automatically extracted facial expressions and body motion
+features, which were used to train supervised machine learning
+models on each dataset, as well as a concatenated dataset. we
+applied models from each task context (scientific text or narrative
+film) to the alternate context to study generalizability. we found
+that models trained on the narrative film dataset generalized to the
+scientific text dataset with no modifications, but the predicted mind
+wandering rate needed to be adjusted before models trained on the
+scientific text dataset would generalize to the narrative film dataset.
+additionally, we analyzed generalizability of individual features
+and found that the lip tightener and jaw drop action units had the
+greatest potential to generalize across task contexts. we discuss
+findings and applications of our work to attention-aware learning
+technologies.
+
+keywords
+mind wandering, mental states, attention aware interfaces,
+cross-corpus training.
+
+1. introduction
+consider a typical day when you were an undergraduate college
+student. your first class is your favorite, so you are engaged in the
+lecture content and processing new information. in your next class,
+you watch a documentary about a subject that does not interest you,
+causing your attention to focus on unrelated thoughts of your social
+life, rather than processing the information in the video. later, you
+work on a homework assignment that you find frustrating, leading
+to waning motivation. towards the end of your day, you attend a
+chemistry lab, where you interact with a new educational game that
+teaches you the basics of chemical bonds. at some points you are
+enjoying the game, and thus engaged in deeply learning the content.
+however, you later become bored during a long period of repetitive
+gameplay, causing you to become distracted and miss important
+information. throughout the day, your mental states (engagement,
+frustration, boredom) influenced your learning. your learning
+
+experience could have been augmented with technology that
+responded to your changing mental state, thus assisting you in
+achieving the most effective learning experience.
+educational interfaces that detect and respond to student mental
+states are driven by work on cognitive and affective state modeling,
+which has been investigated for many years. for example, attention
+and affect has been modeled in educational tasks such as reading
+comprehension [6, 16, 28] and computerized tutoring [3, 19],
+among others. in general, there has been a plethora of work that has
+modeled a variety of mental states within specific educational tasks
+(e.g., [2, 15, 19]) to better understand these states and use that
+knowledge to facilitate student learning.
+however, prior research has overwhelmingly investigated single
+task contexts, and has overlooked generalizability to different
+contexts. for example, models that track attention during reading
+might not generalize to lecture viewing, educational gaming, and
+so on. this makes it difficult to decouple task-specific effects from
+more fundamental patterns. in contrast, models that successfully
+generalize across multiple contexts should reveal observable
+signals (i.e. eye gaze, facial features, and physiology data) that are
+general, rather than task-specific. models using such indicators will
+be key to developing adaptive technologies that are sensitive to
+student mental states and that can operate across a range of
+educational activities.
+we report results on modeling mental states in a generalized way
+using mind wandering (mw) as a case study. mw is a ubiquitous
+phenomenon where thoughts shift from task-related processing to
+task-unrelated thoughts [15]. mw is estimated to occur anywhere
+from 20% - 50% of the time, depending on the person, task, and
+environmental context [23]. it is has also been associated with
+lower performance on a variety of educational tasks, such as
+reading comprehension [16] and retention of lecture content [29],
+thus impacting student learning.
+as with work on other mental states, research on mw has largely
+failed to address models that generalize across contexts [6, 15].
+mw detection has been investigated in reading comprehension [6,
+16], narrative and instructional film comprehension [25, 26], and
+student interaction with an intelligent tutoring system (its) [19].
+to our knowledge, no work has investigated mw detection with
+the goal of generalizability across task contexts.
+we specifically investigate the generalizability of mw models
+across two task contexts - reading a scientific text and viewing a
+narrative film. these contexts were chosen because of their broad
+applicability to education in the classroom and online. for example,
+a documentary film could be shown in a sociology course or
+distance learning students could read instructional texts prior to
+engaging in an online discussion.88
+
+1.1 related work
+cross corpus training has been researched in a variety of
+classification problems, such as sentiment analysis [31] and
+acoustic-based emotion recognition [35]. cross corpus training
+seeks to improve robustness of machine-learned models by
+leveraging multiple datasets in classifier training and testing. for
+example, webb and ferguson [32] applied cross corpus training
+techniques to characterize the function of segments of dialogue
+using automatically extracted lexical and syntactic features called
+cue phrases. each extracted cue phrase was used to classify a
+segment of dialogue. they trained separate classifiers on two
+different datasets, and applied the classifier to the dataset on which
+it was not trained. they found the cross-training results were
+comparable to the results of training and testing on the same dataset
+(e.g. the best cross-trained classifier achieved and accuracy of 71%,
+compared to an accuracy of 81% when trained and tested on the
+same dataset). additionally, they examined generalizability of the
+cue phrases across datasets by reducing the feature set to contain
+only cues present in both datasets. they found that reducing the
+feature set yielded slight improvements, and demonstrated the
+discriminative nature of a small number of features.
+zhang et. al. [35] similarly explored the use of multiple datasets for
+creating context-generalizable models. they built classifiers for
+valence and arousal on highly varied emotional speech datasets
+using a leave-one-corpora-out cross-validation technique.
+additionally, they explored methods for data normalization (within
+each dataset and between datasets) and agglomeration of both
+labeled and unlabeled data. they found that, of their six emotional
+speech corpora, training on some subsets yielded higher accuracy
+than others. their work suggested that careful selection of corpora
+best suited for training might yield better emotional speech
+recognition performance than an all-or-nothing approach to crosscorpus training.
+our work approaches cross-corpus modeling through detection of
+mw. a variety of studies have investigated mw detection during
+educational tasks, such a reading [15], interacting with an
+intelligent tutoring system (its) [19], or watching an educational
+video [26]. no work has focused on mw from a cross-corpus
+modeling perspective, to our knowledge, so we review the
+individual studies below.
+detection of mw from eye gaze features while reading has been
+amply investigated. for example, bixler and d’mello [4] built
+models to detect mw while students read texts about scientific
+research methods. this work made use of probe-caught reports
+(students respond yes or no to auditory thought probes of whether
+they were mw), instead of self-caught reports (students report
+whenever they catch themselves mw). their analysis of eye gaze
+features showed that certain types of fixations were longer during
+mw. specifically, they found that longer gaze fixations
+(consecutive fixations on a single word), first-pass fixations
+(fixations on a word during the first pass through a text), and single
+fixations (fixations on a word only fixated on once) were predictive
+of mw. in other work, bixler and d’mello [5] similarly used eye
+gaze features, but used self-caught reports of mw. they found that
+a greater number of fixations, longer saccade length, and line cross
+saccades were indicative of mw. across studies on mw detection
+during reading, longer fixations were found to be indicative of mw
+[4, 15, 28], suggesting these features might generalize well.
+
+monitoring fingertip blood flow, using the back camera of a
+smartphone (i.e., photoplethysmography). their models achieved a
+22% improvement over chance. although their method for
+detecting mw could be implemented across a variety of tasks, the
+question of whether heart rate is indicative of mw across task
+contexts has not yet been investigated.
+hutt et. al. provided limited evidence of generalizability of mw
+detection across different learning tasks during student interaction
+with an its [19]. they employed a genetic algorithm to train a
+neural network using context-independent eye-gaze features and
+context-dependent interaction features (e.g., current progress
+within the its). they achieved an f1 value of .490 (chance = .190).
+this work provided some evidence of generalizability because the
+visual stimuli and interaction patterns varied throughout. for
+example, students interacted with an animated pedagogical agent in
+a scaffolded dialogue phase and completed concept maps without
+the tutoring agent in another interaction phase. however, it is still
+unclear if their model would generalize to a broader range of tasks,
+particularly less interactive ones like reading or film viewing.
+furthermore, their best-performing models used context-dependent
+features, which could prevent the detector from generalizing to a
+task where those features could not be used.
+
+1.2 novelty
+our contribution is novel in a variety of ways. first, we demonstrate
+the feasibility of building cross-context detectors of mental states,
+specifically mw. further, previous work on mw detection has
+sometimes made use of context-specific features (e.g., reading
+times) that are not expected to generalize to other contexts [19, 25].
+in contrast, our work detects mw using only facial features and
+upper body movement, recorded using commercial-off-the-shelf
+(cots) webcams that are expected to generalize more broadly.
+additionally, the use of cots webcams support a broader
+implementation of mw detectors as webcams are ubiquitous in
+modern technology. this is in contrast to prior research that has
+used specialized equipment, like eye trackers [15, 19, 25] or
+physiology sensors [7], which students would likely not have
+access to.
+
+2. datasets
+this study makes use of narrative film [23] and scientific reading
+comprehension [22] datasets collected as part of a larger project.
+here, we include details pertaining to video-based detection of
+mw.
+
+2.1 narrative film comprehension
+participants were 68 undergraduate students from a medium-sized
+private midwestern university and 41 undergraduate students from
+a large public university in the southern united states. of the 109
+students, 66% were female and their average age was 20.1 years.
+students were compensated with course credit. data from four
+students were discarded due to equipment failure.
+students viewed the narrative film the red balloon (1956), a 32.5minute french-language film with english subtitles (figure 1). the
+film has a musical score but only sparse dialogue. this short fantasy
+film depicts the story of a young parisian boy who finds a red
+helium balloon and quickly discovers it has a mind of its own as it
+follows him wherever he goes. this film was selected because of
+the low likelihood that participants have previously seen it and
+because it has been used in other film comprehension studies [34].
+
+pham and wang [26] similarly used consumer-grade equipment to
+detect mw while students watched videos from massively open
+online courses (moocs). they made use of heart rate, detected by89
+
+figure 1. a screenshot of the narrative film (left) and scientific text (right) are shown.
+students’ faces and upper bodies were recorded with a low-cost
+($30) consumer-grade webcam (logitech c270).
+students were instructed to report mw throughout the film by
+pressing labeled keys on the keyboard. specifically, students were
+asked to report a task-unrelated thought if they were “thinking
+about anything else besides the movie” and a task-related
+interference if they were “thinking about the task itself but not the
+actual content of the movie.” a small beep sounded to register their
+report, but film play was not paused. after viewing the film,
+students took a short test about the content and completed
+additional measures not discussed further.
+we recorded a total of 1,368 mw reports from the 105 participants
+with valid video recordings. in this work, we do not distinguish
+between the two types of mw, instead merging the task-unrelated
+thoughts and the task-related interferences, both of which represent
+thoughts independent of the content of the film.
+
+2.2 scientific reading comprehension
+participants were 104 undergraduate students from a medium-sized
+private midwestern university and 48 undergraduate students from
+a large public university in the southern united states. of the 152
+participants, 61% were female and their average age was 20.1
+years. participants were compensated with course credit. data from
+eight participants were discarded due to equipment failure.
+students read an excerpt from soap-bubbles and the forces which
+mould them [8]. like the red balloon (figure 1), we chose this
+text because its content would likely be unfamiliar to a majority of
+readers. the text contained around 6,500 words from the first
+chapter of the book. in all, 57 pages (screens of text) with an
+average of 115 words each were displayed on a computer screen in
+36-pt courier new typeface. the only modification to the text was
+the removal of images and references to them after verifying that
+these were not needed for comprehension.
+students who read the scientific text were instructed to report mw
+in the same way as those who watched the narrative film. they were
+instructed to report a task-unrelated thought if they were “thinking
+about anything else besides the task” and a task-related interference
+if they were “thinking about the task itself but not the actual content
+of the text.” participants completed a comprehension assessment
+after reading the text. we recorded a total of 3,168 mw reports
+from the 144 students with valid video recordings.
+
+2.3 self reports of mw
+mw was measured via self-reports in both studies, so it is prudent
+to discuss the validity of self-reports. we used self-reports because
+
+this is currently the most common approach to measure an
+inherently internal (but conscious) phenomenon [5, 15]. selfreported mw has been linked to predictable patterns in physiology
+[30], pupillometry [17], eye-gaze [28] and task performance [27],
+providing evidence for the convergent and predictive validity for
+this approach. to improve the quality of self-reports, we
+encouraged students to report honestly and assured them that
+reporting mw would not in any way effect the credit they received
+for participation.
+the alternative to using self-caught reports is using probe-caught
+reports, which require a student response to a thought-probe (e.g.,
+a beep). we chose self-caught reports over the probe-caught
+because the probe-caught method can potentially interrupt the
+comprehension process (i.e., when participants report “no” to the
+probes). interruptions are particularly problematic in the film
+comprehension task, as participants did not have control over the
+media presentation (i.e., no pausing or rewinding of the film).
+furthermore, it is also unclear if a probe-caught report takes place
+at the beginning or end of mw, or somewhere in between.
+conversely, self-caught reports are likely to occur at the end of a
+mw episode when the student became aware that they were not
+attending to the task at hand.
+
+3. machine learning
+we explored a variety of machine learning techniques for crosscontext mw detection using the same approach to segmenting
+instances and constructing features for both datasets.
+
+3.1 segmenting instances
+reports of mw were distributed throughout the course of the film
+viewing or text reading session. we created instances that
+corresponded to reports of mw by first adding a 4-second offset
+prior to the report. this was done to ensure that we captured
+participants’ faces while mw vs. in the act of reporting mw itself
+(i.e., the preparation and execution of the key press). this 4-second
+offset was chosen based on four raters judgements of whether or
+not movement related to the key-press could be seen within offsets
+ranging from 0 to 6 seconds. data was then extracted from the 20
+seconds prior to the mw report. a window size of 20 seconds was
+chosen based on prior experimentation that sought to balance
+creating as many instances as possible (shorter window sizes) and
+having sufficient data in each window (longer window sizes) to
+detect mw.
+we extracted “not mw” instances from windows of data between
+mw reports. the entire session (reading or video watching) was
+divided into 24-second segments (20 second windows of data and
+a 4 second offset as with the mw segments). any segments90
+
+overlapping the 30 seconds prior to a mw report were discarded.
+we do not know precisely when mw starts, so we chose to discard
+instances overlapping the 30 seconds prior to mw reports, to
+separate students when they were actually mw from when they
+were not. we also discarded any segments overlapping a page turn
+(discussed in section 3.2). all remaining segments were labeled
+not mw. our approach to segmenting instances is shown in figure
+2.
+
+table 1. an accounting of instance selection process
+
+base
+
+reading
+(% mw)
+7,267 (30%)
+
+film
+(% mw)
+7,313 (14%)
+
+face detected
+
+7,266 (30%)
+
+7,238 (14%)
+
+page boundary
+
+1,400 (36%)
+
+n/a
+
+participant matching
+
+1,273 (35%)
+
+n/a
+
+downsampling
+
+1,100 (25%)
+
+1,100 (25%)
+
+3.3 feature extraction and selection
+
+figure 2. illustration of the instance extraction method.
+
+3.2 instance selection
+a full accounting of the instance selection process is shown in
+table 1. our goal was to make the two data sets as similar as
+possible so that task-specific effects could be studied without
+additional confounds.
+we first discarded any instances where there was less than one
+second of usable data in that time window. data was not usable
+when the student’s face was occluded due to extreme head pose or
+position, hand-to-face gestures, and rapid movements.
+additionally, for the scientific reading dataset, we discarded
+instances that overlapped with page turn events. in prior
+experimentation, we trained a model to detect mw using only a
+binary feature of whether or not that instance overlapped a page
+turn boundary. mw was detected at rates above chance in this
+experimental model. therefore, we concluded that including
+instances that overlapped page turn boundaries would inflate
+performance as the detector could simply be picking up on the act
+of pressing the key to advance to the next page.
+
+we used commercial software, the emotient sdk [36] to extract
+facial features. the emotient sdk, a version of the cert
+computer vision software [24] (figure 3) provides likelihood
+estimates of the presence of 20 facial action units (aus; specifically
+1, 2, 4, 5, 6 ,7, 9, 10, 12, 14, 15, 17, 18, 20, 23, 24, 25, 26, 28, and
+43 [14]) as well as head pose (orientation), face position (horizontal
+and vertical within the frame), and face size (a proxy for distance
+to camera). additionally, we used a validated motion estimation
+algorithm to compute gross body movements [33]. body movement
+was calculated by measuring the proportion of pixels in each video
+frame that differed by a threshold from a continuously updated
+estimate of the background image generated from the four previous
+frames.
+
+figure 3. interface demonstrating au estimates detected from
+a face video.
+
+after discarding instances using the method above, we matched the
+scientific reading and narrative film datasets on school (mediumsized midwestern private university or large southern public
+university), reported ethnicity, and reported gender. the scientific
+reading dataset was randomly downsampled to contain
+approximately the same number of students in each gender, race, or
+school category, as the film dataset. this participant-level matching
+on school, ethnicity, and gender was done to eliminate external
+sources of variance that could influence mw detection, potentially
+obfuscating task effects from population effects.
+
+features were created by aggregating emotient estimates in a
+window of time leading up to each mw or not mw instance using
+minimum, maximum, median, mean, range, and standard deviation
+for aggregation. in all, there were 162 facial features (6 aggregation
+functions × [20 aus + 3 head pose orientation axes + 2 face
+position coordinates + face size + motion]). outliers (values greater
+than three standard deviations from the mean) were replaced by the
+closest non-outlier value in a process called winsorization [11].
+
+finally, the datasets were downsampled to contain equal numbers
+of instances because the size of the training set is known to bias
+classifier performance [13]. we also downsampled the data to
+achieve a 25% mw rate in order to be consistent with research that
+suggests that mw occurs between 20% and 30% of the time during
+reading and film comprehension [6, 23]. further, the mw rates of
+30% and 14% obtained in these data are more artefacts of the
+instance segmentation approach rather than the objective rate, so
+resampling ensures a dataset that is more reflective of expected
+mw rates.
+
+we used tolerance analysis to eliminate features with high
+multicollinearity (variance inflation factor > 5) [1], after which, 37
+features remained. this was followed by relief-f [21] feature
+selection (on the training data only) to rank features. we retained a
+proportion of the highest ranked features for use in the models
+(proportions ranging from .05 to 1.0 were tested). feature selection
+was performed using nested cross-validation on training data only.
+we ran 5 iterations of feature selection within each cross-validation
+fold (discussed below), using data from a randomly chosen 67% of
+students within the training set in each iteration.
+
+3.4 supervised classification and validation
+informed by preliminary experiments, we selected seven classifiers
+for more extensive tests (naïve bayes, simple logistic regression,
+logitboost, random forest, c4.5, stochastic gradient descent,
+and classification via regression) using the weka data mining91
+
+toolkit [18]. for each classifier, we applied smote [9] to the
+training set only. smote, a common machine learning technique
+for dealing with data imbalance, creates synthetic interpolated
+instances of the minority class to increase classification
+performance.
+we evaluated the performance of our classifiers using leave-oneparticipant-out cross-validation. this process runs multiple
+iterations of each classifier in which, for each fold, the instances
+pertaining to a single participant are added to the test set and the
+training set is comprised of the instances for the other participants.
+feature selection was performed on a subset of participants in the
+training set. the leave-one-out process was repeated for each
+participant, and the classifications of all folds were weighted
+equally to produce the overall result. this cross-validation
+approach ensured that in each fold, data from the same participant
+was in the training set or testing set but never both, thereby
+improving generalization to new participants.
+accuracy (recognition rate) is a common measure to evaluate
+performance in machine learning tasks. however, any classifier
+that defaults to predicting the majority class label of an imbalanced
+dataset can appear to have high accuracy despite incorrect
+predictions of all instances of the minority class label [20]. this is
+particularly detrimental in applications where detecting the
+minority class is of upmost importance. in our task, we prioritized
+the detection of mw despite the large imbalance in our dataset.
+therefore, we considered the f1 score for the mw label as our key
+measure of detection accuracy since f1 attempts to strike a balance
+between precision and recall.
+
+4. results
+4.1 cross-dataset training and testing
+we trained three classifiers: one on the scientific text dataset, one
+on the narrative film dataset, and one on a concatenated dataset
+comprised of the first two. for each of the three training sets, the
+classifier that yielded the highest mw f1 is shown in table 2. we
+used leave-one-student-out cross validation for within-dataset
+evaluations. conversely, to measure generalizability of the models
+across contexts we applied the classifier trained on scientific text
+data to the narrative film data, and vice versa. we compared our
+model to a chance model that classified a random 25% (mw prior
+proportion) of the instances as mw. this chance-level method
+yielded a precision and recall of .250 (equal to the mw base rate).
+table 2. results for the models with highest mw f1 for the
+within-data set validation (cross-training results in
+parentheses).
+training set
+
+classifier mw f1
+
+precision
+
+recall
+
+scientific text logitboost .441 (.267) .376 (.252)
+
+.553 (.284)
+
+narrative film c4.5
+
+.436 (.407) .303 (.278)
+
+.775 (.760)
+
+both
+
+.424
+
+.655
+
+logistic
+
+.314
+
+we calculated improvement over chance as (actual performance –
+chance)/(perfect performance – chance). all three models showed
+improvement over chance (25% for scientific text, 25% for
+narrative film, and 23% for the concatenated dataset) when trained
+and tested on the same dataset. when tested on the alternative
+dataset, the narrative film classifier generalized well to the
+scientific text dataset (21% improvement over chance). however,
+the scientific text model showed chance-level performance on the
+narrative film corpus (2% improvement over chance). the mw f1
+
+of the concatenated dataset model was simply an average of the
+mw f1 score of the individual datasets when the instance
+predictions of the individual datasets are separated (.413 for the
+scientific reading dataset and .436 on the narrative film dataset).
+these results showed that the concatenated classifier does not skew
+towards predicting one dataset better than the other, but rather
+predicts both models with comparable accuracy.
+table 2 also shows precision and recall for each of the models.
+across all models, recall was higher than precision, indicating a lot
+false positives. it is important to note the near chance-level recall
+and precision of the model trained on scientific reading data when
+applied to the narrative film data. the lack of improvement over
+chance for both recall and precision demonstrated the need to
+improve generalizability in both dimensions. conversely, the crosstrained narrative film model had lower precision, but good recall,
+resulting in an improved mw f1 score.
+
+4.2 classifier generalizability
+to address the negligible improvement over chance of the scientific
+text model when tested on the narrative film dataset, we repeated
+the training and testing using c4.5 as the classifier. the c4.5
+classifier was chosen because it generalized better when trained on
+the narrative film dataset than the logitboost classifier generalized
+when trained on the scientific text dataset. the results are shown in
+table 3, where we note no notable improvement over the previous
+logitboost classifier in table 2 (change from .267 to .287 when
+tested on the narrative film dataset). therefore, the lack of evidence
+for generalizability for the scientific text model could be due to
+overfitting to the training set, rather than classifier selection.
+table 3. results (mw f1) for the c4.5 classifier for withinand cross- validation.
+training set
+
+within
+
+cross
+
+scientific text
+
+0.425
+
+0.287
+
+narrative film
+
+0.436
+
+0.407
+
+both
+
+0.415
+
+n/a
+
+4.3 prediction threshold adjustment
+we further investigated the lack of generalizability of the scientific
+text model by considering the mw prediction rate. we compared
+the performance of both models on the narrative film dataset. recall
+dropped considerably more than precision (table 2; recall dropped
+from .775 to .284; precision decreased from .303 to .252). we
+hypothesized that recall decreased because of a difference in
+predicted mw rates (table 4). in fact, the predicted mw rate in the
+narrative film data dropped from 64% to 28% when applying the
+scientific text model to the same data. this supported our
+hypothesis that the low recall was linked to lower predicted mw
+rates. furthermore, 39% of the correctly classified instances (true
+positives and true negatives) were mw when applying the narrative
+film model to the narrative film data compared to 12% for the
+scientific text model applied to the same data. this demonstrated
+that the scientific text model was much more prone to missing mw
+instances, further supporting our hypothesis.
+to address this, we adjusted the predicted mw rate of the scientific
+text model when applied to the narrative film dataset. the classifier
+outputs a likelihood of mw and we previously considered instances
+with likelihoods greater than .5 as mw. we adjusted that prediction
+threshold from .1 to 1 in increments of .1 (figure 4) to investigate
+how changes in predicted mw rate (higher for lower thresholds)
+effected recall, and thus mw f1.92
+
+to rank the subsets of features on generalizability, we examined
+mw f1 scores when testing on the alternative dataset only. for
+example, using the au9 (nose wrinkle) subset, we investigated
+mw f1 value of scientific text model applied to the narrative film
+dataset and the narrative film model applied to the scientific text
+dataset. table 4 shows these results only for features that achieved
+a mw f1 of greater than .250 (chance) on all dimensions (within
+dataset validation and cross-training). we selected features for
+further analysis if their mw f1 was greater than .300 for both crosstraining results. this value of .300 was used to filter out features
+that performed well on the within-dataset validation, but fell short
+on cross training. it also ensured that a feature performed better
+than chance on both cross-trained results (i.e., train on narrative
+film and test on scientific text, and vice versa), rather than only
+generalizing to one dataset. using this criterion, only au23 and
+au26 showed notable improvement over chance.
+
+table 4. predicted mw rates.
+training set
+
+within
+
+cross
+
+scientific text
+
+38%
+
+28%
+
+narrative film
+
+64%
+
+68%
+
+both
+
+52%
+
+n/a
+
+figure 4. mw precision, recall, and f1 as the prediction
+threshold varies for the scientific text model applied to the
+narrative film dataset.
+we note that mw f1 score degrades at a threshold of .5. we
+adjusted the threshold to .3 and yielded the results shown in table
+5. after adjusting the mw prediction threshold, both precision and
+recall of the narrative film data applied to the scientific text model
+showed comparable performance to the cross-trained narrative film
+model. it is important to note that the adjusted mw prediction
+threshold yielded a predicted mw rate of 76%, much higher than
+the mw rate of the dataset (25%). as with the generalized narrative
+film model, this reduced precision because the high predicted mw
+rate produced a large number of false positives.
+table 5. results for models with highest mw f1 (crosstraining results in parentheses). cross-training results for the
+scientific text model reflect a mw prediction threshold of .3.
+training set
+
+classifier mw f1
+
+precision
+
+.553 (.836)
+
+narrative film c4.5
+
+.436 (.407) .303 (.278)
+
+.775 (.760)
+
+both
+
+.424
+
+.655
+
+.314
+
+table 6. mw f1 score for within-data set validation with
+cross-data set scores (in parentheses).
+facial feature
+au4 (brow lowerer)
+au6 (cheek raiser)
+au9 (nose wrinkler)
+au14 (dimpler)
+au23 (lip tightener)
+au26 (jaw drop)
+face height (size)
+face x (position)
+
+training set
+scientific text narrative film
+.378 (.278)
+.398 (.395)
+.369 (.259)
+.361 (.321)
+.300 (.268)
+.392 (.303)
+.303 (.267)
+.383 (.376)
+.334 (.333)
+.363 (.317)
+.414 (.321)
+.365 (.357)
+.322 (.256)
+.339 (.289)
+.404 (.316)
+.382 (.282)
+
+recall
+
+scientific text logitboost .441 (.416) .376 (.276)
+
+logistic
+
+we used the c4.5 classifier to generate the same models in table 2
+(train/test scientific text, train scientific text/test narrative film, etc.)
+using only the features from au23 and au26 (table 7). none of
+these models (scientific text, narrative film, or concatenated)
+achieved a mw f1 as high as those in table 2, which used a
+combination of tolerance analysis and relief-f to select features.
+this suggested that, while au23 and au26 might individually
+predict mw, when used together, their prediction power might be
+limited, compared to other feature selection techniques.
+
+4.4 feature analysis
+we analyzed the facial features to further study generalizability by
+predicting mw with different subsets of the entire feature set. the
+c4.5 classifier was chosen for this feature analysis because of its
+consistency on both the scientific text model and concatenated
+dataset. each subset consisted of the features (e.g., median,
+standard deviation) from one au, or from face position, size,
+orientation, or motion. since tolerance analysis was not used here,
+we only considered the minimum, maximum, median, and standard
+deviation aggregated features to prevent redundancy (e.g., between
+median and mean). for example, we used the minimum, maximum,
+median, and standard deviation feature values for au5 (upper lid
+raiser) to predict mw. this approach was applied to the 20 au
+subsets, as well as face position, size, orientation, and motion
+subsets. we generated the same cross-training configurations of in
+section 4.1 (i.e., train on scientific text, test on narrative film, etc.).
+
+table 7. results for models when only using the c4.5 classifier
+on au23 and au26.
+training set
+
+classifier mw f1
+
+precision
+
+recall
+
+scientific text c4.5
+
+.383 (.272) .255 (.206)
+
+.764 (.404)
+
+narrative film c4.5
+
+.397 (.257) .333 (.235)
+
+.491 (.284)
+
+both
+
+.368
+
+.575
+
+c4.5
+
+.271
+
+5. analysis
+we developed automated detectors of mw using video-based
+features in the contexts of narrative film viewing and scientific
+reading. the generalizability of these models was dependent on
+corpora on which the model was trained and the rate at which the
+model predicts mw. in this section, we discuss our main findings
+and applications of this work. we also discuss limitations and
+future work.
+
+5.1 main findings
+we expanded on previous mw detection work through crosscontext modeling. we trained three models on three datasets93
+
+(scientific text, narrative film, and a dataset concatenated from the
+two). we found each of these models (trained and tested on the
+same corpus) performed at a notable 23% to 25% improvement
+over chance. this demonstrated the feasibility of detecting mw on
+individual corpora. however, recall was greater than precision,
+indicating prediction of false positives. this should be considered
+when implementing mw detectors in educational environments
+where excessive prediction of student mw could be demotivating.
+
+learning (both in the classroom and online). for example, films can
+give historical background on a time period being discussed in
+literature classes and instructional texts can supplement lecture
+content through textbooks or technical articles. due to the
+relationship between mw and low task performance, user
+interfaces that detect and respond to mw in contexts where
+attention is key (i.e. education) would help students remain focused
+on their learning.
+
+we investigated generalizability of the single-dataset models (i.e.
+scientific text or narrative film) by applying the model to the dataset
+on which it was not trained. the model trained on the narrative film
+dataset maintained performance when applied to the scientific text
+dataset (table 2), providing some evidence for generalizability, but
+this performance was boosted by high recall (and comparatively
+low precision). precision and recall (and thus mw f1) were near
+chance-level when the model trained on the scientific text dataset
+was applied to the narrative film dataset, suggesting that the model
+might overfit to the scientific text training set.
+
+these findings are particularly promising for implementation in
+massively open online courses (moocs). our method for detecting
+mw exclusively uses cots webcams. these webcams are
+ubiquitous in today’s computers and mobile devices; thus our work
+would integrate into a variety of learning environments without
+extra cost. such a video-based detector of mw could feasibly
+respond to student mw through suggesting a student revisit text or
+video content, asking a reengaging question, or advising the student
+to take a break.
+
+we attempted to address this problem by applying the c4.5
+classifier, as it comparatively generalized well when trained on the
+narrative film dataset. mw f1 score for the scientific text classifier
+applied to the narrative film data again negligibly increased. this
+suggested that the training data (only scientific text) used was not
+appropriate for model generalization. this idea is supported by the
+performance of the narrative film model on the scientific text data
+(although detection of false positives is a limitation) and the notable
+improvement over chance (22% to 23%) for the concatenated
+dataset. the performance of both models suggested that there were
+discernable similarities between mw instances across the two
+datasets, which can be detected using our techniques.
+in addition to training data, we also found that predicted mw rate
+effected model generalizability. we adjusted mw predictions
+according to a sliding threshold for the narrative film predictions
+obtained from the scientific text model. we found that relaxing the
+criteria for classifying an instance as mw (i.e. adjusting the
+likelihood prediction threshold from .5 to .3) yielded results
+comparable to the cross-trained narrative film model. however, this
+approach to increasing recall should be used with caution as it leads
+to increased likelihood of false positives. perhaps in a real-time
+mw intervention scenario, a more balanced approach could be
+taken where the mw likelihood prediction is used to determine if a
+mw intervention is triggered (e.g., if the detector determines there
+is a 40% likelihood the student is mw, then there is a 40% chance
+a mw intervention is triggered).
+
+5.3 limitations and future work
+while we demonstrated techniques for modeling generalizability
+across task contexts, our work has a few limitations. first, precision
+is moderate, even on our best models. high predicted mw rates
+lead to high recall, but also more false positives. in this work, we
+chose to accept this tradeoff, with the goal of generalizability in
+mind. however, raising precision, while maintaining recall is key
+to task-generalizable mw detectors being successful in educational
+environments. since mw is the minority class (25% of all
+instances), investigating skew-insensitive classifiers, such as
+hellinger distance decision trees [10], could improve precision.
+additionally, this work focuses exclusively on generalizability
+from the perspective of task context (viewing a narrative film vs.
+reading a scientific text). claims of generalizability could be
+strengthened through mw detection across environments. both the
+narrative film and scientific reading datasets were collected in a
+controlled lab setting. mw detection in the field, such as computerenabled classrooms or the personal workstations of mooc users,
+should be considered prior to implementation in such
+environments. furthermore, student generalizability should be
+further examined. in this work, we detect mw in a studentindependent way. however, participants were all of similar age and
+enrolled in college. future work could examine the generalizability
+of our method for detecting mw in non-college-aged students, such
+as elementary students in a computer-enabled classroom or nontraditional students enrolled in distance learning courses.
+
+we detected mw using individual feature subsets to ascertain
+whether certain face-based features (i.e. aus, head orientation,
+position, size, and motion) generalize. we found two feature
+subsets (au23 – lip tightener and au26 – jaw drop) that showed a
+mw f1 of at least .300 on both cross-trained models. it is notable
+that when looking at the generalizability of these features, they did
+not individually achieve mw f1 scores as high as the best
+performing models in table 2. this demonstrated the need for
+multiple features to work together to detect mw, rather than relying
+on a single feature. furthermore, this showed that our method of
+feature selection (tolerance analysis and selecting a proportion of
+features using relieff) was important to model performance.
+
+5.4 concluding remarks
+
+5.2 applications
+
+this research was supported by the national science foundation
+(nsf) (drl 1235958 and iis 1523091). any opinions, findings
+and conclusions, or recommendations expressed in this paper are
+those of the authors and do not necessarily reflect the views of the
+nsf.
+
+the present findings are applicable to educational user interfaces
+that involve reading or film comprehension. monitoring and
+responding to mw could greatly improve student performance on
+these tasks. films and instructional texts play a major role in
+
+in this work, we showed evidence that generalizable detectors of
+mw can be created using video-based features. the corpora used
+to train models of mw and predicted mw rates both play a role in
+the model’s ability to generalize and should be considered as work
+on cross-context mw generalization advances. this work advances
+the field of attention-aware interfaces [12] by demonstrating the
+feasibility of modeling mw across the educational contexts of
+reading a scientific text and viewing a narrative film. our approach
+to detecting mw is the first step towards building interfaces that
+detect mw across multiple educational activities.
+
+6. acknowledgments94
+
+7. references
+[1]
+[2]
+
+[3]
+
+[4]
+
+[5]
+
+[6]
+
+[7]
+
+[8]
+[9]
+
+[10]
+
+[11]
+
+[12]
+
+[13]
+
+[14]
+[15]
+
+[16]
+
+[17]
+
+[18]
+
+[19]
+
+allison, p.d. 1999. multiple regression: a primer. pine
+forge press.
+baker, r.s. et al. 2012. towards automatically detecting
+whether student learning is shallow. international
+conference on intelligent tutoring systems (chania, crete,
+greece, 2012), 444–453.
+baker, r.s. et al. 2012. towards sensor-free affect detection
+in a cognitive tutor for algebra. educational data mining
+(chania, crete, greece, 2012).
+bixler, r. and d’mello, s. 2016. automatic gaze-based
+user-independent detection of mind wandering during
+computerized reading. user modeling and user-adapted
+interaction. 26, 1 (2016), 33–68.
+bixler, r. and d’mello, s.k. 2015. automatic gaze-based
+detection of mind wandering with metacognitive
+awareness.
+user
+modeling,
+adaptation
+and
+personalization: 23rd international conference (dublin,
+ireland, 2015), 31–43.
+bixler, r. and d’mello, s.k. 2014. toward fully automated
+person-independent detection of mind wandering.
+proceedings of the 22nd international conference on user
+modeling, adaptation, and personalization (switzerland,
+2014), 37–48.
+blanchard, n. et al. 2014. automated physiological-based
+detection of mind wandering during learning. intelligent
+tutoring systems (honolulu, hawaii, usa, 2014), 55–60.
+boys, c.v. and others 1890. soap-bubbles, and the forces
+which mould them. cornell university library.
+chawla, n.v. et al. 2002. smote: synthetic minority oversampling technique. journal of artificial intelligence
+research. (2002), 321–357.
+cieslak, d.a. et al. 2012. hellinger distance decision trees
+are robust and skew-insensitive. data mining and
+knowledge discovery. 24, 1 (2012), 136–158.
+dixon, w.j. and yuen, k.k. 1974. trimming and
+winsorization: a review. statistische hefte. 15, 2–3 (1974),
+157–170.
+d’mello, s.k. 2016. giving eyesight to the blind: towards
+attention-aware aied. international journal of artificial
+intelligence in education. 26, (2016), 645–659.
+domingos, p. 2012. a few useful things to know about
+machine learning. communications of the acm. 55, 10
+(2012), 78–87.
+ekman, p. and friesen, w.v. 1977. facial action coding
+system.
+faber, m. et al. 2017. an automated behavioral measure of
+mind wandering during computerized reading. behavior
+research methods. (2017), 1–17.
+franklin, m.s. et al. 2011. catching the mind in flight:
+using behavioral indices to detect mindless reading in real
+time. psychonomic bulletin & review. 18, 5 (2011), 992–
+997.
+franklin, m.s. et al. 2013. window to the wandering mind:
+pupillometry of spontaneous thought while reading. the
+quarterly journal of experimental psychology. 66, 12
+(2013), 2289–2294.
+holmes, g. et al. 1994. weka: a machine learning
+workbench. proceedings of the 1994 second australian and
+new zealand conference on intelligent information systems
+(1994), 357–361.
+hutt, s. et al. 2016. the eyes have it: gaze-based detection
+of mind wandering during learning with an intelligent
+
+[20]
+
+[21]
+
+[22]
+
+[23]
+
+[24]
+
+[25]
+
+[26]
+
+[27]
+
+[28]
+[29]
+
+[30]
+
+[31]
+
+[32]
+
+[33]
+
+[34]
+
+[35]
+
+[36]
+
+tutoring system. proceedings of the 9th international
+conference on educational data mining, international
+educational data mining society (2016), 86–93.
+jeni, l.a. et al. 2013. facing imbalanced data–
+recommendations for the use of performance metrics.
+affective computing and intelligent interaction (acii),
+2013 humaine association conference on (2013), 245–251.
+kononenko, i. 1994. estimating attributes: analysis and
+extensions of relief. machine learning: ecml-94
+(1994), 171–182.
+kopp, k. et al. 2015. influencing the occurrence of mind
+wandering while reading. consciousness and cognition. 34,
+(2015), 52–62.
+kopp, k. et al. 2015. mind wandering during film
+comprehension: the role of prior knowledge and situational
+interest. psychonomic bulletin & review. 23, 3 (2015), 842–
+848.
+littlewort, g. et al. 2011. the computer expression
+recognition toolbox (cert). 2011 ieee international
+conference on automatic face & gesture recognition and
+workshops (fg 2011) (2011), 298–305.
+mills, c. et al. 2016. automatic gaze-based detection of
+mind wandering during film viewing. proceedings of the
+9th international conference on educational data mining
+(raleigh, nc, usa, jun. 2016).
+pham, p. and wang, j. 2015. attentivelearner: improving
+mobile mooc learning via implicit heart rate tracking.
+artificial intelligence in education. c. conati et al., eds.
+springer international publishing. 367–376.
+randall, j.g. et al. 2014. mind-wandering, cognition, and
+performance: a theory-driven meta-analysis of attention
+regulation. psychological bulletin. 140, 6 (2014), 1411.
+reichle, e.d. et al. 2010. eye movements during mindless
+reading. psychological science. 21, 9 (2010), 1300–1310.
+risko, e.f. et al. 2013. everyday attention: mind wandering
+and computer use during lectures. computers & education.
+68, (2013), 275–283.
+smallwood, j. et al. 2004. subjective experience and the
+attentional lapse: task engagement and disengagement
+during sustained attention. consciousness and cognition. 13,
+4 (2004), 657–690.
+wan, x. 2009. co-training for cross-lingual sentiment
+classification. proceedings of the joint conference of the
+47th annual meeting of the acl and the 4th international
+joint conference on natural language processing of the
+afnlp (stroudsburg, pa, usa, 2009), 235–243.
+webb, n. and ferguson, m. 2010. automatic extraction of
+cue phrases for cross-corpus dialogue act classification.
+proceedings of the 23rd international conference on
+computational linguistics: posters (stroudsburg, pa,
+usa, 2010), 1310–1317.
+westlund, j.k. et al. 2015. motion tracker: camera-based
+monitoring of bodily movements using motion silhouettes.
+plos one. 10, 6 (2015).
+zacks, j.m. et al. 2010. the brain’s cutting-room floor:
+segmentation of narrative cinema. frontiers in human
+neuroscience. 4, 168 (2010), 1–15.
+zhang, z. et al. 2011. unsupervised learning in cross-corpus
+acoustic emotion recognition. 2011 ieee workshop on
+automatic speech recognition understanding (dec. 2011),
+523–528.
+2016. emotient module: facial expression emotion
+analysis.

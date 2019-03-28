@@ -1,0 +1,758 @@
+127
+
+assessing computer literacy of adults with low literacy
+skills
+andrew m. olney
+
+institute for intelligent systems
+university of memphis
+memphis, tn 38152
+
+aolney@memphis.edu
+daphne greenberg
+
+department of educational psychology, special
+education, and communication disorders
+georgia state university
+atlanta, ga 30302
+
+dgreenberg@gsu.edu
+
+abstract
+adaptive learning technologies hold great promise for improving the reading skills of adults with low literacy, but
+adults with low literacy skills typically have low computer
+literacy skills. in order to determine whether adults with
+low literacy skills would be able to use an intelligent tutoring system for reading comprehension, we adapted a 44 task
+computer literacy assessment and delivered it to 114 adults
+with reading skills between 3rd and 8th grade levels. this
+paper presents four analyses on these data. first, we report
+the pass/fail data natively exported by the assessment for
+particular computer-based tasks. second, we undertook a
+goms analysis of each computer-based task, to predict the
+task completion time for a skilled user, and found that it
+negatively correlated with proportion correct for each item,
+r(42) = −.4, p = .01. third, we used the goms task decomposition to develop a q-matrix of component computer
+skills for each task, and using logistic mixed effects models
+on this matrix identified five component skills highly predictive of the success or failure of an individual on a computer task: function keys, typing, using icons, right clicking,
+and mouse dragging. and finally, we assessed the predictive
+value of all component skills using logistic lasso.
+
+keywords
+adult literacy, computer literacy, goms, q-matrix, mixed
+model, lasso
+
+1. introduction
+of adults with the lowest literacy levels, 43% live in poverty,
+and low literacy costs the u.s. economy $225 billion annu-
+
+dariush bakhtiari
+
+department of educational psychology, special
+education, and communication disorders
+georgia state university
+atlanta, ga 30302
+
+dbakhtiari1@gsu.edu
+art graesser
+
+institute for intelligent systems
+university of memphis
+memphis, tn 38152
+
+a-graesser@memphis.edu
+ally [14]. the need for literacy interventions is matched
+by the complexity of delivering interventions to this population. low literacy adults have difficulty attending face
+to face programs at literacy centers because of work, child
+care, and transportation [5], and even when these challenges
+are met, two-thirds of literacy centers have long waiting
+lists [14]. adaptive computer-based interventions for literacy hold promise to overcome these challenges. such interventions can be deployed in homes and local libraries, in
+addition to literacy centers. however, computer-based interventions raise another question: can adults with low literacy
+skills use computers well enough to benefit? several surveys
+suggest that this might be a problem. the demographics
+most affected by low literacy are the same demographics
+least likely to use the internet (over age 50, making less
+than $30 thousand a year, and with less than a high school
+education [1]).
+several decades of research have investigated computer literacy using self-report measures as well as objective tests,
+i.e. multiple choice, and find that self-report measures tend
+to exaggerate proficiency while objective tests are more reliable (see [3] for a review). for an adult literacy population, however, multiple-choice tests delivered as print create
+additional concerns as to whether the questions themselves
+can be comprehended. recently a new type of assessment,
+known as the northstar digital literacy assessment (the
+northstar), has been created that directly measures ability
+to perform computer tasks [13]. unlike multiple choice assessments, the northstar can simulate a computer desktop,
+use voice prompts to instruct users to perform tasks on that
+desktop, and then record their mouse clicks and keystrokes
+to determine if the task has been completed. almost all
+of the tasks can be completed without reading by listening
+to the voice prompt instructions. the few tasks that do
+involve reading are word recognition tasks rather than sentence reading, e.g. a task to log in may require the user
+to copy a name and password to the appropriate boxes and
+so require reading of “username,” “password,” and the corresponding fillers. the northstar has been adopted as the
+computer literacy standard for adult basic education in the128
+
+state of minnesota, which further supports its appropriateness for assessing the computer literacy skills of adults with
+low literacy skills.
+the present study investigated the computer literacy skills
+of adults with low literacy skills for the purpose of developing an intelligent tutoring system for reading comprehension for this population [7]. it includes a set of northstar
+items that were collected to cover a range of potential interface and interaction components. in the remainder of the
+paper we describe the data collection procedure and four
+analyses performed, including pass/fail frequencies for each
+task, relation of these frequencies to goms-predicted execution times for skilled users, a logistic mixed-model using a
+q-matrix decomposition of the tasks into component skills,
+and a logistic lasso model to assess the predictive value of
+component skills. from these analyses we identify specific
+tasks that are problematic for adults with low literacy skills
+as well as component skills that make it more likely adults
+with low literacy skills will succeed or fail at a computerbased task.
+
+2. analysis 1: proportion correct
+2.1 participants
+participants (n = 114) were recruited through adult literacy
+centers in atlanta, ga and toronto, on, from classes where
+the reading level was between 3rd and 8th grade. reading
+level was determined by the centers using their “business as
+usual” assessments. demographic surveys were completed
+by 90 participants (79% completion rate). completed surveys indicated that participants were slightly more female
+than male (55 vs. 35) and that participant age ranged from
+17 to 69 (m = 42.74, sd = 13.73).
+
+2.2
+
+materials
+
+forty-four items were selected from four (out of seven) of
+the northstar modules available at the time of the study:
+basic computer skills (21), www (13), windows (6), and
+email (4). task descriptions are given in table 1. basic
+computer skills covered such topics as turning a computer
+on, identifying components of a computer, files and folders, menus, and windows. www focused on browser-based
+activities like searching, search results, browser functionalities, and logging in. although the windows module focused
+on windows overall, the items selected were fairly generic
+to any windowed operating system and mostly pertained to
+desktop applications. email questions used a webmail interface (browser-based email client) and queried how one would
+create a new email, send an email, or similar email task.
+because northstar modules are integrated assessments, the
+northstar project compiled the items we selected into a custom assessment for us.
+
+2.3
+
+procedure
+
+participants first completed informed consent and then the
+demographic survey. both informed consent and demographic
+survey were read aloud to participants to ensure comprehension. participants were then asked to sit in front of a computer to take the northstar assessment. the assessment was
+delivered in the browser using adobe flash. at the start of
+the assessment, a 3-minute orientation video was played explaining how to answer questions in the assessment. if the
+
+participant was confused about what to do, an experimenter
+was available to answer questions. each question consisted
+of an voice prompt defining the task, which was also written at the top of the screen. a replay button was available
+to repeat the prompt. participants could select, click, type,
+drag, etc. on the interface in an attempt to perform the task.
+if the participant did not know how to complete the task,
+they could press an “i don’t know” button, at which point
+the system scored their attempt as a failure. attempts were
+only scored as a success if the participant completed the task
+in the manner requested in the prompt. the completion of
+each task initiated the next task until the assessment was
+complete.
+
+2.4 results & discussion
+the northstar records success/failure of each participant on
+each task, and these data are reported in detail elsewhere [2].
+here we briefly note that the proportion of correct responses
+for each task is quite wide, ranging from .19 to .98. tasks
+in which participants performed particularly well (proportion correct above .80) include identification tasks (e.g. for
+mouse, keyboard, headphone jack, and websites), turning on
+a computer or monitor, and common operations like recycling a file, using checkboxes, dragging, scrolling, and using
+hyperlinks. tasks in which participants performed poorly
+(proportion correct below .60) include identification of various keys, double- or right-clicking, typing web addresses,
+signing into email, and composing email.
+the proportion correct results from the northstar indicate
+the adults with low literacy skills can power on their device
+and perform a variety of basic operations. to the extent
+that these tasks exactly matched tasks that would be performed in a computer-based literacy intervention, like an
+intelligent tutoring system, this level of results is quite useful. however, for some tasks there is not an exact match,
+and the implications of the proportion correct results are
+less clear. for example, difficulties performing tasks using
+word, excel, or webmail may reflect problems with those
+specific interfaces that may not transfer to other programs.
+understanding these more nuanced relationships would require a deeper analysis than is afforded by northstar’s success/failure output.
+
+3.
+
+analysis 2: goms modeling
+
+the purpose of this analysis was to explore whether the
+success rate of the northstar tasks could be modeled using goms (goals, operators, methods, & selection rules),
+a well-known computational technique for modeling expert
+user performance on a task [10]. goms decomposes a particular computer task, e.g. saving a file, into goals and subgoals, perceptual, cognitive, and motor actions in service
+these goals, methods or sequences of operators that achieve
+a goal, and selection rules that choose between alternative
+methods. an important assumption of goms is that the
+users are expert at the computer task in question. therefore
+goms models of execution time represent the upper bound
+of performance after a user has learned the interface and
+practiced it many times. the expert assumption of goms
+is violated in the adult literacy population, making the outcome of this analysis non-obvious. if the goms model predictions of execution time were related to our adult’s performance, that would provide evidence that goms modeling129
+
+click on the monitor
+click on the keyboard
+click on the system unit
+click on the headphone jack
+click on picture of a mouse
+newline key
+caps key
+shift key
+backspace key
+up arrow
+turn on monitor
+turn on computer
+log on to computer
+double click on documents
+right click menu
+
+table 1: northstar tasks
+recycle file
+checkboxes
+organize folder options
+start menu, lauch program
+turn up audio slider
+mute audio
+select browser icons
+click on the website
+drag item in browser
+click on address bar
+type the web address
+click homepage button
+click browser back button
+click browser refresh
+click browser forward
+
+click stop loading
+select search engines
+google query
+google scroll
+use hyperlink
+maximize window
+minimize window
+open excel
+open word using taskbar
+close word
+select login and password
+choose secure password
+sign into email
+compose email
+
+northstar items used in analysis 1.
+
+3.2 results & discussion
+
+figure 1: a cogtool annotation of a northstar
+task. annotations appear as semi-transparent orange boxes over the northstar interface.
+
+has some validity for this population.
+
+3.1
+
+procedure
+
+the cogtool system was used to perform a goms analysis
+[11, 9]. cogtool allows the easy creation of goms models
+by annotating an existing user interface, and then recording
+a demonstration of the task against than annotated interface. figure 1 shows the cogtool interface for the “click on
+the mouse” task. for example, when the northstar task required clicking on an icon, button, or other interface element
+as in figure 1, a cogtool button annotation was overlaid on
+the interface, and then in demonstration mode the modeler
+would demonstrate the task by clicking on the annotated
+button. from this demonstration on the annotation, cogtool builds a goms model that includes the perceptual,
+cognitive, and motor tasks required to perform the task.
+similar annotations were made for auditory directions, keyboard input, and other kinds of interface actions. once a
+task was annotated and demonstrated, a cogtool simulation
+was run on goms model to generate a predicted execution
+time of expert performance. annotations, demonstrations,
+and execution time predictions were performed for all 44
+
+goms-predicted execution times for northstar tasks ranged
+from 3.0 to 17.1 seconds (m = 6.88, sd = 4.07). these execution times were significantly negatively correlated with
+proportion correct, r(42) = −.40, p = .01, ci95 [−.61, −.10],
+indicating that tasks predicted to take an expert longer
+to accomplish were more likely to be answered incorrectly
+by low literacy adults. tasks that take longer are inherently more complex and require more operations to complete. these results suggest that goms has some validity for modeling the performance of adults with low literacy
+skills even though it was not intended for this purpose. however, by themselves these results convey little additional insight. the goms-predicted execution times, generated by
+cogtool, are still at the task level rather than the component skills required to achieve each task. this is partly
+because the orientation of cogtool is to produce execution
+times and partly because of the expert orientation of goms.
+for example, in goms the factors involved in clicking a button are the perceptual (size, location) and motor operations
+involved, but in northstar, some “buttons” are tapping specific types of knowledge, like identifying hardware, understanding icons, or various keys on a keyboard. the different
+types of knowledge behind the various cogtool annotations
+are not represented or considered in the goms analysis it
+provides.
+
+4.
+
+analysis 3: q-matrix & logistic
+mixed models
+
+we would like to understand how the component skills underlying northstar tasks differentially affect the probability
+a low literacy adult will perform the task correctly. in educational data mining, component skills are typically modeled using a q-matrix analysis [4]. in its simplest form,
+a q-matrix analysis constructs a problem by skill matrix
+such that a cellij in the matrix represents whether skilli is
+needed to solve problemj : cellij = 1 if skilli is needed to
+solve problemj , and cellij = 0 if skilli is not needed to solve
+problemj . analysis 2 provides a useful guide towards the
+creation of a q-matrix for the northstar tasks, as it has already captured each component action required to perform130
+
+table 2: component skills coded from goms
+component skill
+probability correct given skill
+checkboxes
+.89
+mouse drag
+.86
+hardware identify
+.83
+hardware function
+.78
+complex scrolling
+.74
+browser functions
+.66
+left click
+.64
+use icons
+.61
+double click
+.58
+window functionality
+.56
+program brands
+.55
+desktop concept
+.53
+select menu
+.50
+good login info
+.50
+login info
+.48
+keyboard function
+.46
+simple typing
+.43
+right click
+.19
+
+each task. what it lacks in some cases, however, is an annotation of the knowledge behind each component action.
+
+4.1
+
+procedure
+
+the first author recoded the goms task annotations with
+18 novice-relevant component skills. the coding was done
+in one pass, and component skills were defined on the fly.
+component skills that occurred in only one task were then
+removed as they offer no predictive utility for other tasks.
+the appropriateness of the component skills was evaluated
+by correlating the total number of component skills needed
+in each task with the goms execution time and the proportion correct for the respective task. we used a logistic
+mixed model to predict the correctness of each participant
+on each task as a function of the presence of component
+skills for that task. this analysis addresses the question as
+to whether there is an effect (main effect) of the presence of
+component skills on the likelihood that an adult with low literacy skills will be able to perform the task correctly. using
+a logistic mixed model in this way has strong similarities to
+cognitive psychometric models like diagnostic classification
+models [16] or more specifically a mixed model implementation of linear logistic test models [15].
+in the logistic mixed model, random slopes were initially included but failed to converge. random intercepts for task
+and participant are theoretically motivated, and backward
+selection of these effects using akaike information criterion
+(aic) achieved a minimum when these effects were included,
+indicating that these intercepts should remain in the model.
+these random intercepts can be considered as per-task difficulty not captured by component skills and per-subject
+ability, respectively. the initial model that included left
+click was rank deficient, so left click, which appears in
+most tasks, was removed from the final model. additionally, the total number of component skills in each task (i.e.
+column sums of the q-matrix) was initially considered as
+a predictor of correctness, but was excluded based on extremely high collinearity, having a variance inflation factor
+of over 40.
+
+4.2 results & discussion
+the component skills and the conditional probability that
+a task will be correctly performed if the component skill is
+present are shown in figure 2. total component skills per
+task was marginally positive correlated with goms execution time, r(42) = .27, p = .07, ci95 [−.02, .53], suggesting
+that tasks with more component skills take longer to perform. total component skills per task was significantly negatively correlated with proportion correct, r(42) = −.35, p =
+.02, ci95 [−.59, −.06], indicating that tasks with more component skills are more difficult to perform correctly. the
+correlation between predicted execution time and proportion correct was not significantly different from the correlation between total component skills and proportion correct,
+t(82) = .18, p = .86, indicating that the q-matrix decomposition of component skills is comparable to the goms execution time in terms of its relationship to proportion correctness. altogether these correlation results provide additional
+evidence that the q-matrix decomposition is appropriate.
+the logistic mixed model had a marginal r2 of .18 (fixed
+effects only) and a conditional r2 of .47 (including random effects) [12]. we found a positive main effect of mouse
+drag, β̂ = 2.06, se = .90, p = .02, such that tasks with
+a mouse drag component were 7.87 times as likely to be
+answered correctly, ci95 [1.36, 45.50], and a marginal main
+effect of hardware identify, β̂ = .89, se = .53, p = .10,
+such that tasks with a hardware identify component were
+2.44 times as likely to be answered correctly, ci95 [.86, 6.94].
+we found negative main effects for keyboard function, β̂ =
+−1.31, se = .51, p = .01, use icon β̂ = −1.35, se =
+.55, p = .01, simple typing β̂ = −1.91, se = .64, p = .003,
+and right click β̂ = −3.20, se = 1.34, p < .02, such that
+tasks with a keyboard function component were .27 times
+as likely to be answered correctly, ci95 [.10, .73], tasks with
+a use icon component were .26 times as likely to be answered correctly, ci95 [.09, .75], tasks with a simple typing
+component were .15 times as likely to be answered correctly,
+ci95 [.04, .52], and tasks with a right click component were
+.04 times as likely to be answered correctly, ci95 [.00, .56].
+we found that mouse drag was extremely predictive of success. the reason is unclear, but we hypothesize that the
+frequency of mouse dragging in many computer tasks may
+have afforded participants the opportunity to become expert
+in this skill. mouse dragging has some similarity to swiping
+on a smartphone or tablet interface, so it may be that expertise with other devices has transferred into the northstar
+tasks. amongst the components that predict failure, perhaps the most intuitive are keyboard function and simple
+typing. typing is a complex skill that takes practice to master. function keys are difficult in that they don’t themselves
+produce a character, but either operate on a character on the
+screen (delete) or work in combination with another key to
+modify it (shift). the negative effects associated with use
+icon and right click are somewhat surprising. icons come
+in many different variations, and so it is possible that the
+negative use icon effect is attributable to a lack of knowledge of specific icons or perhaps to the conventions of icons
+generally. right click is possibly rare and usually brings up
+a context menu with commands that are often available elsewhere, making it more relevant for power users but perhaps
+less so to novice users.131
+
+figure 2: the coefficient path for the lasso model. as the l1 sparsity threshold increases along the x-axis,
+more coefficients are non-zero.
+
+5.1
+
+procedure
+
+a logistic regression base model without random effects was
+initialized with 17 component skills (left click excluded)
+and submitted to lasso. because lasso has a free parameter,
+λ, that controls sparsity of the regression, a lasso analysis
+varies the level of λ and generates regression coefficient estimates at each level. this sequence of regression coefficients
+is known as the regularization path. the value of λ that
+minimized prediction error was estimated using both cross
+validation and aic.
+
+5.2
+
+results & discussion
+
+the coefficient (regularization) path for the lasso model is
+shown in figure 2 and the corresponding aic curve is shown
+
+●
+●
+
+6400
+
+6500
+
+analysis 4: q-matrix lasso
+
+●
+
+●
+
+6200
+
+aic
+
+6300
+
+●
+
+●●
+●
+
+●
+
+6100
+
+●
+
+●
+
+●
+●
+
+6000
+
+analysis 3 provides a more traditional analysis of significant predictors in our study, but must be interpreted with
+caution with respect to generalizing to new data. it may
+be that insignificant predictors in analysis 3 nevertheless
+have predictive value on new data. the problems of relying on p-values or criteria like aic to select variables are
+well known [8]. to explore the predictive potential of the
+q-matrix component skills, we created a lasso model (least
+absolute shrinkage and selection operator [18]), a form of
+regression that promotes sparsity (i.e. zero coefficients) and
+predictive accuracy simultaneously. while not necessarily
+the best predictive model (cf. gradient boosting [6]), lasso
+has the advantage of being simple to interpret, and thus our
+results can guide what variables to use in future models.
+
+●
+
+●
+●
+●
+
+5900
+
+5.
+
+●
+
+●
+
+●
+
+0
+
+2
+
+4
+
+6
+
+8
+
+10
+
+12
+
+●
+
+●
+
+14
+
+|beta|
+
+figure 3: the aic curve for the lasso model. lower
+values of aic indicate better model fit.
+
+in figure 3. in figure 2, the center line represents coefficients having zero values. as the l1 sparsity threshold
+(|beta|) increases, more coefficients become non-zero. for selecting the optimal λ that minimizes overall prediction error,
+ten-fold cross validation and aic yielded congruent results.
+aic results are depicted in the curve in figure 3, which
+shows that that aic improves as |beta| increases, coming to
+a minimum at |beta| = 13.40. accordingly, most coefficients
+for the optimal lasso model are non-zero.132
+
+table 3: lasso component skill coefficients
+component skill
+β̂ exp(β̂)
+mouse drag
+1.80
+6.02
+checkboxes
+1.27
+3.55
+login information
+.88
+2.41
+hardware identify
+.60
+1.82
+hardware function
+.50
+1.65
+desktop concept
+.35
+1.43
+browser functions
+.24
+1.27
+double click
+.11
+1.12
+complex scrolling
+.03
+1.03
+program brands
+.00
+1.00
+select menu
+-.21
+.81
+window functionality
+-.44
+.64
+keyboard function
+-.86
+.42
+use icons
+-1.01
+.36
+good login info
+-1.28
+.28
+simple typing
+-1.47
+.23
+right click
+-2.39
+.09
+
+table 3 gives the β̂ coefficients (log odds) for the aicoptimal model as well as the odds ratio exp(β̂) for each coefficient. the coefficients converted to odds ratios have the
+same interpretation as in the logistic mixed model, e.g. tasks
+with a mouse drag component are 6.02 times as likely to be
+answered correctly as those without. although the logistic
+lasso model does not include random intercepts corresponding to task difficulty and subject ability, the magnitudes of
+coefficients in the logistic lasso are highly comparable to the
+logistic mixed model. however, the strength of the coefficients in the logistic lasso are weaker, in general, than in
+the logistic mixed model, suggesting that the logistic mixed
+model may be slightly over-fitted. for example, according to
+the logistic mixed model, mouse drag tasks are 7.87 times
+as likely to be answered correctly, but according to the logistic lasso model, mouse drag tasks are only 6.02 times as
+likely to be answered correctly; similarly right click containing tasks in the mixed model are .04 times as likely to
+be answered correctly compared to .09 times as likely in the
+logistic lasso. these results suggest that while the logistic
+mixed model might be more appropriate for assessment purposes, as it additionally estimates task difficulty and subject
+ability, the logistic lasso model might be more appropriate
+for predicting the effects of component skills on success rates
+for new tasks.
+
+6. general discussion
+together, our results suggest that not only are there specific northstar tasks that are informative with regard to
+building an adaptive computer-based intervention for adults
+with low literacy skills but also that these tasks can themselves be decomposed into component skills that can be
+further used for this purpose. the main effects of analysis 3 and coefficient rankings of analysis 4 are consistent
+and complimentary with the proportion correct results in
+analysis 1. the marginal main effect for hardware identify explains the high proportion correctness for identification tasks for mouse, keyboard, and headphone jack, and the
+main effect for mouse drag explains the high proportion correctness for recycling a file (dragging to the recycle bin),
+dragging, and scrolling (by dragging a scroll bar). these
+
+correctness-enhancing main effects are also reflected in odds
+ratios greater than one in analysis 4. similarly the main effects for keyboard function and simple typing explain the
+low proportion correctness for identifying various keys, typing web addresses, signing into email, and composing email,
+and these main effects are likewise reflected in odds ratios
+less than one in analysis 4. in these cases we infer that
+the problem is not specific to the interface in question, e.g.
+email, but rather that there is a deficiency in a component
+skill needed for the task taking place in the context of that
+interface.
+the implications for building adaptive computer-based interventions for adults with low literacy skills are clear. first,
+it is important to keep typing to a minimum, either by having users select response options or by using speech recognition. second, right clicking should be eliminated or at
+least made optional. third, icons should be close to icon
+archetypes. and finally, mouse dragging is a good skill
+around which to build user interaction. interestingly, all
+of these implications seem to point to tablet and smartphone platforms, which have a minimum of typing (and
+built in speech interfaces), no right clicking, minimal icons
+in-app, and plenty of swiping/dragging. moreover, smartphone ownership has been rapidly increasing – now 64% of
+households earning below $30 thousand own a smartphone
+[17]. it may be the case that deploying interventions on
+smartphones and tablets better makes use of both the computer literacy strengths and the material resources of low
+literacy adults.
+
+7.
+
+acknowledgments
+
+this research was supported by the institute of education
+sciences (ies; r305c120001). any opinions, findings and
+conclusions, or recommendations expressed in this paper are
+those of the author and do not represent the views of the
+ies.
+
+8.
+
+references
+
+[1] m. anderson and a. perrin. 13% of americans don’t
+use the internet. who are they? technical report, pew
+research center, 2016.
+[2] d. bakhtiari, a. olney, and d. greeberg. computer
+literacy skills of adult learners. in preparation.
+[3] j. a. ballantine, p. m. larres, and p. oyelere.
+computer usage and the validity of self-assessed
+computer competence among first-year business
+students. computers & education, 49(4):976 – 990,
+2007.
+[4] t. barnes, d. bitzer, and m. vouk. experimental
+analysis of the q-matrix method in knowledge
+discovery. in international symposium on
+methodologies for intelligent systems, pages 603–611.
+springer, 2005.
+[5] h. beder and p. medina. classroom dynamics in adult
+literacy education. ncsall research brief. technical
+report, national center for the study of adult
+learning and literacy, 2002.
+[6] j. h. friedman. stochastic gradient boosting.
+computational statistics & data analysis,
+38(4):367–378, 2002.
+[7] a. c. graesser, z. cai, w. o. baer, a. m. olney,133
+
+[8]
+
+[9]
+
+[10]
+
+[11]
+
+[12]
+
+[13]
+[14]
+[15]
+
+[16]
+
+[17]
+
+[18]
+
+x. hu, m. reed, and d. greenberg. reading
+comprehension lessons in autotutor for the center for
+the study of adult literacy. in s. a. crossley and
+d. s. mcnamara, editors, adaptive educational
+technologies for literacy instruction., pages 288–293.
+routledge, 2016. doi: 10.4324/9781315647500 doi:
+10.4324/9781315647500.
+f. harrell. regression modeling strategies: with
+applications to linear models, logistic regression,
+and survival analysis. graduate texts in
+mathematics. springer, 2001.
+b. e. john. cogtool: predictive human performance
+modeling by demonstration. in proceedings of the 19th
+conference on behaviour representation in modeling
+and simulation, pages 83–84, 2010.
+b. e. john and d. e. kieras. the goms family of user
+interface analysis techniques: comparison and
+contrast. acm transactions on computer-human
+interaction (tochi), 3(4):320–351, 1996.
+b. e. john, k. prevas, d. d. salvucci, and
+k. koedinger. predictive human performance
+modeling made easy. in proceedings of the sigchi
+conference on human factors in computing systems,
+chi ’04, pages 455–462, new york, ny, usa, 2004.
+acm.
+s. nakagawa and h. schielzeth. a general and simple
+method for obtaining r2 from generalized linear
+mixed-effects models. methods in ecology and
+evolution, 4(2):133–142, 2013.
+n. d. l. project, 2016.
+proliteracy. u.s. adult literacy facts. technical
+report, 2017.
+f. rijmen, p. d. boeck, and k. u. leuven. the
+random weights linear logistic test model. applied
+psychological measurement, 26(3):271–285, 2002.
+a. a. rupp and j. l. templin. unique characteristics
+of diagnostic classification models: a comprehensive
+review of the current state-of-the-art. measurement:
+interdisciplinary research and perspectives,
+6(4):219–262, 2008.
+a. smith. record shares of americans now own
+smartphones, have home broadband. technical report,
+pew research center, 2017.
+r. tibshirani. regression shrinkage and selection via
+the lasso. journal of the royal statistical society.
+series b (methodological), 58(1):267–288, 1996.

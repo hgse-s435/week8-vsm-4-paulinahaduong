@@ -1,0 +1,930 @@
+111
+
+towards closing the loop: bridging machine-induced
+pedagogical policies to learning theories
+guojing zhou, jianxun wang, collin f. lynch, min chi
+department of computer science
+north carolina state university
+raleigh, nc 27695
+
+{gzhou3,jwang75,cflynch,mchi}@ncsu.edu
+abstract
+in this study, we applied decision trees (dt) to extract
+a compact set of pedagogical decision-making rules from
+an original full set of 3,702 reinforcement learning (rl)induced rules, referred to as the dt-rl rules and full-rl
+rules respectively. we then evaluated the effectiveness of
+the two rule sets against a baseline random condition in
+which the tutor made random yet reasonable decisions. we
+explored two types of trees (weighted and unweighted) as
+well as two pruning strategies (pre- and post-pruning). we
+found that post-pruned weighted trees produced the best results with 529 dt-rl rules. the empirical evaluation was
+conducted in a classroom study using an existing intelligent
+tutoring system (its) named pyrenees. 153 students were
+randomly assigned to three conditions. the procedure was
+the same for all students with domain content and required
+steps strictly controlled. the only substantive differences
+between the three conditions were the policy: (full-rl vs.
+dt-rl vs. random). our result showed that as expected
+the machine induced policies (full-rl and dt-rl) are significantly more effective than the random policy; more importantly, no significant difference was found between the
+full-rl and dt-rl policies though the number of dt-rl
+rules is less than 15% of the number of the full-rl rules
+and the former group also took significantly less time than
+the latter.
+
+1.
+
+introduction
+
+intelligent tutoring systems (itss) are interactive e-learning
+environments that support students’ learning by providing
+instruction, scaffolded practice, and on-demand help. the
+system’s behaviors can be viewed as a sequential decisionmaking process where at each step the system chooses an
+appropriate action from a set of options. pedagogical strategies are the policies used to decide what action to take next
+in the face of alternatives. each system decision will affect
+the user’s subsequent actions and performance. its impact
+on outcomes cannot always be immediately observed and the
+effectiveness of each decision depends upon the effectiveness
+
+of subsequent actions. ideally, an effective learning environment will adapt its decisions to users’ specific needs [1, 11].
+however, there is no existing well-established theory on how
+to make these system decisions effectively. generally speaking, prior research on pedagogical policies can be divided
+into two general categories: top-down or theory-driven, and
+bottom-up or data-driven.
+in theory-driven approaches, itss employ hand-coded pedagogical rules that seek to implement existing cognitive or
+learning theories [1, 10, 17]. while existing learning literature gives helpful guidance on the design of pedagogical
+rules, such guidance is often too general to implement as
+effective immediate decisions. for example, the aptitudetreatment interaction (ati) theory states that instructors
+should match their interventions to the aptitude of the learner
+[5]. while the principle behind this theory is understandable, it is not clear how to implement that rule for each
+decision. how do we represent learner’s aptitude for each
+equation, how exact should be the system’s adaptation, and
+so on.
+data-driven approaches, on the other hand, derive pedagogical policies directly from prior data. here the policies
+specify the pedagogical decisions at a detailed level. reinforcement learning (rl), which we use here, is one popular
+approach that is able to derive pedagogical policies directly
+from student-system interaction logs. these policies are defined as a set of state-action mapping rules, which give the
+best decision to take in each state. the states are typically
+represented as sets of features and the actions are pedagogical actions such as presenting a worked example (we) or
+requiring the student to solve problems (ps). when the system presents a worked example, the students will be given a
+detailed example showing a complete expert solution for the
+problem or the best step to take given their current solution
+state. in problem solving, by contrast, students are tasked
+with solving a problem using the its or with completing an
+individual problem-solving step.
+for this project, our original complete rl-induced policy involves the following seven features representing the students’
+learning process from different perspectives1 .
+
+1
+in the format of: [feature-name] (discretization procedure): explanation of the feature.112
+
+1. [nwesinceps] (0 → 0; (0, 1] → 1; (1, +∞) → 2):
+the number of worked example (we) steps received
+since the last problem solving (ps) step.
+2. [timeinsession] ([0, 2290] → 0; (2290, 4775] → 1;
+(4775, 7939] → 2; (7939, +∞) → 3): the total time
+spent in the current session.
+3. [avgtimeonstepps] ([0, 29.01] → 0; (29.01,
+48.71] → 1; (48.71, +∞) → 2): the average amount of
+time spent on each ps step.
+4. [avgtimeonstepsessionps] ([0, 23.51] → 0;
+(23.51, 36.56] → 1; (36.56, 55] → 2; (55, +∞) → 3):
+the average amount of time spent on each ps step in
+the current session.
+5. [nstepsincelastwrongkc] ([0, 1] → 0; (1, 7]
+→ 1; (7, 25] → 2; (25, +∞) → 3): the number of steps
+received since the last wrong ps step on the current
+knowledge component (kc).
+6. [nwestepsincelastwrong] ([0, 1] → 0; (1, 4]
+→ 1; (4, 10] → 2; (10, +∞) → 3): the number of we
+steps since the last wrong ps step.
+7. [ncorrectpsstepsincelastwrongkcsession]
+(0 → 0; (0, 3] → 1; (3, 10] → 2; (10, +∞) → 3): the
+number of correct ps steps since the last wrong ps
+step on the current kc in the current session.
+with this feature set, a state can be represented as a 7dimensional vector where each element denotes a discretized
+feature value. then, the rules can then be represented as:
+(0:0:0:0:0:0:0) -> ps
+(0:0:0:0:0:0:1) -> ps
+(0:0:0:0:0:1:0) -> ps
+(0:0:0:0:0:1:1) -> we
+in this study we discretized the features into three-four values producing a seven-feature state. this results in a state
+space of 32 ∗ 45 = 9216, that is 9216 rules in one rl-induced
+policy. while these types of polices can specify the exact
+action to take in each case, they are usually too narrow to
+be aligned to existing learning theories. each of the rules
+covers only a very specific case and the relationship between
+rules is unknown. thus it is impossible to explain the power
+of those rules from the perspective of learning theory. the
+opacity of those induced rules not only hinders us in improving data-driven methodologies when they go wrong, it also
+prevents us from advancing learning science research more
+generally. moreover, it is possible that some of the decisions
+are environment-specific and may not generalize to other
+contexts. this in turn prevents translating these induced
+policies to environments other than the one from which they
+are induced. therefore, a general method is needed to shed
+some light on the extracted detailed data-driven policies.
+decision tree (dt) induction is a robust data mining approach which can be used to extract a compact set of rules
+from a set of specific examples. it builds a tree-like hierarchical decision-making pattern which represents the knowledge it learned. each path from root to leaf represents a
+single rule which may be dealt with separately. prior studies have shown that dts can match training examples in
+most cases, even with relatively small trees. davidson et
+
+al., for example, built a dt for predicting the extinction
+risk of mammals [6]. each of the species was described by
+11 ecological features (e.g body mass, geographic range and
+population density) and were labeled with their extinction
+risk (threatened vs. non-threatened). their tree contained
+20 general rules which covered 4500 training examples, with
+a decision accuracy over 80%. additionally, reinchard et al.
+built a dt for predicting the invasiveness of woody plants
+[13]. the resulting dt encoded 15 rules from 235 examples,
+with a decision accuracy over 76%. therefore, in our study,
+we will apply dt to extract general pedagogical decisionmaking rules from the detailed rl-induced policies.
+in short, our primary research question is: is dt an effective methodology for extracting more general pedagogical
+rules from the detailed rl-induced pedagogical rules? in order to investigate this question, we will build dts using the
+rules in a rl-induced policy as training examples and empirically evaluate the effectiveness of the extracted set of dt
+rules by comparing it to the full set of rl-induced rules in a
+classroom study. the state features in the rl-induced policies are the input features for the dt and the pedagogical
+actions are the output labels. in our empirical evaluation,
+we separate the pedagogical decisions from the instructional
+content, strictly controlling the content so that it is equivalent for all participants by 1) using an its which provides
+equal support for all learners; and 2) focusing on tutorial
+decisions that cover the same domain content, in this case
+we versus ps.
+
+2. background
+2.1 applying rl to itss
+beck et al. applied rl to induce pedagogical policies that
+would minimize the time students take to complete problems on animalwatch, an its for grade school arithmetic
+[2]. they trained the model with simulated students. the
+low cost of generated data allowed them to apply a modelfree rl method, temporal difference learning. during the
+test phase, the induced policies were added to animalwatch
+and the new system was empirically compared with the original system. their results showed that the policy group
+spent significantly less time per problem than their no-policy
+peers. note that their primary goal was to reduce the amount
+of time per problem, however faster problem-solving does
+not always result in better learning performance. nonetheless, their results showed that rl can be successfully applied
+to induce pedagogical policies for itss.
+iglesias et al., on the other hand, focused on applying rl to
+improve the effectiveness of an intelligent educational system that teaches students database design [8, 9]. they
+applied another model-free rl algorithm, q-learning to induce policies that provide students with direct navigation
+support through the system’s content. they used simulated
+students to induce the policy and empirically evaluated its
+effectiveness on real students. their results showed that
+while the policy led to more effective system usage behaviors from students, the policy students did not outperform
+the no-policy peers in terms of learning outcomes.
+shen investigated the impact of both immediate and delayed reward functions on rl-induced policies and empirically evaluated the effectiveness of the induced policies within113
+
+an intelligent tutoring system called deep thought [15].
+the induced pedagogical policies are used to decide whether
+the next task should be we or ps. they found that some
+learners benefited significantly more from effective pedagogical policies than others.
+finally, chi et al. applied model-based rl to induce pedagogical policies to improve the effectiveness of an intelligent
+natural language tutoring system for college-level physics
+called cordillera [4]. the authors collected an exploratory
+corpus by training human students on an its that makes
+random decisions and then applied rl to induce pedagogical policies from the corpus. they showed that the induced
+policies were significantly more effective than the prior ones.
+in short, prior studies have shown that rl-induced pedagogical policies can improve students’ learning or reduce
+training time. however, all of these studies focused on the
+effectiveness of the rl-induced policies. none of them considered extracting more general rules from the induced policies.
+
+2.2
+
+extracting general rules
+
+in addition to the work of davidson et al. [6] and reinchard
+et al. [13], dts have been used for other tasks. vayssiers
+et al., for example, applied classification and regression
+trees to predict the presence of 3 species of oak in california [18]. their training examples were vegetation type map
+records for 2085 unique locations. each record consisted of
+25 climatic and geographic features as well as 3 labels showing the presence of the species (quercus agrifolia, quercus
+douglasii and quercus lobata). one dt was induced for
+each type. the dts were tested on another dataset which
+contains the same type of records for 2016 locations. for
+quercus agrifolia, the induced tree had 10 leaf nodes and
+94.9% of its predictions are correct for the locations that
+have the presence of this oak (sensitivity) while 86.7% of
+its predictions are correct for cases without the oak (specificity). for quercus douglasii, the induced tree had 22 leaf
+nodes and a sensitivity and specificity of 87% and 79.9%
+respectively. for quercus lobata, the tree had 6 leaves but
+reached a sensitivity of 77% and a specificity of 73.3%.
+thus, prior studies have shown that dt can effectively extract a small set of general decision-making rules from a
+large set of specific examples. however, all the examples
+used by these studies were observations of existing phenomena. so far as we know, this work is the only relevant research on the application of dt to extract a compact set
+of decision-making rules directly from full rl-induced rules
+and empirically evaluated the two sets of the rules.
+
+2.3
+
+applying dt to rl
+
+prior research on incorporating dt with rl has largely
+focused on seeking a better representation of state space
+or policy for rl. boutilier et al [3]. proposed representational and computational techniques for markov decision
+processes (mdps) to reduce the size of the state space.
+they used dynamic bayesian networks and dts to represent stochastic actions as well as dts to represent rewards.
+based upon this representation, they then developed algorithms to find conditional optimal policies. their method
+was empirically evaluated on several planning problems and
+
+they showed significant savings in both time and space for
+some types of problems. gupta et al. proposed the policy
+tree algorithm for rl. this algorithm is designed to directly
+induce a functional representation of the conditional optimal
+policies as a dt. they evaluated it on a variety of domains
+and showed that it was able to make splits properly [7].
+in short, prior researchers have shown that properly combining dt with rl can result in a large amount of savings
+in time and space for finding good policies. however, none
+of these studies directly applied dt on rl-induced policies.
+
+3.
+
+induce full set of rl-policy
+
+previously, researchers have typically used the markov decision process (mdp) [16] framework to model user-system
+interactions. the central idea behind this approach is to
+transform the problem of inducing effective pedagogical policies on what action the agent should take to the problem of
+computing an optimal policy for an mdp.
+
+3.1 markov decision process
+an mdp is a mathematical framework for representing an
+rl task. it is defined by: a tuple hs , a, t , ri. where s =
+{s1 , s2 , ..., sn } denotes the state space; a = {a1 , a2 , ..., am }
+represents a set of agent’s possible actions; and t : s × a ×
+s → [0, 1] is a transition probability table, where each element is tsai sj = p(sj |si , a). this in turn indicates the
+probability of transiting from state si to state sj by taking an action a while r : s × a × s → r assigns rewards
+to state transitions given actions. the policy is defined as
+π : s → a, mapping state s into action a with the goal of
+maximizing the expected reward.
+after defining an mdp, we can transfer the student-system
+interaction dialog into the trajectory which can then be represented as follows:
+a ,r
+
+a ,r
+
+a ,r
+
+1
+2
+3
+s1 −−1−−→
+s2 −−2−−→
+s3 −−3−−→
+... → sn
+
+a ,r
+
+i
+where si −−i−−→
+si+1 means that the tutor executed action
+ai and received reward ri in state si , and then transferred
+to the next state si+1 . in general, the reward can be divided
+into two categories, immediate and delayed, where immediate rewards are received during the state transition, and
+delayed are available after reaching to goal state.
+
+3.2 training datasets
+our training dataset was collected from three exploratory
+studies in which students were trained on an its which made
+random yet reasonable pedagogical decisions. the studies
+were given as homework assignments during csc226: discrete mathematics, a core cs course offered at ncsu during the fall 2014, spring 2015 and fall 2015 semesters. the
+dataset contains a total of 149 students’ interaction logs.
+all students used the same its, followed the same general
+procedure, studied the same training materials, and worked
+through the same training problems. in order to model the
+students’ learning process, we extracted a total of 142 state
+feature variables, which can be grouped into five categories:
+1. autonomy (am): the amount of work done by the student: such as the number of problems solved so far pscount
+or the number of hints requested hintcount.114
+
+2. temporal situation (ts): the time related information about the work process: such as the average time taken
+per problem avgtime, or the total time spent solving a problem totalpstime.
+3. problem solving (ps): information about the current
+problem solving context, such as the difficulty of the current
+problem probdiff, or whether the student changes the difficulty level newlevel.
+4. performance (pm): information about the student’s
+performance during problem solving: such as the number of
+right application of rules rightapp.
+5. student action (sa): the statistical measurement of
+student’s behavior: such as the number of non-empty-click
+actions that students take actioncount, or the number of
+clicks for derivation appcount.
+
+based methods and an ensemble method and capped the
+maximum number of state feature size to be eight. more
+details of our feature selection methods are described in [14].
+the final resulting rl policy involves seven state features
+and 3706 rules.
+
+3.3
+
+4.1 unweighted vs. weighted tree
+
+inducing rl policies
+
+in order to apply rl to induce pedagogical policies, we
+first defined the pedagogical decision-making problem as an
+mdp. the state representation includes all of the relevant
+features available at the beginning of each step. the actions are we and ps at the step level. the transition tables were calculated on our training dataset, and our reward
+function includes two types of reward: delayed and immediate. our most important reward is based on normalized
+), which measures the
+learning gain (nlg) ( posttest−pretest
+1−pretest
+students’ learning gains irrespective of their incoming competence. this reward was given as a delayed reward as nlg
+scores can only be calculated after students finish the entire
+training process. however, shen et al. [15] showed that giving immediate rewards can lead to the production of more
+effective policies when compared to delayed rewards. this
+is known as the credit-assignment problem. the more that
+we delay success measures from a series of sequential decisions, the more difficult it becomes to identify which of the
+decision(s) in the sequence are responsible for our final success or failure. therefore, for the purposes of this study we
+also assigned immediate rewards based upon the students’
+performance during training on the system.
+the value iteration algorithm was applied to find the optimal
+policy. this algorithm operates by finding the optimal value
+for each state v ∗ (s). the optimal value for a given state is
+the expected discounted reward that the agent will gain if
+it starts in s and follows the optimal policy to the goal.
+generally speaking, v ∗ (s) can be obtained by the optimal
+value function for each state-action pair q∗ (s, a) which is
+defined as the expected discounted reward the agent will
+gain if it takes an action a in a state s and follows the optimal
+policy to the end. the optimal state value v ∗ (s) and value
+function q∗ (s, a) can be obtained by iteratively updating
+v (s) and q(s, a) via equations 1 and 2 until they converge:
+x
+q(s, a) := r(s, a) + γ
+p(sj |si , a)v (s0 )
+(1)
+v (s)
+
+:=
+
+s0 ∈s
+
+max q(s, a)
+a
+
+(2)
+
+here, p(sj |si , a) is the estimated transition model t , r(s, a)
+is the estimated reward model and 0 ≤ γ ≤ 1 is a discount
+factor.
+to induce effective pedagogical policies, we combined rl
+with various feature selections including 10 types of correlation-
+
+4.
+
+extracting compact dt-rl sets
+
+in order to extract a more compact set of decision-making
+rules from the full set of rl-induced rules, we implemented
+the id3 algorithm to build dts [12]. each rule in the final
+rl-induced policy was used as a training example. two
+types of decision trees were built: unweighted and weighted,
+as well as two types of pruning strategies were implemented:
+pre- and post-pruning. next, we will discuss each of them
+in turn.
+
+the decision to give a we vs. ps may impact students’
+learning differently in different situations. we therefore built
+two types of decision trees: unweighted and weighted. unweighted trees treated each decision equally while weighted
+trees take account of the relative importance of each pedagogical rule. when applying the value iteration algorithm
+to induce the optimal policy, we generate the optimal value
+function q∗ (s, a), which gives the expected discounted reward each agent will gain if it takes an action a in a state s
+and follows the optimal policy to the end. for a given state
+s, a large difference between the values of q(s, “p s”) and
+q(s, “w e”) indicates that it is more important for the its
+to follow the optimal decision in the state s. we therefore
+used the absolute difference between the q values for each
+state s to weight each rl pedagogical rule.
+the id3 algorithm builds a tree recursively from root to
+leaves. on each iteration of the construction process the
+algorithm will check the state of the dataset for the current
+branch. it will then select a test feature for the current
+node based upon the weighted information gain. the current
+node will then be expanded by adding branches to it, each
+of which represents a possible value for the selected feature.
+the data will be partitioned over the branches according to
+the value of the test feature. the selected feature cannot
+be used again by its children. weighted information gain is
+defined by the difference between the weighted entropy of the
+examples before it is selected and after they are separated
+by feature value. the weighted entropy of a node can be
+calculated by equation 3
+h(g) = −
+
+j
+x
+
+p(i|g)log2 p(i|g)
+
+(3)
+
+i=1
+
+j is the total number of output label classes. in our case,
+it is the number of pedagogical actions (we or ps) which
+is 2 . p(i|g) is the
+weighted frequency defined by the equap
+p
+w
+tion: p(i|g) = p x∈i wxy .
+x∈i wx is the total weight of the
+y∈g
+examples
+which
+are
+in
+node
+g and which belong to class i.
+p
+and y∈g wy is the total weights of examples in node g.
+the information gain of spliting the current set of training
+examples using feature f can be calculated by equation 4:
+ig(f, g) = h(g) −k
+x
+j=1
+
+p(tj |g)h(tj )
+
+(4)
+
+115
+
+p(tj |g) is the
+weighted frequency of the examples in node g:
+p
+p
+xf =t,x∈g wx
+p
+p(tj |g) =
+.
+xf =t,x∈g wx is the total weights
+y∈g wy
+of
+examples
+in
+nodes
+g
+whose
+value of feature f is j and
+p
+y∈g wy is the total weight of examples in nodes g.
+
+4.2
+
+pre-pruning and post-pruning
+
+to control the size of rules induced by dt, we examined
+two types of pruning strategy: pre- and post-pruning. the
+pre-pruning is conducted during the process of building the
+tree and it used the information gain to determine whether
+to expand or to terminate. only nodes with an information
+gain greater than a threshold times its depth: ig(f, g) ≥
+θ × dg will be expanded and others will be made as a leaf.
+θ is a fixed threshold and dg is the depth of node g.
+post-pruning is conducted after the whole decision tree is
+built and it used the error rate as the pruning measure. the
+error
+rate before a node is expanded is defined as: eg =
+p
+i∈i wi
+. i is the set of the decisions incorrectly classified
+|g|
+by node g and |g| is the total number of examples in the
+node g. the
+p error
+p rate after a node is expanded is defined
+wi
+as: ec = c∈c |g|j∈ic . c is the set of children nodes
+of g after it is expanded and ic is the set of the decisions
+incorrectly classified by the node c. in post-pruning, if the
+difference of a node’s error rate from before to after split is
+less than a threshold, the node will be pruned by removing
+all of its branches to make it a leaf node.
+
+4.3
+
+the compact set of dt-rl rules
+
+in order to induce a compact set of dt-rl rules, we applied the dts to the full set of 3706 rl-induced rules. the
+induced unweighted and weighted dts without pruning has
+2527 and 2456 rules (leaf nodes) respectively. thus, without pruning, dts are already able to extract a smaller set
+of rules: it reduced the total number of rules by over 1000.
+figure 1 shows the relationship between the number of leaf
+nodes (x-axis) and the inverted weighted accuracy (y-axis).
+weighted accuracy(w a) is the weighted percentage of decisions correctlypmade, which can be calculated by the equation: w a =
+
+di ∈t
+
+p
+
+di
+
+wi
+
+wi
+
+. t is the set of correct predictions
+
+made by a dt and wi is the weight of decision i. the inverted weighted accuracy (iw a) is iw a = w a−10 , the
+lower the better. since our goal is to find a good balance
+point between the iwa and the number of leaf nodes, we
+applied a widely used strategy called the elbow method,
+to select the best tree. as we can see in the figure, the
+elbows for the two unweighted tree approaches are around
+800 and 1700 rules (x-axis) for the pre and post pruning
+respectively while the elbows for the two weighted tree approaches are around 250 and 500 for the pre and post pruning respectively. so it seems that weighted tree can extract
+more compact set of rules than the unweighted trees. while
+the weighted pre-pruning approach has around 250 rules,
+its iwa is much higher than the weighted post-pruning approach. therefore, we chose the weighted tree with postpruning strategy which has the an elbow at about 500 leaf
+nodes and reasonable iwa.
+to further justify our dt choice, table 1 shows the relationship between the pruning thresholds, w a and the number
+
+figure 1: leaf nodes - accuracy
+of leaf nodes for the weighted tree with post-pruning. table 1 shows that the tree with the closest number of leaves
+to 500 is the 529 one. it can be obtained by apply a pruning
+threshold of 0.8 and the result tree has a weighted accuracy
+of 0.76. the rules in the resulted tree will be the rules used
+in the dt-rl condition.
+in short, we applied dt on rl-induced pedagogical policies
+to extract a more compact set of decision-making rules. the
+effectiveness of the original full set and the compact set of
+policies were empirically compared against a baseline policy
+which makes random yet reasonable decisions: ps vs. we.
+thus, we have three conditions:
+1. full-rl: the full set of 3706 rl-induced rules.
+2. dt-rl: the compact set of 529 dt-induced rl rules.
+3. random: the random yet reasonable policy.
+
+5.
+
+empirical experiment
+
+participants: this study was conducted in the undergraduate discrete mathematics course at the department
+of computer science at nc state university in the fall of
+2016. 153 students participated in this study, which was
+given as their final homework assignment.
+conditions: students in the study were assigned to three
+conditions via balanced random assignment based upon their
+course section and performance on the class mid-term exam.
+since the primary goal of this work is to examine the effectiveness of the two rl based policies, we assigned more
+students to the full-rl and dt-rl conditions than in the
+random condition. the final group sizes were: n = 61 (fullrl), n = 51 (dt-rl), and n = 41 (random).
+due to preparations for exams and length of the experiment,
+126 students completed the experiment. 5 students were
+excluded from the subsequent analysis due to perfect pretest
+scores, working in group or gaming the system during the
+training. the remaining 121 students were distributed as
+follows: n = 45 for full-rl; n = 41 for rl-dt; n = 35
+for random. we performed a χ2 test of the relationship
+between students’ condition and their rate of completion
+and found no significant difference among the conditions:
+χ2 (2) = 0.955, p = 0.620.
+probability tutor: pyrenees is a web-based its for probability. it covers 10 major principles of probability, such
+as the complement theorem and bayes’ rule. pyrenees116
+
+threshold
+wa
+leaves
+
+table 1: weighted dt with post-pruning
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+1.00 0.99 0.98 0.96 0.93 0.89 0.85 0.79
+2456 2217 2029 1809 1608 1383 1043 758
+
+provides step-by-step instruction and immediate feedback.
+pyrenees can also provide on-demand hints prompting the
+student with what they should do next. as with other systems, help in pyrenees is provided via a sequence of increasingly specific hints. the last hint in the sequence, the
+bottom-out hint, tells the student exactly what to do. for
+the purposes of this study we incorporated three distinct
+pedagogical decision modes into pyrenees to match the three
+conditions.
+procedure: in this experiment, students were required to
+complete 4 phases: 1) pre-training, 2) pre-test, 3) training on
+pyrenees, and 4) post-test. during the pre-training phase,
+all students studied the domain principles through a probability textbook, reviewed some examples, and solved certain
+training problems. the students then took a pre-test which
+contained 14 problems. the textbook was not available at
+this phase and students were not given feedback on their answers, nor were they allowed to go back to earlier questions.
+this was also true of the post-test.
+during phase 3, students in all three conditions received
+the same 12 rather complicated problems in the same order
+on pyrenees. each main domain principle was applied at
+least twice. the minimal number of steps needed to solve
+each training problem ranged from 20 to 50. these steps
+included defining variables, applying principles, and solving equations. the number of domain principles required to
+solve each problem ranged from 3 to 11. all of the students
+could access the corresponding pre-training textbook during this phase. each step in the problems could have been
+provided as either a we or ps based upon the condition
+policy. finally, all of the students completed a post-test
+with 20 problems. 14 of the problems were isomorphic to
+the pre-test given in phase 2. the remaining six were nonisomorphic complicated problems.
+grading criteria: the test problems required students to
+derive an answer by writing and solving one or more equations. we used three scoring rubrics: binary, partial credit,
+and one-point-per-principle. under the binary rubric, a solution was worth 1 point if it was completely correct or 0
+if not. under the partial credit rubric, each problem score
+was defined by the proportion of correct principle applications evident in the solution. a student who correctly applied 4 of 5 possible principles would get a score of 0.8. the
+one-point-per-principle rubric in turn gave a point for each
+correct principle application. all of the tests were graded in
+a double-blind manner by a single experienced grader. the
+results presented below are based upon the partial-credit
+rubric but the same results hold for the other two. for
+comparison purposes, all test scores were normalized to the
+range of [0,1].
+
+6.
+
+0.8
+0.76
+529
+
+0.9
+0.68
+231
+
+empirical results
+
+since both the full-rl and dt-rl policies are based on an
+rl-induced policy, we combined the two conditions together
+as the induced group to evaluate the effectiveness the rlinduced policy. the evaluation was conducted by comparing
+the induced group with the baseline random condition on
+learning performance and training time. moreover, in order to further discover to what extent the compact policy
+retained the power of the full policy, we compared the fullrl and dt-rl conditions on the same measures. next, we
+will discuss each of the comparisons in turn.
+
+6.1 induced vs. random
+we measured students’ incoming competence via the pretest scores collected before training took place. table 2
+shows a comparison between the induced group and the
+random group in terms of learning performance. the parenthesized values following the group names in row 1 denote
+the number of students in each group. the second row in this
+table shows the pre-test scores. the last column shows the
+pairwise t-test results. pairwise t-tests on students’ pre-test
+scores show that there is no significant difference between
+the two groups: t(119) = −0.346, p = 0.730, d = 0.069.
+thus, despite attrition, the two groups remained balanced
+in terms of incoming competence. next, we will compare the
+two groups in terms of learning performance in the post-test
+and training time.
+rows 2 - 4 in table 2 show a comparison of the pre-test, isomorphic post-test (14 isomorphic questions), and adjusted
+post-test scores between the two groups along with the mean
+and sd for each. in order to examine the students’ improvement through training on pyrenees, we compared their
+scores on the pre-test and isomorphic post-test questions.
+a repeated measures analysis using test type (pre-test and
+isomorphic post-test) as factors and test score as the dependent measure showed a main effect for test type: f (1, 119) =
+98.75, p < 0.0001. further comparisons on group by group
+basis showed that on the isomorphic questions, both groups
+scored significantly higher in the post-test than in the pretest: f (1, 85) = 81.30, p < 0.0001 for induced and f (1, 34) =
+18.30, p = 0.0001 for random respectively. this suggests
+that the basic practice and problems, domain exposure, and
+interactivity of our its might help students to learn even
+when pedagogical decisions are made randomly.
+in order to investigate the effectiveness of the induced policies, we compared students’ overall learning performance,
+which was evaluated by their adjusted post-test scores, between the two groups. a one-way ancova analysis was
+conducted on their overall post-test scores (20 questions),
+using the pretest scores as a covariate to factor out the influence of their incoming competence. the result shows a
+significant main effect: f (1, 118) = 4.628, p = 0.033. that
+is, the induced group significantly outperformed the random group on adjusted post-test scores, which is shown in117
+
+cond
+pre
+iso post
+adjusted post
+time
+we steps
+ps steps
+we pct(%)
+
+table 2: induced vs. random
+induced(86)
+random(35)
+t-test result
+.686(.194)
+.699(.171)
+t(119) = −0.346, p = 0.730, d = 0.069
+.851(.155)
+.812(.195)
+t(119) = 1.141, p = 0.256, d = 0.229
+.751(.144)
+.689(.138)
+t(119) = 2.162, p = 0.033, d = 0.433
+105.87(34.30) 111.18(27.33) t(119) = −0.815, p = 0.417, d = 0.163
+205.74(62.73) 189.46(11.39)
+t(119) = 1.522, p = 0.131, d = 0.305
+173.69(61.14) 190.26(10.28) t(119) = −1.591, p = 0.114, d = 0.319
+54.16(16.35)
+49.89(2.78)
+t(119) = 1.532, p = 0.128, d = 0.307
+
+the fourth row of table 2. therefore, the results showed that
+the induced policies are significantly more effective than the
+random policy.
+the fifth row in table 2 shows the average amount of total
+training time (in minutes) students spent on our its for each
+group. pairwise t-test showed no significant difference in
+training time between the two groups: t(119) = −0.815, p =
+0.417, d = 0.163. the results suggest that when compared
+to the random policy, the induced policies generally do not
+have a significant different impact on students’ training time.
+the last three rows in table 2 show the number of we
+and ps steps given as well as the percentage of we steps
+received by the induced and the random group. pairwise
+t-tests showed that there is no significant difference between
+the two groups on these three measures.
+
+6.2
+
+full-rl vs. dt-rl
+
+we then performed the same comparison between the fullrl and dt-rl conditions in order to examine the effectiveness of the dt-extracted compact policy. the second row
+in table 3 shows the pre-test scores for each condition. a
+pairwise t-test on the scores shows no significant difference
+between the two conditions: t(84) = −0.168, p = 0.867,
+d = 0.036. thus the two conditions were balanced in terms
+of incoming competence.
+the pre-test, isomorphic post-test and adjusted post-test
+scores are shown in rows 2 - 4 of table 3. a repeated measures analysis using test type (pre-test and isomorphic posttest) as factors and test score as dependent measure showed
+a main effect for test type: f (1, 85) = 81.30, p < 0.0001.
+further comparisons on group by group basis showed that
+both conditions scored significantly higher in isomorphic
+post-test than in pre-test: f (1, 44) = 42.16, p < 0.0001
+for full-rl and f (1, 40) = 39.16, p < 0.0001 for dt-rl.
+these results suggest that the students can effectively learn
+from pyrenees with the full and compact policies.
+in order to discover to what degree the compact policy retained the effectiveness of the full policy, we compared the
+post-test scores between the two conditions. the results
+of a pairwise t-test showed no significant different between
+them on isomorphic post-test: t(84) = 0.505, p = 0.615,
+d = 0.109. we also conducted an ancova analysis on the
+overall post-test scores using the pretest scores as a covariate and still found no significant different between the two
+conditions: f (1, 83) = 0.348, p = 0.557. in short, while on
+post-test scores, the dt-rl condition scored slightly lower
+than the full-rl condition, the difference is not significant.
+
+the fifth row of table 3 shows the average amount of time
+students spent on training. as the row shows, the fullrl condition spent significantly more time than the dt-rl
+condition: t(84) = 3.829, p = 0.0002, d = 0.827. thus
+the full-rl and dt-rl policies have significant different
+impact upon the students’ training time.
+the last three rows of table 3 show the number of we
+and ps steps given and the percentage of we steps received by the full-rl and the dt-rl condition. pairwise t-tests showed that comparing to the dt-rl condition, the full-rl condition received significantly fewer we
+steps: t(84) = −4.952, p < 0.0001, d = 1.069; received a
+lower percentage of we steps: t(84) = −4.955, p < 0.0001,
+d = 1.070; and completed more ps steps: t(84) = 4.999,
+p < 0.0001, d = 1.079. these results suggest that the pedagogical decisions made by the compact and full policies are
+substantively different.
+
+7.
+
+discussion
+
+in this study, we applied dt to extract a compact set of
+pedagogical rules from the full set of rl-induced rules and
+empirically evaluated the effectiveness of two sets of rules in
+a classroom study. our goal was to shed some light on the
+rl-induced policies and we think this is only the first step
+towards narrowing the gap and building a bridge between
+machine-induced pedagogical policies and learning theories.
+in order to find the best dt, we explored two types of tree:
+unweighted and weighted; and for each of them, we conducted two types of pruning strategy: pre- and post-pruning.
+after comparing the performance among them, we selected
+the weighted tree with the post-pruning strategy to perform
+the extraction of general decision-making rules. the rlinduced policy contains 3706 specific rules, and the compact
+dt-rl consisted of 529 rules with a weighted decision accuracy of 76%.
+in our empirical experiment, we were able to strictly control
+the domain content and thus to isolate the impact of pedagogy from content. based on this isolation, we compared
+students’ performance with the full-rl policy, the dt-rl
+policy and the baseline random policy. our results showed
+that students in all three conditions learned significantly after training on pyrenees, this suggests that the basic training
+of the its is effective, even when the pedagogical decisions
+are made randomly. to evaluate the effectiveness of the two
+machine induced policies (full-rl policy and dt-rl policy), we combined the full-rl and dt-rl condition as the
+induced group and compared its learning performance with
+the random group. our results showed that the induced118
+
+cond
+pre
+iso post
+adjusted post
+time
+we steps
+ps steps
+we pct(%)
+
+table 3: full-rl vs. dt-rl
+full-rl(45)
+dt-rl (41)
+t-test result
+.683(.205)
+.690(.184)
+t(84) = −0.168, p = 0.867, d = 0.036
+.859(.145)
+.842(.168)
+t(84) = 0.505, p = 0.615, d = 0.109
+.757(.144)
+.739(.145)
+t(84) = 0.594, p = 0.554, d = 0.128
+118.42(35.000) 92.10(27.95)
+t(84) = 3.829, p = 0.0002, d = 0.827
+177.44(48.86) 236.80(62.03) t(84) = −4.952, p < 0.0001, d = 1.069
+201.47(47.22) 143.20(60.57)
+t(84) = 4.999, p < 0.0001, d = 1.079
+46.77(12.78)
+62.26(16.13) t(84) = −4.955, p < 0.0001, d = 1.070
+
+group significantly outperform the random group. these
+results suggest that the machine induced policies are indeed
+more effective than the random policy.
+finally, in order to examine to what extent the compact dtrl policy retained the power of the full rl-induced policy,
+we compared the learning performance of the full-rl and
+the dt-rl conditions. our results suggest that while some
+of the power was lost in the general rules extraction, the relative performance difference between the full-rl and the
+dt-rl condition is not significant. in addition, our results
+on the pedagogical decisions made in training revealed that
+the compact dt-rl policy selected significant more we
+than the full-rl policy. this suggests that the two sets
+of policies indeed made materially different decisions. however, since the weighted dt took account of the importance
+of each rule, the dt-rl policy aims to retain maximal decision effectiveness from the full-rl policy while the size of
+the former is less than 15% of the size of the full-rl rules.
+in the future, we will apply existing learning theories to the
+decision-making process generated by decision tree to find
+a theoretical basis for the dt-induced general pedagogical
+decision-making rules.
+
+8.
+
+acknowledgements
+
+this research was supported by the nsf grant #1432156:
+“educational data mining for individualized instruction in
+stem learning environments” and #1651909: “improving
+adaptive decision making in interactive learning environments”.
+
+9.
+
+references
+
+[1] j. r. anderson, a. t. corbett, k. r. koedinger, and
+r. pelletier. cognitive tutors: lessons learned. the
+journal of the learning sciences, 4(2):167–207, 1995.
+[2] j. beck, b. p. woolf, and c. r. beal. advisor: a
+machine learning architecture for intelligent tutor
+construction. aaai/iaai, 2000:552–557, 2000.
+[3] c. boutilier, r. dearden, and m. goldszmidt.
+stochastic dynamic programming with factored
+representations. artificial intelligence, 121(1):49–107,
+2000.
+[4] m. chi, k. vanlehn, d. litman, and p. jordan.
+empirically evaluating the application of
+reinforcement learning to the induction of effective
+and adaptive pedagogical strategies. user modeling
+and user-adapted interaction, 21(1-2):137–180, 2011.
+[5] l. j. cronbach and r. e. snow. aptitudes and
+instructional methods: a handbook for research on
+interactions. irvington, 1977.
+
+[6] a. d. davidson and et al. multiple ecological pathways
+to extinction in mammals. proceedings of the national
+academy of sciences, 106(26):10702–10705, 2009.
+[7] u. d. gupta, e. talvitie, and m. bowling. policy tree:
+adaptive representation for policy gradient. in aaai,
+pages 2547–2553, 2015.
+[8] a. iglesias, p. martı́nez, r. aler, and f. fernández.
+learning teaching strategies in an adaptive and
+intelligent educational system through reinforcement
+learning. applied intelligence, 31(1):89–106, 2009.
+[9] a. iglesias, p. martı́nez, r. aler, and f. fernández.
+reinforcement learning of pedagogical policies in
+adaptive and intelligent educational systems.
+knowledge-based systems, 22(4):266–270, 2009.
+[10] k. r. koedinger and et al. intelligent tutoring goes to
+school in the big city. ijaied, 8(1):30–43, 1997.
+[11] p. phobun and j. vicheanpanya. adaptive intelligent
+tutoring systems for e-learning systems.
+procedia-social and behavioral sciences,
+2(2):4064–4069, 2010.
+[12] j. r. quinlan. induction of decision trees. machine
+learning, 1(1):81–106, 1986.
+[13] s. h. reichard and c. w. hamilton. predicting
+invasions of woody plants introduced into north
+america. conservation biology, 11(1):193–203, 1997.
+[14] s. shen and m. chi. aim low: correlation-based
+feature selection for model-based reinforcement
+learning. edm, 2016.
+[15] s. shen and m. chi. reinforcement learning: the
+sooner the better, or the later the better? in umap,
+pages 37–44. acm, 2016.
+[16] r. s. sutton and a. g. barto. reinforcement learning:
+an introduction, volume 1. mit press cambridge,
+1998.
+[17] k. vanlehn. the behavior of tutoring systems.
+ijaied, 16(3):227–265, 2006.
+[18] m. p. vayssières, r. e. plant, and b. h. allen-diaz.
+classification trees: an alternative non-parametric
+approach for predicting species distributions. journal
+of vegetation science, 11(5):679–694, 2000.

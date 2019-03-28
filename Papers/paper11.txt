@@ -1,0 +1,894 @@
+95
+
+addressing student behavior and affect
+with empathy and growth mindset
+shamya karumbaiah
+
+university of massachusetts
+amherst
+140 governors drive
+amherst, ma 01003-9264
+
+shamya@cs.umass.edu
+beverly woolf
+university of massachusetts
+amherst
+140 governors drive
+amherst, ma 01003-9264
+
+bev@cs.umass.edu
+
+rafael lizarralde
+
+danielle allessio
+
+university of massachusetts
+amherst
+140 governors drive
+amherst, ma 01003-9264
+
+university of massachusetts
+amherst
+140 governors drive
+amherst, ma 01003-9264
+
+worcester polytechnic institute
+100 institute rd
+worcester, ma 01609
+
+worcester polytechnic institute
+100 institute rd
+worcester, ma 01609
+
+rezecib@cs.umass.edu
+ivon arroyo
+iarroyo@wpi.edu
+
+abstract
+we present results of a randomized controlled study that
+compared different types of affective messages delivered by
+pedagogical agents. we used animated characters that were
+empathic and emphasized the malleability of intelligence and
+the importance of effort. results showed significant correlations between students who received more empathic messages and those who were more confident, more patient, exhibited higher levels of interest, and valued math knowledge
+more. students who received more growth mindset messages, tended to get more problems correct on their first
+attempt but valued math knowledge less and had lower
+posttest scores. students who received more success/failure
+messages tended to make more mistakes, to be less learningoriented, and stated that they were more confused. we conclude that these affective messages are powerful media to
+influence students’ perceptions of themselves as learners, as
+well as their perceptions of the domain being taught. we
+have reported significant results that support the use of empathy to improve student affect and attitudes in a math
+tutor.
+
+keywords
+student affect, empathy messages, growth mindset, pedagogical agents, intelligent tutor, confidence
+
+1. introduction
+students experience many emotions while studying and taking tests [16]. students’ emotions (such as confidence, boredom, and anxiety) can influence achievement outcomes [10,
+18] and predispositions (such as low self-concept and pessimism) can diminish academic success [5, 14].
+
+allessio@umass.edu
+naomi wixon
+mwixon@wpi.edu
+
+pekrun’s control-value theory of emotion has been experimentally validated by classroom experiments that used student self-reports (answers to 5-point scale survey questions).
+these experiments provide evidence that educational interventions can reduce students’ anxiety [16, 19].
+dweck’s growth mindset theory suggests that students who
+believe that intelligence can be increased through effort and
+persistence tend to seek out academic challenges, compared
+to those who view their intelligence as immutable [8, 9].
+students who are praised for their effort (as opposed to performance) are more likely to view intelligence as being malleable, and their self-esteem remains stable regardless of how
+hard they have to work to succeed at a task.
+hattie and timperley [13] studied which types of feedback
+and conditions enable learning to flourish and which cases
+stifle growth. according to their study feedback is intended
+to help a student get from where they are to where they need
+to be. graesser et al., [12] reported that there are significant
+relationships between the content of feedback dialogue and
+the emotions experienced during learning. they found significant correlations between dialog and the affective states
+of confusion, eureka (delight) and frustration.
+pekrun et al., [17] tested a theoretical model positing that
+a student’s anticipated achievement feedback in a classroom
+setting influences his/her achievement goals and emotions.
+for example, self-referential feedback, in which a student’s
+competence is defined in terms of self-improvement, had a
+positive influence on a student’s mastery goal adoption. on
+the other hand, normative feedback, in which student competence is defined relative to other students’ mastery goals and
+performance goals, had a positive influence on performanceapproach and performance-avoidance goal adoption. furthermore, feedback condition and achievement goals predicted test-related emotions (i.e., enjoyment, hope, pride,
+relief, anger, anxiety, hopelessness, and shame).
+teachers have limited opportunities to recognize and respond to individual student’s affect in typical classrooms.96
+
+ideally, digital learning environments can manage the delicate balance between motivation and cognition, promoting
+both interest and deep learning. the overwhelming majority
+of work on affect-aware virtual tutors has focused on modeling affect, i.e., designing computational models capable of
+detecting how students feel while they interact with intelligent tutoring systems [2]. while modeling affect is a critical
+first step, very little research exists on systematically exploring the impact of interventions on students’ performance,
+learning, and attitudes, i.e., how an environment might respond to students emotions (e.g., frustration, anxiety, and
+boredom) as they arise. d’mello and graesser carried out
+close research work on empathic characters in autotutor,
+a conversational tutor that uses 3d companions to conduct
+dialogs in natural language with students [6, 7, 11].
+
+1.1
+
+oriented goals[3]. other results indicate that empathic
+characters can help decrease students’ anxiety and boredom.
+our results showed that: a) student anxiety and boredom
+can be reduced using simple 2d characters, as did d’mello et
+al., (2007); b) these benefits are due primarily to empathy,
+and secondarily to growth mindset messages; and c) indicating only success or failure is actively harmful to students,
+in comparison to emphasizing the learning process and the
+importance of effort.
+
+mathspring
+
+the testbed for this research is mathspring, an intelligent
+tutor that personalizes mathematics problems, provides help
+using multimedia, and effectively teaches students to improve in standardized test scores [4]. learning companions
+(figure 1) in mathspring suggest to students that their effort contributes to success, and that making mistakes only
+means more effort is needed. companions use about 20 different messages focused on effort and growth mindset (table 2).
+to date, mathspring learning companions have provided
+positive significant effects for the overall population of students and were more effective for lower achieving students
+and for female students in general [2]. however, characters seemed to have been harmful to some students (e.g.,
+high-achieving males), who had higher affective baselines at
+pretest time and seem to have been distracted by the characters. these results suggest that affective characters should
+probably be different for students who are not presently frustrated or anxious (often high achieving males). one possibility is that the behavior of the characters be adaptive to
+the affective state of the student.
+
+1.2
+
+recognize and respond to affect
+
+previously, we evaluated the hypothesis that tailored affective messages delivered by digital animated characters may positively impact students emotions, attitude, and learning performance. specifically, we identified concrete prescriptive principles about how to respond
+to student emotion as it occurs during online learning [1, 3].
+with models of student emotion, we explored mechanisms to
+address negative emotions. our models predict confidence,
+interest, frustration, and excitement in real-time, based on
+data from hundreds of students. the gold standard was
+students’ self-reported responses to questions, such as “how
+confident do you feel right now?”
+we found that growth mindset messages based on dweck’s
+theory [9] provide an apparent boost in student math
+learning [3], resulted in less performance-oriented goals
+(e.g., beating classmates, instead of a self-referenced focus),
+and less boredom reported on the posttest. typically
+online educational systems only report correctness: “your
+answer is correct/incorrect.” we discovered that such success/failure messages are correlated to higher reported anxiety and boredom, and appear to increase performance-
+
+figure 1: learning companions respond to student
+actions with gestures and messages shown both as
+text and audio. above: companion shows high interest while the student views an example problem
+with solution steps shown. below: companion provides a growth mindset message, encouraging the
+student to put in effort to become good at math.
+
+1.3 research goals
+the research questions in this paper focus on identifying
+messages that support students’ motivation to persist working on a task. which messages (see table 2) should a tutoring system send to students to encourage them to persist?
+how should agents respond to negative emotions? should
+students be praised when they do well? are the benefits to
+student learning and emotion due to empathic or motivational aspects of the companion? what are the results on
+learning and emotion of using an empathic or less empathic
+companion in comparison to a companion that indicates only
+success or failure?97
+
+table 1: outcomes variables measured in the experiment. the questions on the pre- and posttest were
+answered in a 5-point scale, going from “not at all” to “very much”.
+interest - students’ interest in math. “are you interested when solving math problems?”
+excitement - how exciting students find math. “do you feel that solving math is exciting?”
+confusion - how confused students feel while solving math problems. “do you feel confident that you will
+eventually be able to understand the mathematics material?”
+frustration - how frustrating students find math. average of “do you get frustrated when solving math problems?” and “does solving math problems make your feel frustrated?”
+learning orientation - how much students focus on learning as opposed to performance. average of “when
+you are doing math exercises, is your goal to learn as much as you can?” and “do you prefer learning about things
+that make you curious even if that means you have to work harder?”
+performance approach goals - “do you want to show that you are better at math than your classmates?”
+math value - how important do students think math is. “compared to most other activities, how important is
+it or you to be good at math?”
+math liking - measure of how much students like math. “do you like your math class?”
+math test performance - student’s score on math questions that are representative of the content covered in
+mathspring.
+
+2.
+
+method
+
+we conducted a randomized controlled study to evaluate
+three different types of affective messages delivered by pedagogical agents (table 2). the study took place in an urban school district in southern california with sixty-four 6th
+grade students in three math classes for four class sessions,
+during december 2016. on part of the first and last day,
+students completed a pretest and posttest including questions related to various affective states, and questions about
+mathematics. outcome variables measured from these questions are provided in table 1.
+three conditions of learning companion messages were randomly assigned to students and delivered in both audio and
+written form in order to increase the likelihood of exposure: 1) empathy condition for 24 students, 2) growth
+mindset condition for 20 students and 3) success/failure
+condition for 20 students; see table 2 for examples of the
+different types of messages. for all conditions, students were
+asked to self-report their frustration or confidence in a fivepoint scale every five minutes or every eight problems, which
+ever came first, but only after a problem was completed.
+the prompts were shown on a separate screen and invited
+students to report on their frustration or confidence.
+the empathy condition was set to visually reflect positive
+emotion with a certain probability for each math problem
+if the last student emotion report had a positive valence.
+when the most recent emotion report had a negative valence, and with a certain probability, the character first visually reflected the negative emotion; then it reported an
+empathy message such as “sometimes these problems make
+me feel [frustrated]”, and finally a connector such as “on the
+other hand”, connected with a growth mindset message such
+as “i know that putting effort into problem solving and learning from hints will make our intelligence grow.” note that
+only students experiencing negative emotions were exposed
+to growth mindset messages, as opposed to the following
+condition.
+the growth mindset condition emphasized messages that
+accentuate the importance of effort and perseverance in achieving success. the growth mindset condition was set to pro-
+
+vide one of many growth mindset messages after a second incorrect attempt was made (the first incorrect attempt caused
+the hint button to flash), regardless of students’ emotions.
+this condition also provided occasional growth mindset messages at the beginning of a new problem.
+the success/failure condition provided both traditional
+success/failure messages and some more basic meta-cognitive
+support for when students made mistakes (e.g., acknowledging that their answer was not correct while encouraging them
+to use a hint). the success/failure condition provided students with a response if they answered a problem correctly
+and also after they made a second mistake.
+
+3.
+
+results
+
+out of the 64, three students’ data were discarded due to
+minimal interaction with mathspring. across the n =
+61 students, 21066 event log rows were recorded for three
+classes over four separate days, from which several behavioral features were derived and used throughout the analysis;
+our data and processing scripts can be found on github [15].
+all the students completed a pretest and posttest. students
+in empathy, growth mindset and success/failure conditions
+received a total of 978, 763, and 882 messages respectively.
+means, standard deviations and percentage shares for each
+type of message are given in table 3. it is important to
+note that students received messages from all categories but
+their condition emphasized the corresponding message type.
+for example, a student in growth mindset condition received
+significantly more growth mindset messages than a student
+in empathy condition. this distribution of messages means
+that different students saw different amounts of each type
+of message, which allows us to perform partial correlations
+with respect to the counts of each message type, separating
+their effects.98
+
+table 2: examples of messages spoken by characters.
+condition
+empathy
+growth
+mindset
+success/
+failure
+
+message
+“don’t you sometimes get frustrated trying to solve math problems? i do. but guess what.
+keep in mind that when you are struggling with are new idea or skill you are learning
+something and becoming smarter.”
+“hey, congratulations! your effort paid off, you got it right!”
+“did you know that when we practice to learn new math skills our brain grows and gets
+stronger?”
+“let’s click on help, and i am sure we will learn something.”
+“very good, we got another one right!”
+“hmm. wrong. shall we work it out on paper?”
+
+figure 2: time spent on a problem immediately before and after receiving the different categories of messages.
+
+3.1
+
+partial correlations
+
+first, we attempted to replicate the results of our previous
+exploratory work [3]. for the three message types, partial
+correlations of the total number of each messages were measured for the nine posttest measures, controlling for the corresponding pretest measure, time spent in the tutor, and
+message frequency (total messages heard / time spent).
+table 4 shows the result of this analysis. we observe that
+with exposure to more empathic messages, students exhibited higher levels of interest and valued math knowledge more (rows 1 and 7). increased interest can be viewed
+as analogous to the high negative correlation with boredom
+reported in our earlier work. with growth mindset messages, students valued math knowledge less and had
+lower post test performance scores (rows 7 and 9).
+with success/failure messages, students were less learningoriented and claimed to be more confused (rows 6 and 3).
+
+as we see in figure 2, students tend to spend less time
+on problems immediately after they receive growth mindset
+or success/failure messages. in contrast, the time spent on
+a problem increases slightly after receiving empathic messages. students who received more empathic and growth
+mindset messages tend to answer fewer questions than do
+students who received mostly success/failure message (figure 3). combined with the last plot, it looks like the students
+in the empathy condition continue to invest more time on
+solving problems than rushing through the problem set.
+
+figure 3: problems seen per minute across different
+pedagogies
+
+to further understand the dynamics, we derived some intutor variables and performed partial correlations shown in
+table 5. the data for this analysis was derived as per student metrics based on their interaction with mathspring.
+we observed that students tend to answer significantly more
+questions when in the success/failure condition and end up
+making more mistakes as well (rows 4 and 5). it is important
+to note that they also avoid asking for hints (row 6). it
+seems like these students tend to rush through the problems
+while being more careless. they also make more mistakes
+when they receive more growth mindset messages (row 5).
+this leads to simpler questions which they tend to get right
+in the first attempt (row 1). it appears that the students
+in empathy condition continue to invest more time on
+solving problems than rushing through the problem set. the
+number of problems seen by these students is significantly
+less (row 4).99
+
+table 3: the distribution of messages seen by students in each pedagogical conditions.
+condition
+empathy
+growth
+mindset
+success/
+failure
+
+n
+21
+
+empathy messages
+mean
+std
+%
+7.48
+7.0
+16%
+
+growth mindset messages
+mean
+std
+%
+9.95
+7.2
+21%
+
+success/failure messages
+mean
+std
+%
+29.1
+22
+62%
+
+20
+
+0.2
+
+0.5
+
+0.5%
+
+10
+
+5
+
+26%
+
+27.9
+
+19.2
+
+73%
+
+20
+
+1.2
+
+1.7
+
+2.7%
+
+4.6
+
+4.8
+
+10%
+
+38.3
+
+26.6
+
+86%
+
+table 4: partial correlations between different types of messages seen and posttest variables (table 1),
+accounting for the corresponding pretest value, time spent in tutor and message frequency.
+variable
+(1)
+(2)
+(3)
+(4)
+(5)
+(6)
+(7)
+(8)
+(9)
+
+interest
+excitement
+confusion
+frustration
+performance
+approach
+learning
+orientation
+math value
+math liking
+performance
+
+empathy messages
+corr
+p
+0.28*
+0.03
+0.00
+1.00
+-0.05
+0.74
+0.10
+0.43
+
+growth mindset messages
+corr
+p
+0.19
+0.15
+-0.07
+0.60
+-0.05
+0.74
+-0.08
+0.54
+
+success/failure
+corr
+-0.20
+-0.08
+0.32*
+-0.18
+
+messages
+p
+0.14
+0.54
+0.02
+0.18
+
+-0.19
+
+0.14
+
+-0.05
+
+0.70
+
+0.20
+
+0.12
+
+0.02
+
+0.85
+
+0.02
+
+0.88
+
+-0.24+
+
+0.06
+
+0.09
+0.96
+0.07
+
+-0.10
+0.05
+-0.13
+
+0.25*
+0.01
+-0.01
+
+0.05
+0.96
+0.93
+
++
+
+-0.22
+0.01
+-0.23+
+
++
+
+0.45
+0.72
+0.33
+p ≤ 0.10, * p ≤ 0.05
+
+table 5: partial correlations between different types of messages seen and within-tutor variables, accounting
+for time spent in the tutor and message frequency.
+variable
+(1)
+(2)
+(3)
+(4)
+(5)
+(6)
+
+% problems solved on
+first attempt
+avg problem
+difficulty
+learning gain
+problems seen
+mistakes made
+hints per problem
+
+empathy messages
+corr
+p
+
+growth mindset messages
+corr
+p
+
+success/failure messages
+corr
+p
+
+0.06
+
+0.62
+
+0.34**
+
+0.007
+
+-0.01
+
+0.94
+
+0.07
+
+0.61
+
+-0.05
+
+0.69
+
+0.19
+
+0.14
+
+-0.10
+-0.23+
+-0.01
+0.10
+
+0.50
+0.07
+0.91
+0.43
+
+-0.07
+-0.04
+0.59**
+0.16
+
+0.63
+0.78
+6e-7
+0.22
++-0.14
+0.34
+0.77**
+4e-13
+0.30*
+0.02
+0.10
+-0.22+
+p ≤ 0.10, * p ≤ 0.05, ** p ≤ 0.01
+
+100
+
+3.2
+
+markov chain analysis
+
+as students solve problems in the tutoring system, the learning companion comments on their attempts; the effect of
+these messages on student affect is sequential, but the partial correlations do not capture this. to analyze this effect,
+we built markov chain models using in-tutor student selfreports of confidence and frustration. each model describes
+transitions in affective states, from one self-report to the
+next, where students received a particular type of character messages (empathy, growth mindset, and success/failure)
+between self-reports. to reduce the state space, the 5-point
+scale used in the self-reports was simplified to two values confident (≥ 3), not confident (< 3); similarly for frustration.
+the goal of the markov models was not to predict emotional
+changes, but rather to examine whether different messages
+had significant effects on affect. markov models can show
+the probability of transitioning between affective states, but
+also have a stationary distribution, which represents the
+amount of students that would be in each state after undergoing many transitions. for example, a group of students were to use the system for many hours and receive
+only empathic messages, our model suggests that 99.5% of
+them would be confident about learning math (figure 4).
+
+figure 4: state transitions between the confident
+(c) and not confident (n) affective states. the stationary distribution is shown below each state. only
+the empathy model was significant in the likelihood
+ratio test (p ≤ 0.05)
+after
+empathic
+message
+
+table 6: stationary distributions in the markov
+models of confidence and frustration.
+message
+type
+empathy
+growth
+mindset
+success/
+failure
+
+confidence
+conf
+not
+99.5%* 0.05%*
+
+frustration
+frust
+not
+35%
+65%
+
+74%
+
+26%
+
+30%
+
+70%
+
+80%
+
+20%
+
+25%
+
+75%
+*p ≤ 0.05
+
+4. discussion
+some of our results support the hypothesis that affective
+messages delivered by characters can positively impact students’ emotions and affective predispositions for math problem solving. this is particularly evident for empathy, as
+the more empathic messages a student saw the higher their
+interest in mathematics problem solving, as well as their beliefs that mathematics is valuable to learn (table 4). an
+analysis of student behavior suggests that students who saw
+a high frequency of empathic messages also tended to be
+more patient and cautious with problem solving, suggesting
+that empathic messages may encourage students to persist
+through adversity. exposure to empathic messages was significantly correlated to investing time in each math problem activity, leading also to fewer problems seen per session. a positive trend is exhibited between high frequency
+of empathic messages and hints requested, even if not significant (table 5). empirical temporal models generated from
+students’ changes in self-reports of affect, within the tutor,
+revealed that students receiving empathic messages have a
+higher likelihood to become more confident and to remain
+confident.
+
+0.01
+0.99
+
+c
+99.5%
+
+n
+0.50
+
+0.50
+
+0.5%
+
+0.11
+
+after growth
+mindset
+message
+
+0.89
+
+after
+success/
+failure
+message
+
+0.90
+
+c
+73%
+
+n
+0.31
+
+0.69
+
+27%
+
+0.10
+c
+80%
+
+n
+0.39
+
+0.61
+
+20%
+
+we used a likelihood ratio test to analyze the significance
+of these models: the probability of the null model (ignoring
+message type) generating the data divided by the probability
+of the alternate model (for a particular message type) generating the data gives a p-value. figure 4 shows the state transitions for confidence in the null model and the model for
+confidence after receiving empathic messages, which was
+significant with p = 0.0149 (the other models were not significant). we also examined the stationary distributions for
+each model (table 6).
+
+the response to growth mindset messages delivered by characters yielded mixed results. as students saw more of these
+kinds of messages they also succeeded more often at solving
+problems correctly (on the first attempt); interestingly, at
+the same time, they also made more mistakes. this is also
+desirable, as growth mindset messages emphasize that making mistakes is okay and can even help learning, legitimizing
+a high frequency of errors. it is possible that students were
+using those mistakes and hints to learn and succeed later on;
+a (not significant) positive trend suggests that students receiving more of these kinds of messages also asked for more
+hints per problem. in contrast, marginally significant effects
+suggest that a high frequency of growth mindset messages
+might be detrimental to students’ perception of math value,
+and that their posttest performance is worse when they receive more of this kind of messages. it is hard to conclude
+the meaning of these marginally significant effects, especially
+because a previous study suggested that these messages were
+beneficial in general [3]. note that empathic messages used
+’growth mindset’ messages also, in order to resolve the negative emotion (see table 2). one possible explanation is that
+the empathic condition was so positive because it was also
+very selective at showing growth mindset messages for only
+those who experienced negative emotions. it is likely that
+high achieving students, or those who “felt ok”, rejected
+growth mindset messages that they might have perceived to
+be unnecessary.101
+
+an important comment is that we did not expect that success/failure messages could be so harmful to students. regardless of whether messages indicated success or failure, as
+students received more of these messages they also exhibited
+lower levels of mastery/learning orientation at posttest time.
+they also reported higher levels of confusion at posttest time
+(note that the confusion can be positive for learning within
+the learning experience, but not after the learning experience has concluded). regarding behavior within the tutor,
+the more students were exposed to success/failure messages,
+the more they appeared to rush through problems, make
+mistakes, and request fewer hints per problem.
+to summarize, empathy messages were associated with variables consistent with methodical work and an increased interest/value of mathematics. however, both growth mindset
+and success/failure messages appeared to be associated with
+a greater number of mistakes. finally, success/failure messages themselves were associated with a whole host of concerning behaviors such as confusion with the material following posttest, reduced learning orientation, hurried work, and
+a reduced likelihood of requesting hints. this is consistent
+with dweck’s findings that growth mindset messages are superior to success/failure messages [8, 9]. whether empathic
+messages in fact result in improved student performance pre
+to posttest will likely require larger samples than this small
+study (n = 61). however, students in non-empathic conditions have demonstrated significantly more mistakes in their
+work.
+
+5.
+
+conclusions
+
+this research emphasizes the importance of understanding
+an intervention’s effect on a student’s affective state, which
+in turn is connected to engagement, performance, and learning. although many researchers have focused on modeling
+affect, very little research effort has been put into systematically measuring the impact of the intervention on the student behavior in an adaptive learning environment. empathic messages that respond to students’ recent emotions
+have resulted in superior results both in improving the student interaction with the system and in the overall learning
+experience. growth mindset follows next with some positive impact on in-tutor performance but its overall effect
+in the short-term is questionable. success/failure messages
+are generally harmful to students: reducing learning orientation, increasing confusion, and making students more
+careless during the learning experience.
+we conclude that affective messages delivered by characters in online tutoring environments are a very important
+medium for building student-tutor rapport in a virtual environment, powerful signals that influence perceptions of students themselves as learners, as well as perceptions of the
+domain being taught. we have reported significant results
+that support the use of empathy to improve student affect
+and attitudes in a math tutor. the long-term effect of these
+messages needs to be studied when the novelty of this intervention wears off. in the future, we hope to study the
+impact of the frequency and content of these messages. to
+evaluate the generalizability of these results, student populations across different demographics needs to be studied as
+well as the applicability of the messages to domains beyond
+mathematics.
+
+6.
+
+acknowledgments
+
+this research is supported by the national science foundation (nsf) 1324385 iis/cyberlearning dip: collaborative
+research: impact of adaptive interventions on student affect, performance, and learning. any opinions, findings,
+and conclusions, or recommendations expressed in this paper are those of the authors and do not necessarily reflect
+the views of nsf.
+
+7.
+
+additional authors
+
+additional authors: winslow burleson (new york university, 70 washington square south new york, new york,
+10012; email: wb50@nyu.edu).
+
+8.
+
+references
+
+[1] i. arroyo, w. burleson, m. tai, k. muldner, and b. p.
+woolf. gender differences in the use and benefit of
+advanced learning technologies for mathematics.
+journal of educational psychology, 105(4):957, 2013.
+[2] i. arroyo, d. g. cooper, w. burleson, b. p. woolf,
+k. muldner, and r. christopherson. emotion sensors
+go to school. in aied, volume 200, pages 17–24, 2009.
+[3] i. arroyo, s. schultz, n. wixon, k. muldner,
+w. burleson, and b. p. woolf. addressing affective
+states with empathy and growth mindset. 6th
+international workshop on personalization
+approaches in learning environments, 2016.
+[4] i. arroyo, b. p. woolf, w. burelson, k. muldner,
+d. rai, and m. tai. a multimedia adaptive tutoring
+system for mathematics that addresses cognition,
+metacognition and affect. international journal of
+artificial intelligence in education, 24(4):387–426,
+2014.
+[5] l. corno and r. e. snow. adapting teaching to
+individual differences among learners. handbook of
+research on teaching, 3(605-629), 1986.
+[6] s. d’mello and a. graesser. automatic detection of
+learner’s affect from gross body language. applied
+artificial intelligence, 23(2):123–150, 2009.
+[7] s. d’mello and a. graesser. autotutor and affective
+autotutor: learning by talking with cognitively and
+emotionally intelligent computers that talk back.
+acm transactions on interactive intelligent systems
+(tiis), 2(4):23, 2012.
+[8] c. s. dweck. self-theories: their role in motivation,
+personality, and development. psychology press, 2000.
+[9] c. s. dweck. beliefs that make smart people dumb.
+why smart people can be so stupid, 24:41, 2002.
+[10] d. goleman. emotional intelligence. why it can
+matter more than fq. learning, 24(6):49–50, 1996.
+[11] a. c. graesser, p. chipman, b. c. haynes, and
+a. olney. autotutor: an intelligent tutoring system
+with mixed-initiative dialogue. ieee transactions on
+education, 48(4):612–618, 2005.
+[12] a. c. graesser, s. k. d’mello, s. d. craig,
+a. witherspoon, j. sullins, b. mcdaniel, and
+b. gholson. the relationship between affective states
+and dialog patterns during interactions with
+autotutor. journal of interactive learning research,
+19(2):293, 2008.
+[13] j. hattie and h. timperley. the power of feedback.
+review of educational research, 77(1):81–112, 2007.102
+
+[14] a. n. kluger and a. denisi. feedback interventions:
+toward the understanding of a double-edged sword.
+current directions in psychological science, 7(3):67–72,
+1998.
+[15] r. lizarralde and s. karumbaiah. a collection of
+scripts for processing mathspring data. https:
+//github.com/rezecib/mathspringdataprocessing,
+2017.
+[16] r. pekrun. emotions and learning. international
+academy of education. australia: international
+bureau of education, 2014.
+[17] r. pekrun, a. cusack, k. murayama, a. j. elliot, and
+k. thomas. the power of anticipated feedback:
+effects on students’ achievement goals and
+achievement emotions. learning and instruction,
+29:115–124, 2014.
+[18] r. pekrun, t. goetz, l. m. daniels, r. h. stupnisky,
+and r. p. perry. boredom in achievement settings:
+exploring control-value antecedents and performance
+outcomes of a neglected emotion. journal of
+educational psychology, 102(3):531, 2010.
+[19] r. pekrun, e. vogl, k. r. muis, and g. m. sinatra.
+measuring emotions during epistemic activities: the
+epistemically-related emotion scales. cognition and
+emotion, pages 1–9, 2016.

@@ -1,0 +1,1025 @@
+63
+
+behavior-based latent variable model
+for learner engagement
+andrew s. lan1 , christopher g. brinton2 , tsung-yen yang3 , mung chiang1
+1
+
+princeton university, 2 zoomi inc., 3 national chiao tung university
+
+andrew.lan@princeton.edu, christopher.brinton@zoomiinc.com, tsungyenyang.eecs02@nctu.edu.tw, chiangm@princeton.edu
+
+abstract
+we propose a new model for learning that relates videowatching behavior and engagement to quiz performance. in
+our model, a learner’s knowledge gain from watching a lecture
+video is treated as proportional to their latent engagement
+level, and the learner’s engagement is in turn dictated by a set
+of behavioral features we propose that quantify the learner’s
+interaction with the lecture video. a learner’s latent concept
+knowledge is assumed to dictate their observed performance
+on in-video quiz questions. one of the advantages of our
+method for determining engagement is that it can be done
+entirely within standard online learning platforms, serving
+as a more universal and less invasive alternative to existing
+measures of engagement that require the use of external
+devices. we evaluate our method on a real-world massive
+open online course (mooc) dataset, from which we find that
+it achieves high quality in terms of predicting unobserved
+first-attempt quiz responses, outperforming two state-of-theart baseline algorithms on all metrics and dataset partitions
+tested. we also find that our model enables the identification
+of key behavioral features (e.g., larger numbers of pauses
+and rewinds, and smaller numbers of fast forwards) that are
+correlated with higher learner engagement.
+
+keywords
+behavioral data, engagement, latent variable model, learning
+analytics, mooc, performance prediction
+
+1.
+
+introduction
+
+the recent and rapid development of online learning platforms, coupled with advancements in machine learning, has
+created an opportunity to revamp the traditional “one-sizefits-all” approach to education. this opportunity is facilitated
+by the ability of many learning platforms, such as massive
+open online course (mooc) platforms, to collect several
+different types of data on learners, including their assessment
+responses as well as their learning behavior [9]. the focus
+of this work is on using different forms of data to model
+the learning process, which can lead to effective learning
+analytics and potentially improve learning efficacy.
+
+1.1
+
+behavior-based learning analytics
+
+current approaches to learning analytics are focused mainly
+on providing feedback to learners about their knowledge
+states – or the level to which they have mastered given concepts/topics/knowledge components – through analysis of
+their responses to assessment questions [10, 24]. there are
+other cognitive (e.g., engagement [17, 31], confusion [37], and
+
+emotion [11]) as well as non-cognitive (e.g., fatigue, motivation, and level of financial support [14]) factors beyond
+assessment performance that are crucial to the learning process as well. accounting for them thus has the potential to
+yield more effective learning analytics and feedback.
+to date, it has been difficult to measure these factors of the
+learning process. contemporary online learning platforms,
+however, have the capability to collect behavioral data that
+can provide some indicators of them. this data commonly
+includes learners’ usage patterns of different types of learning
+resources [12, 15], their interactions with others via social
+learning networks [7, 28], their clickstream and keystroke activity logs [2, 8, 30], and sometimes other metadata including
+facial expressions [35] and gaze location [6].
+recent research has attempted to use behavioral data to
+augment learning analytics. [5] proposed a latent response
+model to classify whether a learner is gaming an intelligent
+tutoring system, for example. several of these works have
+sought to demonstrate the relationship between behavior and
+performance of learners in different scenarios. in the context
+of moocs, [22] concluded that working on more assignments
+lead to better knowledge transfer than only watching videos,
+[12] extracted probabilistic use cases of different types of
+learning resources and showed they are predictive of certification, [32] used discussion forum activity and topic analysis to
+predict test performance, and [26] discovered that submission
+activities can be used to predict final exam scores. in other
+educational domains, [2] discovered that learner keystroke
+activity in essay-writing sessions is indicative of essay quality, [29] identified behavior as one of the factors predicting
+math test achievement, and [25] found that behavior is predictive of whether learners can provide elegant solutions to
+mathematical questions.
+in this work, we are interested in how behavioral data can
+be used to model a learner’s engagement.
+
+1.2
+
+learner engagement
+
+monitoring and fostering engagement is crucial to education,
+yet defining it concretely remains elusive. research has
+sought to identify factors in online learning that may drive
+engagement; for example, [17] showed that certain production
+styles of lecture videos promote it. [20] defined disengagement
+as dropping out in the middle of a video and studied the
+relationship between disengagement and video content, while
+[31] considered the relationship between engagement and the64
+
+semantic features of mathematical questions that learners
+respond to. [33] studied the relationship between learners’
+self-reported engagement levels in a learning session and their
+facial expressions immediately following in-session quizzes,
+and [34] considered how engagement is related to linguistic
+features of discussion forum posts.
+there are many types of engagement [3], with the type of
+interest depending on the specific learning scenario. several
+approaches have been proposed for measuring and quantifying different types. these approaches can be roughly
+divided into two categories: device-based and activity-based.
+device-based approaches measure learner engagement using
+devices external to the learning platform, such as cameras to
+record facial expressions [35], eye-tracking devices to detect
+mind wandering while reading text documents [6], and pupil
+dilation measurements, which are claimed to be highly correlated with engagement [16]. activity-based approaches, on
+the other hand, measure engagement using heuristic features
+constructed from learners’ activity logs; prior work includes
+using replies/upvote counts and topic analysis of discussions
+[28], and manually defining different engagement levels based
+on activity types found in moocs [4, 21].
+both of these types have their drawbacks. device-based
+approaches are far from universal in standard learning platforms because they require integration with external devices.
+they are also naturally invasive and carry potential privacy
+risks. activity-based approaches, on the other hand, are
+not built on the same granularity of data, and tend to be
+defined from heuristics that have no guarantee of correlating
+with learning outcomes. it is therefore desirable to develop a
+statistically principled, activity-based approach to inferring
+a learner’s engagement.
+
+1.3
+
+our approach and contributions
+
+in this paper, we propose a probabilistic model for inferring a
+learner’s engagement level by treating it as a latent variable
+that drives the learner’s performance and is in turn driven
+by the learner’s behavior. we apply our framework to a
+real-world mooc dataset consisting of clickstream actions
+generated as learners watch lecture videos, and question
+responses from learners answering in-video quiz questions.
+we first formalize a method for quantifying a learner’s behavior while watching a video as a set of nine behavioral features
+that summarize the clickstream data generated (section 2).
+these features are intuitive quantities such as the fraction
+of video played, the number of pauses made, and the average playback rate, some of which have been associated with
+performance previously [8]. then, we present our statistical
+model of learning (section 3) as two main components: a
+learning model and a response model. the learning model
+treats a learner’s gain in concept knowledge as proportional
+to their latent engagement level while watching a lecture
+video. concept knowledge is treated as multidimensional, on
+a set of latent concepts underlying the course, and videos
+are associated with varying levels to different concepts. the
+response model treats a learner’s performance on in-video
+quiz questions, in turn, as proportional to their knowledge
+on the concepts that this particular question relates to.
+by defining engagement to correlate directly with perfor-
+
+mance, we are able to learn which behavioral features lead to
+high engagement through a single model. this differs from
+prior works that first define heuristic notions of engagement
+and subsequently correlate engagement with performance,
+in separate procedures. moreover, our formulation of latent
+engagement can be made from entirely within standard learning platforms, serving as a more universally applicable and
+less invasive alternative to device-based approaches.
+finally, we evaluate two different aspects of our model (section 4): its ability to predict unobserved, first-attempt quiz
+question responses, and its ability to provide meaningful
+analytics on engagement. we find that our model predicts
+with high quality, achieving aucs of up to 0.76, and outperforming two state-of-the-art baselines on all metrics and
+dataset partitions tested. one of the partitions tested corresponds to the beginning of the course, underscoring the
+ability of our model to provide early detection of struggling
+or advanced students. in terms of analytics, we find that
+our model enables us to identify behavioral features (e.g.,
+large numbers of pauses and rewinds, and small numbers of
+fast forwards) that indicate high learner engagement, and to
+track learners’ engagement patterns throughout the course.
+more generally, these findings can enable an online learning platform to detect learner disengagement and perform
+appropriate interventions in a fully automated manner.
+
+2.
+
+behavioral data
+
+in this section, we start by detailing the setup of lecture
+videos and quizzes in moocs. we then specify videowatching clickstream data and our method for summarizing
+it into behavioral features.
+
+2.1
+
+course setup and data capture
+
+we are interested in modeling learner engagement while
+watching lecture videos to predict their performance on invideo quiz questions. for this purpose, we can view an
+instructor’s course delivery as the sequence of videos that
+learners will watch interspersed with the quiz questions they
+will answer. let q = (q1 , q2 , . . .) be the sequence of questions
+asked through the course. a video could have any number
+of questions generally, including none; to enforce a 1:1 correspondence between video content and questions, we will
+consider the “video” for question qn to be all video content
+that appears between qn−1 and qn . based on this, we will
+explain the formats of video-watching and quiz response data
+we work with in this section.
+our dataset. the dataset we will use is from the fall 2012
+offering of the course networks: friends, money, and bytes
+(fmb) on coursera [1]. this course has 92 videos distributed
+among 20 lectures, and exactly one question per video.
+
+2.1.1
+
+video-watching clickstreams
+
+when a learner watches a video on a mooc, their behavior
+is typically recorded as a sequence of clickstream actions.
+in particular, each time a learner makes an action – play,
+pause, seek, ratechange, open, or close – on the video
+player, a clickstream event is generated. formally, the ith
+event created for the course will be in the format
+ei =< ui , vi , ei , p0i , pi , xi , si , ri >65
+
+here, ui and vi are the ids of the specific learner (user) and
+video, respectively, and ei is the type of action that ui made
+on vi . pi is the position of the video player (in seconds)
+immediately after ei is made, p0i is the position immediately
+before,1 xi is the unix timestamp (in seconds) at which ei
+was fired, si is the binary state of the video player – either
+playing or paused – once this action is made, and ri is the
+playback rate of the video player once this action is made.
+our fmb dataset has 314,632 learner-generated clickstreams
+from 3,976 learners.2
+the set eu,v = {ei |ui = u, vi = v} of clickstreams for learner
+u recorded on video v can be used to reconstruct the behavior
+u exhibits on v. in section 2.2 we will explain the features
+computed from eu,v to summarize this behavior.
+
+figure 1: distribution of the number of videos that
+each each learner completed in fmb. more than
+85% of learners completed less than 20 videos.
+
+2.1.2 quiz responses
+when a learner submits a response to an in-video quiz question, an event is generated in the format
+am =< um , vm , xm , am , ym >
+again, um and vm are the learner and video ids (i.e., the
+quiz corresponding to the video). xm is the unix timestamp
+of the submission, am is the specific response, and ym is the
+number of points awarded for the response. the questions
+in our dataset are multiple choice with a single response, so
+ym is binary-valued.
+in this work, we are interested in whether quiz responses
+were correct on first attempt (cfa) or not. as a result,
+with au,v = {am |um = u, vm = v}, we consider the event
+a0u,v in this set with the earliest timestamp x0u,v . we also
+0
+only consider the set of clickstreams eu,v
+⊆ eu,v that occur
+before x0u,v , as the ones after would be anti-causal to cfa.
+
+2.2
+
+behavioral features and cfa score
+
+0
+with the data eu,v
+and a0u,v , we construct two sets of information for each learner u on each video v, i.e., each
+learner-video pair. first is a set of nine behavioral features
+that summarize u’s video-watching behavior on v [8]:
+
+(3) fraction played. the fraction of the video that the
+learner played relative to the length. formally, it is calculated
+as gu,v /lv , where
+gu,v =
+
+x
+i∈s
+
+is the total length of video that was played (while in the
+playing state). here, s = {i ∈ a0u,v : ai+1 6= open ∧ si =
+playing}.
+(4) fraction paused. the fraction of time the learner
+stayed paused on the video relative to the length. it is
+calculated as hu,v /lv , where
+hu,v =
+
+x
+i∈s
+
+eu,v =
+
+x
+i∈s
+
+min(xi+1 − xi , lv )
+
+is the elapsed time on v obtained by finding the total unix
+time for u on v, and lv is the length of the video (in seconds).
+here, s = {i ∈ a0u,v : ai+1 6= open}. lv is included as an
+upper bound for excessively long intervals of time.
+(2) fraction completed. the fraction of the video that the
+learner completed, between 0 (none) and 1 (all). formally,
+it is cu,v /lv , where cu,v is the number of unique 1 second
+segments of the video that the learner visited.
+
+(5) number of pauses. the number of times the learner
+paused the video, or
+
+x
+
+pi and p0i will only differ when i is a skip event.
+this number excludes invalid stall, null, and error events,
+as well as open and close events which are generated automatically.
+
+1{ai = pause}
+
+where 1{} is the indicator function.
+(6) number of rewinds. the number of times the learner
+skipped backwards in the video, or
+
+x
+
+i∈a0u,v
+
+1{ai = skip ∧ p0i < pi }
+
+(7) number of fast forwards. the number of times the
+learner skipped forward in the video, i.e., with p0i > pi in the
+previous equation.
+(8) average playback rate. the time-average of the
+learner’s playback rate on the video. formally, it is calculated
+as
+
+1
+
+2
+
+min(ti+1 − ti , lv )
+
+is the total time the learner stayed in the paused state on this
+video. here, s = {i ∈ a0u,v : ai+1 6= open ∧ si = paused}.
+
+i∈a0u,v
+
+(1) fraction spent. the fraction of time the learner spent
+on the video, relative to the playback length of the video.
+formally, this quantity is eu,v /lv , where
+
+min(p0i+1 − pi , lv )
+
+r̄u,v =
+
+p
+i∈s ri · min(xi+1 − xi , lv )
+p
+i∈s
+
+where s = {i ∈
+
+a0u,vmin(xi+1 − xi , lv )
+
+: ai+1 6= open ∧ si = playing}.
+
+66
+
+(9) standard deviation of playback rate. the standard
+deviation of the learner’s playback rate. it is calculated as
+
+ p
+
+i∈s (ri
+
+− r̄u,v )2 · min(xi+1 − xi , lv )
+i∈s min(xi+1 − xi , lv )
+
+p
+
+with the same s as the average playback rate.
+the second piece of information for each learner-video pair
+is u’s cfa score yu,v ∈ {0, 1} on the quiz question for v.
+
+2.3
+
+dataset subsets
+
+we will consider different groups of learner-video pairs when
+evaluating our model in section 4. our motivation for doing
+so is the heterogeneity of learner motivation and high dropoff
+rates in moocs [9]: many will quit the course after watching
+just a few lectures. modeling in a small subset of data,
+particularly those at the beginning of the course, is desirable
+because it can lead to “early detection” of those who may
+drop out [8].
+figure 1 shows the dropoff for our dataset in terms of the
+number of videos each learner completed: more than 85%
+of learners completed just 20% of the course. “completed”
+is defined here as having watched some of the video and
+responded to the corresponding question. let tu be the
+number of videos learner u completed and γ(v) be the index
+of video v in the course, we define ωu0 ,v0 = {(u, v) : tu ≥
+u0 ∧ γ(v) ≤ v0 } to be the subset of learner-video pairs
+such that u completed at least u0 videos and v is within the
+first v0 videos. the full dataset is ω1,92 , and we will also
+consider ω20,92 as the subset of 346 active learners over the
+full course and ω1,20 as the subset of all learners over the
+first two weeks3 in our evaluation.
+
+3.
+
+statistical model of learning
+with latent engagement
+
+in this section, we propose our statistical model. let u
+denote the number of learners (indexed by u) and v the
+number of videos (indexed by v). further, we use tu to
+denote the number of time instances registered by learner
+u (indexed by t); we take a time instance to be a learner
+completing a video, i.e., watching a video and answering the
+corresponding quiz question. for simplicity, we use a discrete
+notion of time, i.e., each learner-video pair will correspond
+to one time instance for one learner.
+our model considers learners’ responses to quiz questions
+as measurements of their underlying knowledge on a set of
+concepts; let k denote the number of such concepts. further,
+our model considers the action of watching lecture videos
+as part of learning that changes learners’ latent knowledge
+states over time. these different aspects of the model are
+visualized in figure 2: there are two main components, a
+response model and a learning model.
+
+3.1
+
+response model
+
+our statistical model of learner responses is given by
+t
+(t)
+p(yu(t) = 1|c(t)
+u ) = σ(wv(u,t) cu − µv(u,t) + au ),
+3
+
+(1)
+
+in fmb, the first two weeks of lectures is the first 20 videos.
+
+figure 2: our proposed statistical model of learning
+consists of two main parts, a response model and a
+learning model.
+where v(u, t) : ω ⊆ {1, . . . , u } × {1, . . . , maxu tu } →
+{1, . . . , v } denotes a mapping from a learner index-time
+index pair to the index of the video v that u was watching at
+(t)
+t. yu ∈ {0, 1} is the binary-valued cfa score of learner u
+on the quiz question corresponding to the video they watch
+at time t, with 1 denoting a correct response (cfa) and 0
+denoting an incorrect response (non-cfa).
+the variable wv ∈ rk
++ denotes the non-negative, kdimensional quiz question–concept association vector that
+characterizes how the quiz question corresponding to video v
+tests learners’ knowledge on each concept, and the variable
+µv is a scalar characterizing the intrinsic difficulty of the quiz
+(t)
+question. cu is the k-dimensional concept knowledge vector
+of learner u at time t, characterizing the knowledge level of
+the learner on each concept at the time, and au denotes the
+static, intrinsic ability of learner u. finally, σ(x) = 1+e1−x is
+the sigmoid function.
+we restrict the question–concept association vector wv to be
+non-negative in order to make the parameters interpretable
+[24]. under this restriction, the values of concept knowledge
+(t)
+vector cu can be understood as follows: large, positive values
+lead to higher chances of answering a question correctly, thus
+corresponding to high knowledge, while small, negative values
+lead to lower chances of answering a question correctly, thus
+corresponding to low knowledge.
+
+3.2
+
+learning model
+
+our model of learning considers transitions in learners’ knowledge states as induced by watching lecture videos. it is given
+by
+(t−1)
+c(t)
++ e(t)
+u = cu
+u dv(u,t) ,
+
+t = 1, . . . , tu ,
+
+(2)
+
+where the variable dv ∈ rk
++ denotes the non-negative, kdimensional learning gain vector for video v; each entry
+characterizes the degree to which the video improves learners’
+knowledge level on each concept. the assumption of nonnegativity on dv implies that videos will not negatively affect
+(0)
+learners’ knowledge, as in [23]. cu is the initial knowledge
+state of learner u at time t = 0, i.e., before starting the67
+
+ω20,92
+
+ω1,20
+
+ω1,92
+
+acc
+
+auc
+
+acc
+
+auc
+
+acc
+
+auc
+
+proposed model
+
+0.7293±0.0070
+
+0.7608±0.0094
+
+0.7096±0.0057
+
+0.7045±0.0066
+
+0.7058±0.0054
+
+0.7216±0.0054
+
+sparfa
+
+0.7209±0.0070
+
+0.7532±0.0098
+
+0.7061±0.0069
+
+0.7020±0.0070
+
+0.6975±0.0048
+
+0.7124±0.0050
+
+bkt
+
+0.7038±0.0084
+
+0.7218±0.0126
+
+0.6825±0.0058
+
+0.6662±0.0065
+
+0.6803±0.0055
+
+0.6830±0.0059
+
+table 1: quality comparison of the different algorithms on predicting unobserved quiz question responses.
+the obtained acc and auc metrics on different subsets of the fmb dataset are given. our proposed model
+obtains higher quality than the sparfa and bkt baselines in each case.
+course and watching any video.
+(t)
+
+the scalar latent variable eu ∈ [0, 1] in (2) characterizes
+the engagement level that learner u exhibits when watching
+video v(u, t) at time t. this is in turn modeled as
+t (t)
+e(t)
+u = σ(β fu ),
+
+(3)
+
+(t)
+
+where fu is a 9-dimensional vector of the behavioral features
+defined in section 2.2, summarizing learner u’s behavior while
+the video at time t. β is the unknown, 9-dimensional parameter vector that characterizes how engagement associates
+with each behavioral feature.
+taken together, (2) and (3) state that the knowledge gain a
+learner will experience on a particular concept while watching
+a particular video is given by
+(i) the video’s intrinsic association with the concept, modulated by
+(ii) the learner’s engagement while watching the video, as
+manifested by their clickstream behavior.
+from (2), a learner’s (latent) engagement level dictates the
+fraction of the video’s available learning gain they acquire
+to improve their knowledge on each concept. the response
+model (1) in turn holds that performance is dictated by a
+learner’s concept knowledge states. in this way, engagement
+is directly correlated with performance through the concept
+knowledge states. note that in this paper, we treat the en(t)
+gagement variable eu as a scalar; the extension of modeling
+it as a vector and thus separating engagement by concept is
+part of our ongoing work.
+it is worth mentioning the similarity between our characterization of engagement as a latent variable in the learning
+model and the input gate variables in long-short term memory (lstm) neural networks [18]. in lstm, the change
+in the latent memory state (loosely corresponding to the
+(t)
+latent concept knowledge state vector cu ) is given by the
+input vector (loosely corresponding to the video learning
+gain vector dv ) modulated by a set of input gate variables
+(t)
+(corresponding to the engagement variable eu ).
+parameter inference. our statistical model of learning
+and response can be seen as a particular type of recurrent neural network (rnn). therefore, for parameter inference, we
+implement a stochastic gradient descent algorithm with standard backpropagation. given the graded learner responses
+(t)
+(t)
+yu and behavioral features fu , our parameter inference
+
+algorithm estimates the quiz question–concept association
+vectors wv , the quiz question intrinsic difficulties µv , the the
+video learning gain vectors dv , the learner initial knowledge
+(0)
+vectors cu , the learner abilities au , and the engagement–
+behavioral feature association vector β. we omit the details
+of the algorithm for simplicity of exposition.
+
+4.
+
+experiments
+
+in this section, we evaluate the proposed latent engagement
+model on the fmb dataset. we first demonstrate the gain
+in predictive quality of the proposed model over two baseline
+algorithms (section 4.1), and then show how our model can
+be used to study engagement (section 4.2).
+
+4.1
+
+predicting unobserved responses
+
+we evaluate our proposed model’s quality by testing its
+ability to predict unobserved quiz question responses.
+baselines. we compare our model against two well-known,
+state-of-the-art response prediction algorithms that do not
+use behavioral data. first is the sparse factor analysis
+(sparfa) algorithm [24], which factors the learner-question
+matrix to extract latent concept knowledge, but does not use
+a time-varying model of learners’ knowledge states. second is
+a version of the bayesian knowledge tracing (bkt) algorithm
+that tracks learners’ time-varying knowledge states, which
+incorporates a set of guessing and slipping probability parameters for each question, a learning probability parameter
+for each video, and an initial knowledge level parameter for
+each learner [13, 27].
+
+4.1.1
+
+experimental setup and metrics
+
+regularization. in order to prevent overfitting, we add
+`2 -norm regularization terms to the overall optimization
+objective function for every set of variables in both the
+proposed model and in sparfa. we use a parameter λ to
+control the amount of regularization on each variable.
+cross validation. we perform 5-fold cross validation on
+the full dataset (ω1,92 ), and on each subset of the dataset
+introduced in section 2.3 (ω20,92 and ω1,20 ). to do so, we
+randomly partition each learner’s quiz question responses
+into 5 data folds. leaving out one fold as the test set, we use
+the remaining four folds as training and validation sets to
+select the values of the tuning parameters for each algorithm,
+i.e., by training on three of the folds and validating on the
+other. we then train every algorithm on all four observed
+folds using the tuned values of the parameters, and evaluate
+them on the holdout set. all experiments are repeated for
+20 random partitions of the training and test sets.
+for the proposed model and for sparfa, we tune both the68
+
+feature
+
+coefficient
+
+fraction spent
+
+0.1941
+
+fraction completed
+
+0.1443
+
+fraction played
+
+0.2024
+
+fraction paused
+
+0.0955
+
+number of pauses
+
+0.2233
+
+number of rewinds
+number of fast forwards
+average playback rate
+standard deviation of playback rate
+
+0.4338
+−0.1551
+0.2797
+
+0.0314
+
+table 2: regression coefficient vector β learned over
+the full dataset, associating each clickstream feature
+to engagement. all but one of the features (number
+of fast forwards) is positively correlated with engagement.
+number of concepts k ∈ {2, 4, 6, 8, 10} and the regularization parameter λ ∈ {0.5, 1.0, . . . , 10.0}. note that for the
+proposed model, when a question response is left out as part
+of the test set, only the response is left out of the training
+set: the algorithm still uses the clickstream data for the
+corresponding learner-video pair to model engagement.
+metrics. to evaluate the quality of the algorithms, we
+employ two commonly used binary classification metrics:
+prediction accuracy (acc) and area under the receiver operating characteristic curve (auc) [19]. the acc metric is
+simply the fraction of predictions that are made correctly,
+while the auc measures the tradeoff between the true and
+false positive rates of the classifier. both metrics take values
+in [0, 1], with larger values indicating higher quality.
+
+4.1.2 results and discussion
+table 1 gives the evaluation results for the three algorithms.
+the average and standard deviation over the 20 random data
+partitions are reported for each dataset group and metric.
+first of all, the results show that our proposed model consistently achieves higher quality than both baseline algorithms
+on both metrics. it significantly outperforms bkt in particular (sparfa also outperforms bkt). this shows the
+potential of our model to push the envelope on achievable
+quality in performance prediction research.
+notice that our model achieves its biggest quality improvement on the full dataset, with a 1.3% gain in auc over
+sparfa and a 5.7% gain over bkt. this observation suggests that as more clickstream data is captured and available
+for modeling – especially as we observe more video-watching
+behavioral data from learners over a longer period of time
+(the full dataset ω1,92 contains clickstream data for up to
+12 weeks, while the ω1,20 subset only contains data for the
+first 2 weeks) – the proposed model achieves more significant
+quality enhancements over the baseline algorithms. this
+is somewhat surprising, since prior work on behavior-based
+performance prediction [8] has found the largest gains in the
+presence of fewer learner-video pairs, i.e., before there are
+many question responses for other algorithms to model on.
+but our algorithm also benefits from additional question re-
+
+(t)
+
+figure 3: plot of the latent engagement level ej
+over time for one third of the learners in fmb, showing a diverse set of behaviors across learners.
+
+sponses, to update its learned relationship between behavior
+and concept knowledge.
+the first two weeks of data (ω1,20 ) is sparse in that the
+majority of learners answer at most a few questions during
+this time, many of whom will drop out (see figure 1). in
+this case, our model obtains a modest improvement over
+sparfa, which is static and uses fewer parameters. the
+gain over bkt is particularly pronounced, at 5.7%. this,
+combined with the findings for active learners over the full
+course (ω20,92 ), shows that observing video-watching behavior of learners who drop out of the course in its early states
+(these learners are excluded from ω20,92 ) leads to a slight
+increase in the performance gain of the proposed model over
+the baseline algorithms. importantly, this shows that our
+algorithm provides benefit for early detection, with the ability
+to predict performance of learners who will end up dropping
+out [8].
+
+4.2
+
+analyzing engagement
+
+given predictive quality, one benefit of our model is that it
+can be used to analyze engagement. the two parameters to
+consider for this are the regression coefficient vector β and
+(t)
+the engagement scalar eu itself.
+behavior and engagement. table 2 gives each of the
+estimated feature coefficients in β for the full dataset ω1,92 ,
+with regularization parameters chosen via cross validation.
+all of the features except for the number of fast forwards are
+positively correlated with the latent engagement level. this
+is to be expected since many of the features are associated
+with processing more video content, e.g., spending more
+time, playing more, or pausing longer to reflect, while fast
+forwarding involves skipping over the content.
+the features that contribute most to high latent engagement
+levels are the number of pauses, the number of rewinds, and
+the average playback rate. the first two of these are likely
+indicators of actual engagement as well, since they indicate
+whether the learner was thinking while pausing the video
+or re-visiting earlier content which contains knowledge that
+they need to recall or revise. the strong, positive correlation
+of average playback rate is somewhat surprising though:
+we may expect that a higher playback rate would have a69
+
+(a) learners that consistently exhibit
+high engagement and finish the course.
+
+(b) learners that exhibit high engagement but drop out early.
+(t)
+
+figure 4: plot of the latent engagement level ej
+
+over time for selected learners in three different groups.
+
+negative impact on engagement, like fast forwarding does, as
+it involves speeding through content. on the other hand, it
+may be an indication that learners are more focused on the
+material and trying to keep their interest higher.
+engagement over time. figure 3 visualizes the evolution
+(t)
+of eu over time for 1/3 of the learners (randomly selected).
+patterns in engagement differs substantially across learners;
+those who finish the course mostly exhibit high engagement
+levels throughout, while those who drop out early vary greatly
+in their engagement, some high and others low.
+figure 4 breaks down the learners into three different types
+according to their engagement patterns, and plots their engagement levels over time separately. the first type of learner
+(a) finishes the course and consistently exhibits high engagement levels throughout the duration. the second type (b)
+also consistently exhibits high engagement levels, but drops
+out of the course after up to three weeks. the third type of
+learner (c) exhibits inconsistent engagement levels before an
+early dropout. equipped with temporal plots like these, an
+instructor could determine which learners may be in need
+of intervention, and could design different interventions for
+different engagement clusters [8, 36].
+
+5.
+
+(c) learners that exhibit inconsistent
+engagement and drop out.
+
+conclusions and future work
+
+in this paper, we proposed a new statistical model for learning, based on learner behavior while watching lecture videos
+and their performance on in-video quiz questions. our model
+has two main parts: (i) a response model, which relates a
+learner’s performance to latent concept knowledge, and (ii)
+a learning model, which relates the learner’s concept knowledge in turn to their latent engagement level while watching
+videos. through evaluation on a real-world mooc dataset,
+we showed that our model can predict unobserved question
+responses with superior quality to two state-of-the-art baselines, and also that it can lead to engagement analytics: it
+identifies key behavioral features driving high engagement,
+and shows how each learner’s engagement evolves over time.
+our proposed model enables the measurement of engagement
+solely from data that is logged within online learning platforms: clickstream data and quiz responses. in this way, it
+serves as a less invasive alternative to current approaches
+for measuring engagement that require external devices, e.g.,
+cameras and eye-trackers [6, 16, 35]. one avenue of future
+work is to conduct an experiment that will correlate our
+definition of latent engagement with these methods.
+
+additionally, one could test other, more sophisticated characterizations of the latent engagement variable. one such
+approach could seek to characterize engagement as a function of learners’ previous knowledge level. an alternative or
+addition to this would be a generative modeling approach of
+engagement to enable the prediction of future engagement
+given each learner’s learning history.
+one of the long-term, end-all goals of this work is the design
+of a method for useful, real-time analytics to instructors. the
+true test of this ability comes from incorporating the method
+into a learning system, providing its outputs – namely, performance prediction forecasts and engagement evolution – to
+an instructor through the user interface, and measuring the
+resulting improvement in learning outcomes.
+
+acknowledgments
+thanks to debshila basu mallick for discussions on the
+different types of engagement.
+
+6.
+
+references
+
+[1] networks: friends, money, and bytes. https:
+//www.coursera.org/course/friendsmoneybytes.
+[2] l. allen, m. jacovina, m. dascalu, r. roscoe, k. kent,
+a. likens, and d. mcnamara. {enter}ing the time
+series {space}: uncovering the writing process
+through keystroke analyses. in proc. intl. conf. educ.
+data min., pages 22–29, june 2016.
+[3] a. anderson, s. christenson, m. sinclair, and c. lehr.
+check & connect: the importance of relationships for
+promoting engagement with school. j. school psychol.,
+42(2):95–113, mar. 2004.
+[4] a. anderson, d. huttenlocher, j. kleinberg, and
+j. leskovec. engaging with massive online courses. in
+proc. intl. conf. world wide web, pages 687–698, apr.
+2014.
+[5] r. baker, a. corbett, and k. koedinger. detecting
+student misuse of intelligent tutoring systems. in proc.
+intl. conf. intell. tutoring syst., pages 531–540, aug.
+2004.
+[6] r. bixler and s. d’mello. automatic gaze-based
+user-independent detection of mind wandering during
+computerized reading. user model. user-adapt.
+interact., 26(1):33–68, mar. 2016.
+[7] c. brinton, s. buccapatnam, f. wong, m. chiang, and
+h. poor. social learning networks: efficiency
+optimization for mooc forums. in proc. ieee conf.70
+
+comput. commun., pages 1–9, apr. 2016.
+[8] c. brinton and m. chiang. mooc performance
+prediction via clickstream data and social learning
+networks. in proc. ieee conf. comput. commun.,
+pages 2299–2307, april 2015.
+[9] c. brinton, r. rill, s. ha, m. chiang, r. smith, and
+w. ju. individualization for education at scale: miic
+design and preliminary evaluation. ieee trans. learn.
+technol., 8(1):136–148, jan. 2015.
+[10] h. cen, k. koedinger, and b. junker. learning factors
+analysis – a general method for cognitive model
+evaluation and improvement. in proc. intl. conf. intell.
+tutoring syst., pages 164–175, june 2006.
+[11] l. chen, x. li, z. xia, z. song, l. morency, and
+a. dubrawski. riding an emotional roller-coaster: a
+multimodal study of young child’s math problem
+solving activities. in proc. intl. conf. educ. data min.,
+pages 38–45, june 2016.
+[12] c. coleman, d. seaton, and i. chuang. probabilistic
+use cases: discovering behavioral patterns for
+predicting certification. in proc. acm conf. learn at
+scale, pages 141–148, mar. 2015.
+[13] a. corbett and j. anderson. knowledge tracing:
+modeling the acquisition of procedural knowledge. user
+model. user-adapt. interact., 4(4):253–278, dec. 1994.
+[14] c. farrington, m. roderick, e. allensworth,
+j. nagaoka, t. keyes, d. johnson, and n. beechum.
+teaching adolescents to become learners: the role of
+noncognitive factors in shaping school performance–a
+critical literature review. consortium on chicago
+school research, 2012.
+[15] b. gelman, m. revelle, c. domeniconi, a. johri, and
+k. veeramachaneni. acting the same differently: a
+cross-course comparison of user behavior in moocs. in
+proc. intl. conf. educ. data min., pages 376–381, june
+2016.
+[16] m. gilzenrat, j. cohen, j. rajkowski, and
+g. aston-jones. pupil dynamics predict changes in task
+engagement mediated by locus coeruleus. in proc. soc.
+neurosci. abs., page 19, nov. 2003.
+[17] p. guo, j. kim, and r. rubin. how video production
+affects student engagement: an empirical study of
+mooc videos. in proc. acm conf. learn at scale,
+pages 41–50, mar. 2014.
+[18] s. hochreiter and j. schmidhuber. long short-term
+memory. neural comput., 9(8):1735–1780, nov. 1997.
+[19] h. jin and c. ling. using auc and accuracy in
+evaluating learning algorithms. ieee trans. knowl.
+data eng., 17(3):299–310, mar. 2005.
+[20] j. kim, p. guo, d. seaton, p. mitros, k. gajos, and
+r. miller. understanding in-video dropouts and
+interaction peaks in online lecture videos. in proc.
+acm conf. learn at scale, pages 31–40, mar. 2014.
+[21] r. kizilcec, c. piech, and e. schneider. deconstructing
+disengagement: analyzing learner subpopulations in
+massive open online courses. in proc. intl. conf. learn.
+analyt. knowl., pages 170–179, apr. 2013.
+[22] k. koedinger, j. kim, j. jia, e. mclaughlin, and
+n. bier. learning is not a spectator sport: doing is
+better than watching for learning from a mooc. in
+proc. acm conf. learn at scale, pages 111–120, mar.
+2015.
+
+[23] a. lan, c. studer, and r. baraniuk. time-varying
+learning and content analytics via sparse factor
+analysis. in proc. acm sigkdd intl. conf. knowl.
+discov. data min., pages 452–461, aug. 2014.
+[24] a. lan, a. waters, c. studer, and r. baraniuk. sparse
+factor analysis for learning and content analytics. j.
+mach. learn. res., 15:1959–2008, june 2014.
+[25] l. malkiewich, r. baker, v. shute, s. kai, and
+l. paquette. classifying behavior to elucidate elegant
+problem solving in an educational game. in proc. intl.
+conf. educ. data min., pages 448–453, june 2016.
+[26] j. mcbroom, b. jeffries, i. koprinska, and k. yacef.
+mining behaviours of students in autograding
+submission system logs. in proc. intl. conf. educ. data
+min., pages 159–166, june 2016.
+[27] z. pardos and n. heffernan. modeling individualization
+in a bayesian networks implementation of knowledge
+tracing. in proc. intl. conf. user model. adapt.
+personalization, pages 255–266, june 2010.
+[28] j. reich, b. stewart, k. mavon, and d. tingley. the
+civic mission of moocs: measuring engagement across
+political differences in forums. in proc. acm conf.
+learn at scale, pages 1–10, apr. 2016.
+[29] m. san pedro, e. snow, r. baker, d. mcnamara, and
+n. heffernan. exploring dynamical assessments of
+affect, behavior, and cognition and math state test
+achievement. in proc. intl. conf. educ. data min.,
+pages 85–92, june 2015.
+[30] c. shi, s. fu, q. chen, and h. qu. vismooc:
+visualizing video clickstream data from massive open
+online courses. in ieee pacific visual. symp., pages
+159–166, apr. 2015.
+[31] s. slater, r. baker, j. ocumpaugh, p. inventado,
+p. scupelli, and n. heffernan. semantic features of
+math problems: relationships to student learning and
+engagement. in proc. intl. conf. educ. data min.,
+pages 223–230, june 2016.
+[32] s. tomkins, a. ramesh, and l. getoor. predicting
+post-test performance from online student behavior: a
+high school mooc case study. in proc. intl. conf.
+educ. data min., pages 239–246, june 2016.
+[33] a. vail, j. wiggins, j. grafsgaard, k. boyer, e. wiebe,
+and j. lester. the affective impact of tutor questions:
+predicting frustration and engagement. in proc. intl.
+conf. educ. data min., pages 247–254, june 2016.
+[34] x. wang, d. yang, m. wen, k. koedinger, and c. rosé.
+investigating how student’s cognitive behavior in
+mooc discussion forums affect learning gains. in proc.
+intl. conf. educ. data min., pages 226–233, june 2015.
+[35] j. whitehill, z. serpell, y. lin, a. foster, and
+j. movellan. the faces of engagement: automatic
+recognition of student engagement from facial
+expressions. ieee trans. affect. comput., 5(1):86–98,
+jan. 2014.
+[36] j. whitehill, j. williams, g. lopez, c. coleman, and
+j. reich. beyond prediction: towards automatic
+intervention in mooc student stop-out. in proc. intl.
+conf. educ. data min., pages 171–178, june 2015.
+[37] d. yang, r. kraut, and c. rosé. exploring the effect of
+student confusion in massive open online courses. j.
+educ. data min., 8(1):52–83, 2016.

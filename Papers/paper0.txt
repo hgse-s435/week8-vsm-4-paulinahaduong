@@ -1,0 +1,1019 @@
+zone out no more: mitigating mind wandering during
+computerized reading
+sidney k. d’mello, caitlin mills, robert bixler, & nigel bosch
+university of notre dame
+118 haggar hall
+notre dame, in 46556, usa
+sdmello@nd.edu
+
+abstract
+mind wandering, defined as shifts in attention from task-related
+processing to task-unrelated thoughts, is a ubiquitous
+phenomenon that has a negative influence on performance and
+productivity in many contexts, including learning. we propose
+that next-generation learning technologies should have some
+mechanism to detect and respond to mind wandering in real-time.
+towards this end, we developed a technology that automatically
+detects mind wandering from eye-gaze during learning from
+instructional texts. when mind wandering is detected, the
+technology intervenes by posing just-in-time questions and
+encouraging re-reading as needed. after multiple rounds of
+iterative refinement, we summatively compared the technology to
+a yoked-control in an experiment with 104 participants. the key
+dependent variable was performance on a post-reading
+comprehension assessment. our results suggest that the
+technology was successful in correcting comprehension deficits
+attributed to mind wandering (d = .47 sigma) under specific
+conditions, thereby highlighting the potential to improve learning
+by “attending to attention.”
+
+keywords
+mind wandering; gaze tracking; student modeling; attentionaware.
+
+1. introduction
+despite our best efforts to write a clear and engaging paper,
+chances are high that within the next 10 pages you might fall prey
+to what is referred to as zoning out, daydreaming, or mind
+wandering [45]. despite your best intention to concentrate on our
+paper, at some point your attention might drift away to unrelated
+thoughts of lunch, childcare, or an upcoming trip. this prediction
+is not based on some negative or cynical opinion of the
+reader/reviewer (we read and review papers too), but on what is
+known about attentional control, vigilance, and concentration
+while individuals are engaged in complex comprehension
+activities, such as reading for understanding.
+one recent study tracked mind wandering of 5,000 individuals
+from 83 countries with a smartphone app that prompted people
+with thought-probes at random intervals throughout the day [24].
+people reported mind wandering for 46.9% of the prompts, which
+confirmed lab studies on the pervasiveness of mind wandering
+(see [45] for a review). mind wandering is more than merely
+incidental; a recent meta-analysis of 88 samples indicated a
+negative correlation between mind wandering and performance
+across a variety of tasks [34], a correlation which increases with
+task complexity. when compounded with its high frequency,
+mind wandering can have serious consequences on the
+performance and productivity of society at large.
+
+of learning with technology. traditional learning technologies
+rely on the assumption that students are attending to the learning
+session, although this is not always the case. for example, it has
+been estimated that students mind wander approximately 40% of
+the time when engaging with online lectures [38], which are an
+important component of moocs. some advanced technologies
+do aim to detect and respond to affective states like boredom, but
+evidence for their effectiveness is still equivocal (see [9] for a
+review). further, boredom is related to but not the same as
+attention [12]. there are technologies that aim to prevent mind
+wandering by engendering a highly immersive learning
+experience and have achieved some success in this regard [40,
+41]. but what is to be done when attentional focus inevitably
+wanes as the session progresses and the novelty of the system and
+content fades?
+our central thesis is that next-generation learning technologies
+should include mechanisms to model and respond to learners’
+attention in real-time [8]. such attention-aware technologies can
+model various aspects of learner attention (e.g., divided attention,
+alternating attention). here, we focus on detecting and mitigating
+mind wandering, a quintessential signal of waning engagement.
+we situate our work in the context of reading because reading is
+a common activity shared across multiple learning technologies,
+thereby increasing the generalizability of our results. further,
+students mind wander approximately 30% of the time during
+computerized reading [44]. and although mind wandering can
+facilitate certain cognitive processes like future planning and
+divergent thinking [2, 28], it negatively correlates with
+comprehension and learning (reviewed in [31, 45]), suggesting
+that it is important to address mind wandering during learning.
+towards this end, we developed and validated a closed-loop
+attention-aware learning technology that combines a machinelearned mind wandering detector with a real-time interpolated
+testing and re-study intervention. our attention-aware technology
+works as follows. learners read a text on a computer screen using
+a self-paced screen-by-screen (also called page-by-page) reading
+paradigm. we track eye-gaze during reading using a remote eye
+tracker that does not restrict head movements. we focus on eyegaze for mind wandering detection due to decades of research
+suggesting a tight coupling between attentional focus and eye
+movements during reading [36]. when mind wandering is
+detected, the system intervenes in an attempt to redirect
+attentional focus and correct any comprehension deficits that
+might arise due to mind wandering. the interventions consist of
+asking comprehension question on pages where mind wandering
+was detected and providing opportunities to re-read based on
+learners’ responses. in this paper, we discuss the mind wandering
+
+mind wandering is also unfortunately an under-addressed
+problem in education and is yet to be deeply studied in the context8
+
+detector, intervention approach, and results of a summative
+evaluation study 1.
+
+1.1 related work
+the idea of attention-aware user interfaces is not new, but was
+proposed almost a decade ago by roda and thomas [39]. there
+was even an article on futuristic applications of attention-aware
+systems in educational contexts [35]. prior to this, gluck, et al.
+[15] discussed the use of eye tracking to increase the bandwidth
+of information available to an intelligent tutoring system (its).
+similarly, anderson [1] followed up on some of these ideas by
+demonstrating how particular beneficial instructional strategies
+could only be launched via a real-time analysis of eye gaze.
+most of the recent work has been on leveraging eye gaze to
+increase the bandwidth of learner models [22, 23, 29]. conati, et
+al. [5] provide an excellent review of much of the existing work
+in this area. we can group the research into three categories: (1)
+offline-analyses of eye gaze to study attentional processes, (2)
+computational modeling of attentional states, and (3) closed-loop
+systems that respond to attention in real-time. offline-analysis of
+eye movements has received considerable attention in cognitive
+and educational psychology for several decades [e.g., 16, 19], so
+this area of research is relatively healthy. online computational
+models of learner attention are just beginning to emerge [e.g., 6,
+11], while closed-loop attention-aware systems are few and far
+between (see [7, 15, 42, 48] for a more or less exhaustive list).
+two known examples, gazetutor and attentivereview, are
+discussed below.
+gazetutor [7] is a learning technology for biology. it has an
+animated conversational agent that provides spoken explanations
+on biology topics which are synchronized with images. the
+system uses a tobii t60 eye tracker to detect inattention, which
+is assumed to occur when learners’ gaze is not on the tutor agent
+or image for at least five consecutive seconds. when this occurs,
+the system interrupts its speech mid utterance, directs learners to
+reorient their attention (e.g., “i’m over here you know”), and
+repeats speaking from the start of the current utterance. in an
+evaluation study, 48 learners (undergraduate students) completed
+a learning session on four biology topics with the attention-aware
+components enabled (experimental group) or disabled (control
+group). the results indicated that gazetutor was successful in
+dynamically reorienting learners’ attentional patterns towards the
+interface. importantly, learning gains for deep reasoning
+questions were significantly higher for the experimental vs.
+control group, but only for high aptitude learners. the results
+suggest that even the most basic attention-aware technology can
+be effective in improving learning, at least for a subset of learners.
+however, a key limitation is that the researchers simply assumed
+that off-screen gaze corresponded to inattention, but did not test
+this assumption (e.g., students could have been concentrating
+with their eyes closed and this would have been perceived as
+being inattentive).
+attentivereview [32] is a closed-loop system for mooc learning
+on mobile phones. the system uses video-based
+photoplethysmography (ppg) to detect a learners’ heart rate from
+the back camera of a smartphone while they view mooc-like
+lectures on the phone. attentivereview ranks the lectures based
+1
+
+on its estimates of learners’ “perceived difficulty,” selecting the
+most difficult lecture for subsequent review (called adaptive
+review). in a 32-participant between-subjects evaluation study,
+the authors found that learning gains obtained from the adaptive
+review condition were statistically on par with a full review
+condition, but were achieved in 66.7% less review time. although
+this result suggests that attentivereview increased learning
+efficiency, there is the question as to whether the system should
+even be considered to be an “attention-aware” technology. this is
+because it is arguable if the system has anything to do with
+attention (except for “attention” appearing in its name) as it
+selects items for review based on a model of “perceived
+difficulty” and not on learners’ “attentional state.” the two might
+be related, but are clearly not the same.
+
+1.2 novelty
+our paper focuses on closing the loop between research on
+educational data and learning outcomes by developing and
+validating the first (in our view) real-time learning technology
+that detects and mitigates mind wandering during computerized
+reading. although automated detection of complex mental states
+with the goal of developing intelligent learning technologies that
+respond to the sensed states is an active research area (see reviews
+by [9, 18]), mind wandering has rarely been explored as an aspect
+of a learner’s mental state that warrants detection and corrective
+action. and while there has been some work on modeling the
+locus of learner attention (see review by [5]), mind wandering is
+inherently different than more commonly studied forms of
+attention (e.g., selective attention, distraction), because it involves
+more covert forms of involuntary attentional lapses spawned by
+self-generated internal thought [45]. simply put, mind wandering
+is a form of “looking without seeing” because the eyes might be
+fixated on the appropriate external stimulus, but very little is
+being processed as the mind is consumed by stimulusindependent internal thoughts. offline automated approaches to
+detect mind wandering have been developed (e.g., [3, 11, 27, 33]),
+but these detectors have not yet been used to trigger online
+interventions. here, we adapt an offline gaze-based automated
+mind wandering detector [13] to trigger real-time interventions to
+address mind wandering during reading. we conduct a
+randomized control trial to evaluate the efficacy of our attentionaware learning technology in improving learning.
+
+2. mind wandering detection
+we adopted a supervised learning approach for mind wandering
+detection. below we provide a high-level overview of the
+approach; readers are directed to [3, 13] for a detailed discussion
+of the general approach used to build gaze-based detectors of
+mind wandering.
+
+2.1 training data
+we obtained training data from a previous study [26] that
+involved 98 undergraduate students reading a 57-page text on the
+surface tension of liquids [4] on a computer screen for an average
+of 28 minutes. the text contained around 6500 words, with an
+average of 115 words per page, and was displayed on a computer
+screen with courier new typeface. we recorded eye-gaze with a
+tobii tx300 eye tracker set to a sampling frequency of 120 hz.
+
+this paper reports updated results of an earlier version [10] presented
+as a “late-breaking work” (lbw) poster at the 2016 acm chi
+conference. lbw “extended abstracts” are not included in the main
+conference proceedings and copyright is retained by the authors.9
+
+participants could read normally and were free to move or gesture
+as they pleased.
+participants were instructed to report mind wandering (during
+reading) by pressing a predetermined key when they found
+themselves “thinking about the task itself but not the actual
+content of the text” or when they were “thinking about anything
+else besides the task.” this is consistent with contemporary
+approaches (see [45]) that rely on self-reporting because mind
+wandering is an internal conscious phenomena. further, selfreports of mind wandering have been linked to predictable
+patterns in physiology [43], pupillometry [14], eye-gaze [37], and
+task performance [34], providing validity for this approach.
+
+on the page, we classified the page as a positive instance of mind
+wandering. this was done because analyses indicated that
+participants were more likely to be mind wandering in those cases
+(but see [13] for alternate strategies to handle missing instances).
+
+on average, we received mind wandering reports for 32% of the
+pages (sd = 20%), although there was considerable variability
+among participants (ranging from 0% to 82%). self-reported
+mind wandering negatively correlated (r = -.23, p < .05) with
+scores on a subsequent comprehension assessment [26], which
+provides evidence for the predictive validity of the self-reports.
+
+2.2 model building
+the stream of eye-gaze data was filtered to produce a series of
+fixations, saccades, and blinks, from which global eye gaze
+features were extracted (see figure 1). global features are
+independent of the words being read and are therefore more
+generalizable than so-called local features. a full list of 62 global
+features along with detailed descriptions is provided in [13], but
+briefly the features can be grouped into the following four
+categories: (1) eye movement descriptive features (n = 48) were
+statistical functionals (e.g., min, median) for fixation duration,
+saccade duration, saccade amplitude, saccade velocity, and
+relative and absolute saccade angle distributions; (2) pupil
+diameter descriptive features were statistical functionals (n = 8)
+computed from participant-level z-score standardized estimates
+of pupil diameter; (3) blink features (n = 2) consisted of the
+number of blinks and the mean blink duration; (4) miscellaneous
+gaze features (n = 4) consisted of the number of saccades,
+horizontal saccade proportion, fixation dispersion, and the
+fixation duration/saccade duration ratio. we proceeded with a
+subset of 32 features after eliminating features exhibiting
+multicollinearity.
+features were calculated from only a certain amount of gaze data
+from each page, called the window. the end of the window was
+positioned 3 seconds before a self-report so as to not overlap with
+the key-press. the average amount of time between self-reports
+and the beginning of the page was 16 seconds. we used this time
+point as the end of the window for pages with no self-report.
+pages that were shorter than the target window size were
+discarded, as were pages with windows that contained fewer than
+five gaze fixations as there was insufficient data to compute some
+of the features. there were a total of 4,225 windows with
+sufficient data for supervised classification.
+we experimented with a number of supervised classifiers on
+window sizes of 4, 8, and 12 seconds to discriminate positive
+(pages with a self-report = 32%) from negative (pages without a
+self-report) instances of mind wandering. the training data were
+downsampled to achieve a 50% base rate; testing data were
+unaltered. a leave-one-participant-out validation approach was
+adopted where models were built on data from n-1 participants
+and evaluated on the held-out participant. the process was
+repeated for all participants. model validation was conducted in a
+way to simulate a real-time system by analyzing data from every
+page. when classification was not possible due to a lack of valid
+gaze data and/or because participants did not spend enough time
+
+figure 1: gaze fixations during mind wandering (top)
+and normal reading (bottom)
+
+2.3 detector accuracy
+the best model was a support vector machine that used global
+features and operated on a window size of 8-seconds. the area
+under the roc curve (auc or auroc or a’) was .66, which
+exceeds the 0.5 chance threshold [17].
+we assigned each instance as mind wandering or not mind
+wandering based on whether the detector’s predicted likelihood
+of mind wandering (ranges from 0 to 1) was below or above 0.5
+we adopted the default 0.5 threshold as it led to a higher rate of
+true positives while maintaining a moderate rate of true negatives.
+this resulted in the following confusion matrix shown in table 1.
+the model had a weighted precision of 72.2% and a weighted
+recall of 67.4%, which we deemed to be sufficiently accurate for
+intervention.
+table 1: proportionalized confusion matrix for mind
+wandering detection
+predicted mind wandering (mw)
+actual mw
+
+yes
+
+no
+
+yes
+
+0.715 (hit)
+
+0.285 (miss)
+
+no
+
+0.346 (false positive)
+
+0.654 (correct rejection)
+
+3. intervention to address mind wandering
+our intervention approach is grounded in the basic idea that
+learning of conceptual information involves creating and
+maintaining an internal model (mental model) by integrating
+information from the text with prior knowledge from memory
+[25]. this integration process relies on attentional focus and
+breaks down during mind wandering because information from
+the external environment is no longer being integrated into the
+internal mental model. this results in an impaired model which
+leads to less effective suppression of off-task thoughts. this
+increase in mind wandering further impairs the mental model,10
+
+resulting in a vicious cycle. our intervention targets this vicious
+cycle by redirecting attention to the primary task and attempting
+to correct for comprehension deficits attributed to mind
+wandering. based on research demonstrating the effectiveness of
+interpolated testing [47], we propose that asking questions on
+pages where mind wandering is detected and encouraging rereading in response to incorrect responses will aid in re-directing
+attention to the text and correct knowledge deficits.
+
+page regardless of whether the second question was answered
+correctly, so as not to be overly burdensome.
+
+3.1 intervention implementation
+our initial intervention was implemented for the same text used
+to create the mind wandering detector (although it could be
+applied to any text). the text was integrated into the computer
+reading interface. mind wandering detection occurred when the
+learner navigated to the next page using the right arrow key. in
+order to address ambiguity in mind wandering detection, we used
+the detector’s mind wandering likelihood to probabilistically
+determine when to intervene. for example, if the mind wandering
+likelihood was 70%, then there was a 70% chance of intervention
+on any given page (all else being equal). we did not intervene for
+the first three pages in order to allow the learner to become
+familiar with the text and interface. to reduce disruption, there
+was a 50% reduced probability of intervening on adjacent pages,
+and the maximum number of interventions was capped at 1/3 ×
+the number of pages (19 for the present 57-page text). table 2
+presents pseudo code for when to launch an intervention.
+table 2: pseudo code for intervention strategy
+launch_intervention:
+if current_page >= waitpages
+and
+total_interventions < maxintrv)
+and
+gaze_likelihood > random(0,1)
+and
+(!has_intervened(previous_page)
+or 0.5 < random (0,1)):
+do_intervention()
+else:
+show_next_page()
+do_intervention:
+answer1 = show_question1()
+if answer1 is correct:
+show_positive_feedback()
+show_next_page()
+else:
+show_neg_feedback()
+suggest_rereading()
+if page advance detected:
+answer2 = show_question2();
+show_next_page()
+
+figure 2 presents an outline of the intervention strategy. the
+intervention itself relied on two multiple choice questions for
+each page (screen) of the text. when the system decided to
+intervene, one of the questions (randomly selected) was presented
+to the learner. if the learner answered this online question
+correctly, positive feedback was provided, and the learner could
+advance to the next page. if the learner answered incorrectly,
+negative feedback was provided, and the system encouraged the
+learner to re-read the page. the learner was then provided with a
+second (randomly selected) online question, which could either
+be the same or the alternate question for that page. feedback was
+not provided and the learner was allowed to advance to the next
+
+figure 2: outline of intervention strategy
+
+3.2 iterative refinement
+the technology was refined through multiple rounds of formative
+testing with 67 participants, recruited from the same institution
+used to build the detector. participants were observed while
+interacting with the technology, their responses were analyzed,
+and they were interviewed about their experience. we used the
+feedback gleaned from these tests to refine the intervention
+parameters (i.e., when to launch, how many interventions to
+launch, whether to launch interventions on subsequent pages),
+intervention questions themselves, and instructions on how to
+attend to the intervention. for example, earlier versions of the
+intervention used a fixed threshold (instead of the aforementioned
+probabilistic approach) to trigger an intervention. despite many
+attempts to set this threshold, the end result was that some
+participants received many interventions while others received
+almost no interventions. this issue was corrected by
+probabilistically rather than deterministically launching the
+intervention. additional testing/refinement of the comprehension
+questions used in the intervention was done using crowdsourcing
+platforms, specifically amazon’s mechanical turk (mturk).
+
+4. evaluation study
+we conducted a randomized controlled trial to evaluate the
+technology. the experiment had two conditions: an intervention
+condition and a yoked control condition (as described below). the
+yoked control was needed to verify that any learning benefits are
+attributed to the technology being sensitive to mind wandering
+and not merely to the added opportunities to answer online
+questions and re-read. this is because we know that interpolated
+testing itself has beneficial comprehension effects [47].
+
+4.1 method
+participants (n = 104) were a new set of undergraduate students
+who participated to fulfill research credit requirements. they
+were recruited from the same university used to build the mw
+detector and for the iterative testing and refinement cycles.
+we did not use a pretest because we expected participants to be
+unfamiliar with the topic. participants were not informed that the
+interface would be tracking their mind wandering (until the11
+
+debriefing at the end), instead, they were instructed as follows:
+“while reading the text, you will occasionally be asked some
+questions about the page you just read. depending on your
+answer, you will re-read the same page and you will be asked
+another question that may or may not be the same question.”
+participants in the intervention condition received the
+intervention as described above (i.e., based on detected mind
+wandering likelihoods). each participant in the yoked control
+condition was paired with a participant in the intervention
+condition. he or she received an intervention question on the
+same pages as their paired intervention participant regardless of
+mind wandering likelihood. for example, if participant a (i.e.,
+intervention condition) received questions on pages 5, 7, 10, and
+25, participant b (i.e., yoked control condition) would receive
+intervention questions on the same pages. however, if the yoked
+participant answered incorrectly, then (s)he had the opportunity
+to re-read and answer another question regardless of the outcome
+of their intervention-condition partner.
+after reading, participants completed a 38-item multiple choice
+comprehension assessment to measure learning. the questions
+were randomly selected from the 57 pages (one per page) with the
+exception that a higher selection priority was given to pages that
+were re-read on account of the intervention. participants in the
+yoked control condition received the same posttest questions as
+their intervention condition counterparts.
+
+4.2 results
+participants received an average of 16 (min of 7 and max of 19)
+interventions. they spent an average of 27.5 seconds on each
+screen prior to receiving an intervention. there was no significant
+difference across conditions (p = .998), suggesting that reading
+time was not a confound. in what follows, we compared each
+intervention participant to his/her yoked control with a two-tailed
+paired-samples t-test and a 0.05 criteria for statistical
+significance.
+mind wandering detection. the detector’s likelihood of mind
+wandering was slightly higher for participants in the yokedcontrol condition (m = .431; sd = .170) compared to the
+intervention condition (m = .404; sd = .112), but the difference
+was not statistically significant (p = .348). this was unsurprising
+as participants in both groups received the same interventions,
+which itself was expected to reduce mind wandering. importantly,
+mind wandering likelihoods were negatively correlated with
+performance on the online questions (r = -.296, p = .033) as well
+as on posttest questions (r = -.319, p = .021). this provides
+evidence for the validity of the mind wandering detector when
+applied to a new set of learners and under different conditions
+(i.e., reading interspersed with online questions compared to
+uninterrupted reading).
+comprehension assessment. there was some overlap between
+the online questions and the posttest questions. to obtain an
+unbiased estimate of learning, we only analyzed performance on
+previously unseen posttest questions. that is, questions that were
+used as part of the intervention were first removed before
+computing posttest scores.
+there were no significant condition differences on overall
+posttest scores (p = .846). the intervention condition answered
+57.6% (sd = .157) of the questions correctly while the yoked
+control condition answered 58.1% (sd = .129) correctly. this
+finding was not surprising as both conditions received the exact
+same treatment except that the interventions were triggered based
+
+on detected mind wandering in the intervention condition but not
+the control condition.
+next, we examined posttest performance as a function of mind
+wandering during reading. each page was designated as a low or
+high mind wandering page based on a median split of mind
+wandering likelihoods (medians = .35 and .36 on a 0 to 1 scale for
+intervention and control conditions, respectively). we then
+analyzed performance on posttest questions corresponding to
+pages with low vs. high likelihoods of mind wandering (during
+reading). the results are shown in table 3.
+we found no significant posttest differences on pages where both
+the intervention and control participants had low (p = .759) or
+high (p = .922) mind wandering likelihoods (first and last rows in
+table 3, respectively). there was also no significant posttest
+difference (p = .630) for pages where the intervention condition
+had high mind wandering likelihoods but the control condition
+had low mind wandering likelihoods (row 3). however, the
+intervention condition significantly (p = .003, d = .47 sigma)
+outperformed the control condition for pages where the
+intervention participants had low likelihoods of mind wandering
+but control participants had high mind wandering likelihoods
+(row 2). these last two finding suggests that the intervention had
+the intended effect of reducing comprehension deficits
+attributable to mind wandering because it led to equitable
+performance when mind wandering was high and improved
+performance when it was low.
+table 3: posttest performance (proportion of correct
+responses) as a function of mind wandering during reading.
+standard deviations in parenthesis.
+mind
+wandering
+
+posttest
+
+n
+
+int.
+
+cntrl.
+
+int.
+
+cntrl.
+
+43
+
+low
+
+low
+
+.604 (.288)
+
+.623 (.287)
+
+40
+
+low
+
+high
+
+.643 (.263)
+
+.489 (.298)
+
+43
+
+high
+
+low
+
+.535 (.295)
+
+.566 (.305)
+
+45
+
+high
+
+high
+
+.522 (.312)
+
+.515 (.291)
+
+scores
+
+note. int. = intervention. cntrl. = control. bolded cells represent a
+statistically significant difference. n = number of pairs (out of 52) in each
+analysis. it differs slightly across analyses as not all participants were
+assigned to each mind wandering group.
+
+after-task interview. we interviewed a subset of the participants
+in order to gauge their subjective experience with the
+intervention. a few key themes emerged. participants reported
+paying closer attention to the text after realizing they would be
+periodically answering multiple-choice questions. this was good.
+however, participants also reported that they adapted their
+reading strategies in one of two ways in response to the questions.
+since the questions targeted factual information (sometimes
+verbatim) from the text, some participants paid more attention to
+details and precise wordings instead of the broader concepts being
+discussed in the text. more discouragingly, some participants
+reported adopting a preemptive skimming strategy in that they
+would only look for keywords that they expected to appear in a
+subsequent question.
+participants were encouraged to re-read text when they answered
+incorrectly before receiving another question (or the same
+question in some cases). many participants reported simply
+scanning the text (when re-reading) to locate keywords from the
+question before moving on. since the scanning strategy was often12
+
+successful to answer the subsequent question, participants
+reported that the questions were too easy and it took relatively
+little effort to locate the correct answer compared to re-reading.
+they suggested that it may have been better if the questions had
+targeted key concepts rather than facts.
+finally, participants reported difficulties with re-engaging with
+the text after answering an online question because the text was
+cleared when an intervention question was displayed; an item that
+can be easily corrected in subsequent versions.
+
+5. discussion
+we developed the first educational technology capable of realtime mind wandering detection and dynamic intervention during
+computerized reading. in the remainder of this section, we discuss
+the significance of our main findings, limitations, and avenues for
+future work.
+
+5.1 significance of main findings
+we have three main findings. first, we demonstrated that a
+machine-learned mind wandering detector built in one context
+can be applied to a different (albeit related) interaction context.
+specifically, the detector was trained on a data set involving
+participants silently reading and self-reporting mind wandering,
+but was applied to an interactive context involving interpolated
+assessments, which engendered different reading strategies.
+further, self-reports of mind wandering were not collected in this
+interactive context, which might have influenced mind wandering
+rates in and of itself. despite these differences, we were able to
+demonstrate the predictive validity of the detector by showing
+that it negatively correlated with both online and offline
+comprehension scores when evaluated on new participants.
+second, we showed promising effects for our intervention
+approach despite a very conservative experimental design, which
+ensured that the intervention and control groups were equated
+along all respects, except that the intervention was triggered based
+on the mind wandering detector (key manipulation). further, we
+used a probabilistic approach to trigger an intervention, because
+the detector is inherently imperfect. as a result, participants could
+have received an intervention when they were not mind
+wandering and/or could have failed to receive one when they were
+mind wandering. therefore, it was essential to compare the two
+groups under conditions when the mind wandering levels
+differed. this more nuanced analysis revealed that although the
+intervention itself did not lead to a boost in overall comprehension
+(because it is remedial), it equated comprehension scores when
+mind wandering was high (i.e., scores for the intervention group
+were comparable when the control group was low on mind
+wandering). it also demonstrated the cost of not intervening
+during mind wandering (i.e., scores for the intervention group
+were greater when the control group was high on mind
+wandering). in other words, the intervention was successful in
+mitigating the negative effects of mind wandering.
+third, despite the advantages articulated above, the intervention
+itself was reactive and engendered several unintended (and
+presumably suboptimal) behaviors. in particular, students altered
+their reading strategies in response to the interpolated questions,
+which were a critical part of the intervention. in a sense, they
+attempted to “game the intervention” by attempting to proactively
+predict the types of questions they might receive and then
+adopting a complementary reading strategy consisting of
+skimming and/or focusing on factual information. this reliance
+on surface- rather than deeper-levels of processing was
+incongruent with our goal of promoting deep comprehension.
+
+5.2 limitations
+there are a number of methodological limitations with this work
+that go beyond limitations with the intervention (as discussed
+above). first, we focused on a single text that is perceived as
+being quite dull and consequently triggers rather high levels of
+mind wandering [26]. this raises the question of whether the
+detector will generalize to different texts. we expect some level
+of generalizability in terms of features used because the detector
+only used content- and position- (on the screen) free global gaze
+features. however, given that several supervised classifiers are
+very sensitive to differences in base rates, the detector might overor under- predict mind wandering when applied to texts that
+engender different rates of mind wandering. therefore, retraining
+the detector with a more diverse set of texts is warranted.
+another limitation is the scalability of our learning technology.
+the eye tracker we used was a cost-prohibitive tobii tx300 that
+will not scale beyond the laboratory. fortunately, commercialoff-the-shelf (cots) eye trackers, such as eye tribe and tobii
+eyex, can be used to surpass this limitation. it is an open question
+as to whether the mind wandering detector can operate with
+similar fidelity with these cots eye trackers. our use of global
+gaze features which do not require high-precision eye tracking
+holds considerable promise in this regard. nevertheless,
+replication with scalable eye trackers and/or scalable alternatives
+to eye tracking (e.g., facial-feature tracking [46] or monitoring
+reading patterns [27]) is an important next step (see section 5.3).
+our use of surface-level questions for both the intervention and
+the subsequent comprehension assessment is also a limitation as
+is the lack of a delayed comprehension assessment. it might be
+the case that the intervention effects manifest as richer encodings
+in long-term memory, a possibility that cannot be addressed in the
+current experiment that only assessed immediate learning.
+other limitations include a limited student sample (i.e.
+undergraduates from a private midwestern college) and a
+laboratory setup. it is possible that the results would not
+generalize to a more diverse student population or in more
+ecological environments (but see below for evidence of
+generalizability of the detector in classroom environments).
+replication with data from more diverse populations and
+environments would be a necessary next step to increase the
+ecological validity of this work.
+
+5.3 future work
+our future work is progressing along two main fronts. one is to
+address limitations in the intervention and design of the
+experimental evaluation as discussed above. accordingly, we are
+exploring alternative intervention strategies, such as: (a) tagging
+items for future re-study rather than interrupting participants
+during reading; (b) highlighting specific portions of the text as an
+overt cue to facilitate comprehension of critical information; (c)
+asking fewer intervention questions, but selecting inference
+questions that target deeper levels of comprehension and that span
+multiple pages of the text; and (d) asking learners to engage in
+reflection by providing written self-explanations of the textual
+content. we are currently evaluating one such redesigned
+intervention – open-ended questions targeting deeper levels of
+comprehension (item c). our revised experimental design taps
+both surface- and inference-level comprehension and assesses
+comprehension immediately after reading (to measure learning)
+and after a one-week delay (to measure retention).
+we are also developing attention-aware versions of more
+interactive interfaces, such as learning with an intelligent tutoring13
+
+system called gurututor [30]. this project also addresses some
+of the scalability concerns by replacing expensive research-grade
+eye tracking with cost-effective cots eye tracking (e.g., the eye
+tribe or tobii eyex) and provides evidence for real-world
+generalizability by collecting data in classrooms rather than the
+lab. we recently tested our implementation on 135 students (total)
+in a noisy computer-enabled high-school classroom where eyegaze of entire classes of students was collected during their
+normal class periods [20]. using a similar approach to the present
+work, we used the data to build and validate a studentindependent gaze-based mind wandering detector. the resultant
+mind wandering detection accuracy (f1 of 0.59) was substantially
+greater than chance (f1 of 0.24) and outperformed earlier work on
+the same domain [21]. the next step is to develop interventions
+that redirect attention and correct learning deficiencies
+attributable to mind wandering and to test the interventions in
+real-world environments. by doing so, we hope to advance our
+foundational vision of developing next-generation technologies
+that enhance the process and products of learning by “attending
+to attention.”
+
+[6]
+
+[7]
+
+[8]
+
+[9]
+
+[10]
+
+[11]
+
+[12]
+figure 3: guru tutor interface overlaid with eye-gaze
+obtained via the eyetribe
+
+[13]
+
+6. acknowledgements
+this research was supported by the national science foundation
+(nsf) (drl 1235958 and iis 1523091). the authors are grateful
+to kris kopp and jenny wu for their contributions to the study.
+any opinions, findings and conclusions, or recommendations
+expressed in this paper are those of the authors and do not
+necessarily reflect the views of nsf.
+
+[14]
+
+[15]
+
+7. references
+[1] anderson, j.r. 2002. spanning seven orders of magnitude:
+a challenge for cognitive modeling. cognitive science, 26
+(1), 85-112.
+[2] baird, b., smallwood, j., mrazek, m.d., kam, j.w.,
+franklin, m.s. and schooler, j.w. 2012. inspired by
+distraction mind wandering facilitates creative incubation.
+psychological science, 23 (10), 1117-1122.
+[3] bixler, r. and d'mello, s.k. 2016. automatic gaze-based
+user-independent detection of mind wandering during
+computerized reading. user modeling & user-adapted
+interaction, 26, 33-68.
+[4] boys, c.v. 1895. soap bubbles, their colours and the forces
+which mold them. society for promoting christian
+knowledge.
+[5] conati, c., aleven, v. and mitrovic, a. 2013. eye-tracking
+for student modelling in intelligent tutoring systems. in
+sottilare, r., graesser, a., hu, x. and holden, h. eds.
+design recommendations for intelligent tutoring systems -
+
+[16]
+
+[17]
+
+[18]
+
+[19]
+
+volume 1: learner modeling, army research laboratory,
+orlando, fl.
+conati, c. and merten, c. 2007. eye-tracking for user
+modeling in exploratory learning environments: an
+empirical evaluation. knowledge-based systems, 20 (6),
+557-574.
+d'mello, s., olney, a., williams, c. and hays, p. 2012.
+gaze tutor: a gaze-reactive intelligent tutoring system.
+international journal of human-computer studies, 70 (5),
+377-398.
+d'mello, s.k. 2016. giving eyesight to the blind: towards
+attention-aware aied. international journal of artificial
+intelligence in education, 26 (2), 645-659.
+d'mello, s.k., blanchard, n., baker, r., ocumpaugh, j. and
+brawner, k. 2014. i feel your pain: a selective review of
+affect-sensitive instructional strategies. in sottilare, r.,
+graesser, a., hu, x. and goldberg, b. eds. design
+recommendations for adaptive intelligent tutoring
+systems: adaptive instructional strategies (volume 2), us
+army research laboratory, orlando, fl.
+d'mello, s.k., kopp, k., bixler, r. and bosch, n. 2016.
+attending to attention: detecting and combating mind
+wandering during computerized reading in extended
+abstracts of the acm sigchi conference on human
+factors in computing systems (chi 2016), acm, new
+york.
+drummond, j. and litman, d. 2010. in the zone: towards
+detecting student zoning out using supervised machine
+learning. in aleven, v., kay, j. and mostow, j. eds.
+intelligent tutoring systems., springer-verlag, berlin /
+heidelberg.
+eastwood, j.d., frischen, a., fenske, m.j. and smilek, d.
+2012. the unengaged mind: defining boredom in terms of
+attention. perspectives on psychological science, 7 (5), 482495.
+faber, m., bixler, r. and d'mello, s.k. in press. an
+automated behavioral measure of mind wandering during
+computerized reading. behavior research methods.
+franklin, m.s., broadway, j.m., mrazek, m.d., smallwood,
+j. and schooler, j.w. 2013. window to the wandering mind:
+pupillometry of spontaneous thought while reading. the
+quarterly journal of experimental psychology, 66 (12),
+2289-2294.
+gluck, k.a., anderson, j.r. and douglass, s.a. 2000.
+broader bandwidth in student modeling: what if its were
+“eye” ts? in gauthier, c., frasson, c. and vanlehn, k. eds.
+proceedings of the 5th international conference on
+intelligent tutoring systems, springer, berlin.
+graesser, a., lu, s., olde, b., cooper-pye, e. and whitten,
+s. 2005. question asking and eye tracking during cognitive
+disequilibrium: comprehending illustrated texts on devices
+when the devices break down. memory and cognition, 33,
+1235-1247.
+hanley, j.a. and mcneil, b.j. 1982. the meaning and use
+of the area under a receiver operating characteristic (roc)
+curve. radiology, 143 (1), 29-36.
+harley, j.m., lajoie, s.p., frasson, c. and hall, n.c. in
+press. developing emotion-aware, advanced learning
+technologies: a taxonomy of approaches and features.
+international journal of artificial intelligence in education.
+hegarty, m. and just, m. 1993. constructing mental models
+of machines from text and diagrams. journal of memory and
+language, 32 (6), 717-742.14
+
+[20] hutt, s., mills, c., bosch, n., krasich, k., brockmole, j.r.
+and d'mello, s.k. in review. out of the fr-eye- ing pan:
+towards gaze-based models of attention during learning
+with technology in the classroom.
+[21] hutt, s., mills, c., white, s., donnelly, p.j. and d’mello,
+s.k. 2016. the eyes have it: gaze-based detection of mind
+wandering during learning with an intelligent tutoring
+system. in proceedings of the 9th international conference
+on educational data mining (edm 2016), international
+educational data mining society.
+[22] jaques, n., conati, c., harley, j.m. and azevedo, r. year.
+predicting affect from gaze data during interaction with an
+intelligent tutoring system. in intelligent tutoring systems,
+(2014), springer, 29-38.
+[23] kardan, s. and conati, c. 2012. exploring gaze data for
+determining user learning with an interactive simulation. in
+carberry, s., weibelzahl, s., micarelli, a. and semeraro, g.
+eds. proceedings of the 20th international conference on
+user modeling, adaptation, and personalization (umap
+2012), springer, berlin.
+[24] killingsworth, m.a. and gilbert, d.t. 2010. a wandering
+mind is an unhappy mind. science, 330 (6006), 932-932.
+[25] kintsch, w. 1998. comprehension: a paradigm for
+cognition. cambridge university press, new york.
+[26] kopp, k., d’mello, s. and mills, c. 2015. influencing the
+occurrence of mind wandering while reading. consciousness
+and cognition, 34 (1), 52-62.
+[27] mills, c. and d’mello, s.k. 2015. toward a real-time (day)
+dreamcatcher: detecting mind wandering episodes during
+online reading. in romero, c., pechenizkiy, m., boticario,
+j. and santos, o. eds. proceedings of the 8th international
+conference on educational data mining (edm 2015),
+international educational data mining society.
+[28] mooneyham, b.w. and schooler, j.w. 2013. the costs and
+benefits of mind-wandering: a review. canadian journal of
+experimental psychology/revue canadienne de psychologie
+expérimentale, 67 (1), 11.
+[29] muir, m. and conati, c. 2012. an analysis of attention to
+student–adaptive hints in an educational game. in cerri,
+s.a., clancey, w.j., papadourakis, g. and panourgia, k.
+eds. proceedings of the international conference on
+intelligent tutoring systems, springer, berlin.
+[30] olney, a., d'mello, a., person, n., cade, w., hays, p.,
+williams, c., lehman, b. and graesser, a. 2012. guru: a
+computer tutor that models expert human tutors. in cerri, s.,
+clancey, w., papadourakis, g. and panourgia, k. eds.
+proceedings of the 11th international conference on
+intelligent
+tutoring
+systems,
+springer-verlag,
+berlin/heidelberg.
+[31] olney, a., risko, e.f., d'mello, s.k. and graesser, a.c.
+2015. attention in educational contexts: the role of the
+learning task in guiding attention. in fawcett, j., risko, e.f.
+and kingstone, a. eds. the handbook of attention, mit
+press, cambridge, ma.
+[32] pham, p. and wang, j. 2016. adaptive review for mobile
+mooc learning via implicit physiological signal sensing.
+in proceedings of the 18th acm international conference
+on multimodal interaction (icmi 2016), acm, new york,
+ny.
+[33] pham, p. and wang, j. 2015. attentivelearner: improving
+mobile mooc learning via implicit heart rate tracking. in
+international conference on artificial intelligence in
+education, springer, berlin heidelberg.
+
+[34] randall, j.g., oswald, f.l. and beier, m.e. 2014. mindwandering, cognition, and performance: a theory-driven
+meta-analysis of attention regulation. psychological
+bulletin, 140 (6), 1411-1431.
+[35] rapp, d.n. 2006. the value of attention aware systems in
+educational settings. computers in human behavior, 22 (4),
+603-614.
+[36] rayner, k. 1998. eye movements in reading and information
+processing: 20 years of research. psychological bulletin, 124
+(3), 372-422.
+[37] reichle, e.d., reineberg, a.e. and schooler, j.w. 2010. eye
+movements during mindless reading. psychological science,
+21 (9), 1300.
+[38] risko, e.f., buchanan, d., medimorec, s. and kingstone, a.
+2013. everyday attention: mind wandering and computer
+use during lectures. computers & education, 68 (1), 275283.
+[39] roda, c. and thomas, j. 2006. attention aware systems:
+theories, applications, and research agenda. computers in
+human behavior, 22 (4), 557-587.
+[40] rowe, j., mott, b., mcquiggan, s., robison, j., lee, s. and
+lester, j. year. crystal island: a narrative-centered learning
+environment for eighth grade microbiology. in workshop on
+intelligent educational games at the 14th international
+conference on artificial intelligence in education,
+brighton, uk, (2009), 11-20.
+[41] shute, v.j., ventura, m., bauer, m. and zapata-rivera, d.
+2009. melding the power of serious games and embedded
+assessment to monitor and foster learning: flow and grow.
+in ritterfeld, u., cody, m. and vorderer, p. eds. serious
+games: mechanisms and effects, routledge, taylor and
+francis, mahwah, nj.
+[42] sibert, j.l., gokturk, m. and lavine, r.a. 2000. the reading
+assistant: eye gaze triggered auditory prompting for reading
+remediation. in proceedings of the 13th annual acm
+symposium on user interface software and technology,
+acm, new york, ny.
+[43] smallwood, j., davies, j.b., heim, d., finnigan, f.,
+sudberry, m., o'connor, r. and obonsawin, m. 2004.
+subjective experience and the attentional lapse: task
+engagement and disengagement during sustained attention.
+consciousness and cognition, 13 (4), 657-690.
+[44] smallwood, j., fishman, d.j. and schooler, j.w. 2007.
+counting the cost of an absent mind: mind wandering as an
+underrecognized influence on educational performance.
+psychonomic bulletin & review, 14 (2), 230-236.
+[45] smallwood, j. and schooler, j.w. 2015. the science of mind
+wandering: empirically navigating the stream of
+consciousness. annu. rev. psychol, 66, 487-518.
+[46] stewart, a., bosch, p., chen, h., donnelly, p.j. and
+d’mello, s.k. 2016. where's your mind at? video-based
+mind wandering detection during film viewing. in aroyo,
+l., d'mello, s., vassileva, j. and blustein, j. eds.
+proceedings of the 2016 acm on international conference
+on user modeling, adaptation, & personalization (acm
+umap 2016), acm, new york.
+[47] szpunar, k.k., khan, n.y. and schacter, d.l. 2013.
+interpolated memory tests reduce mind wandering and
+improve learning of online lectures. proceedings of the
+national academy of sciences, 110 (16), 6313-6317.
+[48] wang, h., chignell, m. and ishizuka, m. 2006. empathic
+tutoring software agents using real-time eye tracking. in
+proceedings of the 2006 symposium on eye tracking
+research &applications, acm, new york.

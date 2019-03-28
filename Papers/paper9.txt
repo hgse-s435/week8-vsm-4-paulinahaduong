@@ -1,0 +1,1282 @@
+79
+
+predicting short- and long-term vocabulary learning via
+semantic features of partial word knowledge
+sungjin nam
+
+school of information
+university of michigan
+ann arbor, mi 48109
+
+sjnam@umich.edu
+
+gwen frishkoff
+
+kevyn collins-thompson
+
+gfrishkoff@gmail.com
+
+kevynct@umich.edu
+
+department of psychology
+university of oregon
+eugene, or 97403
+
+abstract
+
+we show how the novel use of a semantic representation
+based on osgood’s semantic differential scales can lead to
+effective features in predicting short- and long-term learning
+in students using a vocabulary learning system. previous
+studies in students’ intermediate knowledge states during
+vocabulary acquisition did not provide much information
+on which semantic knowledge students gained during word
+learning practice. moreover, these studies relied on human
+ratings to evaluate the students’ responses. to solve this
+problem, we propose a semantic representation for words
+based on osgood’s semantic decomposition of vocabulary
+[16]. to demonstrate our method can effectively represent
+students’ knowledge in vocabulary acquisition, we build
+models for predicting the student’s short-term vocabulary
+acquisition and long-term retention. we compare the
+effectiveness of our osgood-based semantic representation to
+that provided by word2vec neural word embedding [13], and
+find that prediction models using features based on osgood
+scale-based scores (osg) perform better than the baseline
+and are comparable in accuracy to those using word2vec
+score-based models (w2v). by using more interpretable
+osgood-based scales, our study results can help with better
+understanding of students’ ongoing learning states and
+designing personalized learning systems that can address an
+individual’s weak points in vocabulary acquisition.
+
+keywords
+
+vocabulary learning, semantic similarity, prediction model,
+intelligent tutoring system
+
+1. introduction
+
+studies of word learning have shown that knowledge of
+individual words is typically not all-or-nothing. rather,
+people acquire varying degrees of knowledge of many words
+incrementally over time, by exposure to them in context [9].
+this is especially true for so-called “academic” words that are
+less common and more abstract — e.g., pontificate, probity,
+or assiduous [7]. binary representations and measures model
+word knowledge simply as correct or incorrect on a particular
+
+school of information
+university of michigan
+ann arbor, mi 48109
+
+item (word), but in reality, a student’s knowledge level may
+reside between these two extremes. thus, previous studies of
+vocabulary acquisition have suggested that students’ partial
+knowledge be modeled using a representation that adding an
+additional label corresponding to an intermediate knowledge
+state [6] or further, in terms of continuous metrics for
+semantic similarity [3].
+in addition, there are multiple dimensions to a word’s
+meaning [16]. measuring a student’s partial knowledge on
+a single scale may only provide abstract information about
+the student’s general answer quality and not give enough
+information to specify which dimensions of word knowledge
+a student already has learned or needs to improve. in order
+to achieve detailed understanding of a student’s learning
+state, online learning systems should be able to capture
+a student’s “learning trajectory” that tracks their partial
+knowledge on a particular item over time, over multiple
+dimensions of meaning in a multidimensional semantic
+representation.
+hence, multidimensional representations of word knowledge
+can be an important element for building an effective
+intelligent tutoring system (its) for reading and language.
+maintaining a fine-grained semantic representation of a
+student’s degree of word knowledge can be helpful for
+the its to design more engaging instructional content,
+more helpful personalized feedback, and more sensitive
+assessments [17, 19]. selecting semantic representations
+to model, understand, and predict learning outcomes is
+important to designing a more effective and efficient its.
+in this paper, we explore the use of multidimensional
+semantic word representations for modeling and predicting
+short- and long-term learning outcomes in a vocabulary
+tutoring system.
+our approach derives predictive
+features using a novel application of existing methods in
+cognitive psychology combined with methods from natural
+language processing (nlp). first, we introduce a new
+multidimensional representation of a word based on the
+osgood semantic differential [16], an empirically based,
+cognitive framework that uses a small number of scales
+to represent latent components of word meaning. we
+compare the effectiveness of model features based on this
+osgood-based representation to features based on a different
+representation, the widely-used word2vec word embedding
+[13]. second, we evaluate our prediction models using
+data from a meaning-generation task that was conducted
+during a computer-based intervention. our study results
+demonstrate how similarity-based metrics based on rich80
+
+semantic representation can be used to automatically
+evaluate specific components of word knowledge, track
+changes in the student’s knowledge toward the correct
+meaning, and compute a rich set of features for use in
+predicting short- and long-term learning outcomes. our
+methods could support advances in real-time, adaptive
+support for word semantic learning, resulting in more
+effective personalized learning systems.
+
+semantic representation & the osgood framework.
+to quantify the semantic characteristics of a student’s
+intermediate knowledge of vocabulary, this paper uses a
+“spatial analogue” for capturing semantic characteristics of
+words. in [16], osgood investigated how the meaning of
+a word can be represented by a series of general semantic
+scales. by using these scales, osgood suggested that the
+meanings of any word can be projected and explored in a
+continuous semantic space.
+
+2.
+
+osgood asked human raters to evaluate a set of words using a
+large number of scales (e.g., tall-short, fat-thin, heavy-light)
+and captured the semantic representation of a word [16].
+respondents gave likert ratings, which indicated whether
+they thought that a word meaning was closer to one extreme
+(-3) or the other (+3), or basically irrelevant (0). a principal
+components analysis (pca) was used to represent the latent
+semantic features that can explain the patterns of response
+to individual words within this task.
+
+related work
+
+the present study is informed by three areas of research:
+(1) studies of partial word knowledge; (2) the osgood
+framework for multiple dimensions of word meaning, and (3)
+computational methods for estimating semantic similarity.
+partial word knowledge. the concept of partial word
+knowledge has interested vocabulary researchers for several
+decades, particularly in the learning and instruction of “tier
+2” words [20]. tier 2 words are low-frequency and typically
+have complex (multiple, nuanced) meanings. by nature,
+they are rarely learned through “one-shot” learning or direct
+definition. instead, they are learned partially and gaps are
+filled in over time.
+words in this intermediate state, neither novel nor fully
+known, are sometimes called “frontier words” [5]. durso
+and shore operationalized the frontier word as a word the
+student had seen previously but was not actively using it [6].
+based on this definition, the student may have had implicit
+memory of frontier words, such as general information like
+whether the word indicates a good or bad situation or refers
+a person or an action. they discovered that students are
+more familiar with frontier words than other types of words
+in terms of their sounds and orthographic characteristics [6].
+this previous work suggested that the concept of frontier
+words can be used to represent a student’s partial knowledge
+states in a vocabulary acquisition task [5, 6].
+in some studies, partial word knowledge has been
+represented using simple, categorical labels, e.g., multiplechoice tests that include “partially correct” response options,
+as well as a single “best” (correct) response. in other studies,
+the student is presented with a word and is asked to say
+what it means [1]. the definition is given partial credit
+if it reflects knowledge that is partial or incomplete. for
+example, a student may recognize that the word probity
+has a positive connotation, even if she cannot give a
+complete definition. however, single categorical or scorebased indicators may not explain which specific aspects of
+vocabulary knowledge the student is missing. moreover,
+these studies relied on human ratings to evaluate students’
+responses for unknown words [6]. although widely used
+in psychometric and psycholinguistic studies [4, 16], hiring
+human raters is expensive and may not be done in real time
+during students’ interaction with the tutoring system.
+to address these problems, we propose a data-driven method
+that can automatically extract semantic characteristics of
+a word based on a set of relatively simple, interpretable
+scales. the method benefits from existing findings in
+cognitive psychology and natural language processing. in
+the following sections, we illustrate more details of related
+findings and how they can be used in an intelligent tutoring
+system setting.
+
+in our study, we suggest a method that can automatically
+extract similar semantic information that can project a word
+into a multidimensional semantic space. by using semantic
+scales selected from [16], we verify if such representation of
+semantic attributes of words is useful for predicting students’
+short- and long-term learning.
+semantic similarity measures. studies in nlp have
+suggested methods to automatically evaluate the semantic
+association between two words. for example, markov
+estimation of semantic association (mesa) [3, 9] can
+estimate the similarity between words from a random walk
+model over a synonym network such as wordnet [14]. other
+methods like latent semantic analysis (lsa) are based on
+co-occurrence of the word in a document corpus. in lsa,
+semantic similarity between words is determined by using
+a cosine similarity measure, derived from a sparse matrix
+constructed from unique words and paragraphs containing
+the words [10].
+for this paper, we use word2vec [13], a widely used word
+embedding method, to calculate the semantic similarity
+between words. word2vec’s technique [11] transforms the
+semantic context, such as proximity between words, into a
+numeric vector space. in this way, linguistic regularities
+and patterns are encoded into linear translations. for
+example, using outputs from word2vec, relationships
+between words can be estimated by simple operations on
+their corresponding vectors, e.g., madrid - spain + france
+= paris, or germany + capital = berlin [13].
+measures from these computational semantic similarity tools
+are powerful because they can provide an automated method
+for evaluation of partial word knowledge. however, they
+typically produce a single measure (e.g., cosine similarity or
+euclidean distance), representing semantic similarity as a
+one-dimensional construct. with such a measure, it is not
+possible to determine represent partial semantic knowledge
+and changes in knowledge of latent semantic features as
+word knowledge progresses from unknown to frontier to
+fully known. in following sections, we describe how we
+address this problem, using novel methods to to estimate
+the contribution of osgood semantic features to individual
+word meanings.81
+
+2.1
+
+overview of the study
+
+based on findings from existing studies, this study will
+suggest an automatized method for evaluating students’
+partial knowledge of vocabulary that can be used to predict
+students’ short-term vocabulary acquisition and long-term
+retention. to investigate this problem, we will answer the
+following research questions with this paper.
+the first research question (rq1): can semantic similarity
+scores from word2vec be used to predict students’ shortterm learning and long-term retention? previous studies in
+vocabulary tutoring systems tend to focus on how different
+experimental conditions, such as different spacing between
+question items [18], difficulty levels [17], and systematic
+feedback [7], affect students’ short-term learning. this study
+will answer how computationally estimated trial-by-trial
+scores in a vocabulary tutoring system can be used to predict
+students’ short-term learning and long-term retention.
+rq2: compared to using regular word2vec scores, how does
+the model using osgood’s semantic scales [16] as features
+perform for immediate and delayed learning prediction
+tasks? as described in the previous section, the initial
+outcome from word2vec returns hundreds of semantic
+dimensions to represent the semantic characteristics of
+a word. summary statistics for comparing such highdimensional vectors, such as cosine similarity or euclidean
+distance, only provide the overall similarity between words.
+if measures from osgood scales work in a similar level
+to models using regular word2vec scores for predicting
+students’ learning outcomes, we can argue that it can
+be an effective method for representing students’ partial
+knowledge of vocabulary.
+
+3. method
+3.1 word learning study
+
+this study used a vocabulary tutoring system called
+dynamic support of contextual vocabulary acquisition
+for reading (dscovar) [8]). dscovar aims to support
+efficient and effective learning vocabulary in context. all
+participants accessed dscovar in a classroom-setting
+environment by using chromebook devices or the school’s
+computer lab in the presence of other students.
+
+3.1.1
+
+study participants
+
+participants included 280 middle school students (6th to
+8th grade) from multiple schools, including children from
+diverse socio-economic and educational backgrounds. table
+1 provides a summary of student demographics, including
+location (p1 or p2), age and grade level, sex. location p1 is
+a laboratory school affiliated with a large urban university in
+the northeastern united states. students from location p1
+were generally of high socio-economic status (e.g., children
+of university faculty and staff). location p2 includes three
+public middle schools in a southern metropolitan area of the
+united states. all students from location p2 qualified for
+free or reduced lunch. the study included a broad range of
+students so that the results of this analysis were more likely
+to generalize to future samples.
+
+3.1.2
+
+study materials
+
+dscovar presented students with 60 sat-level english
+words (also known as tier 2 words). these “target words,”
+lesser-known words that the students are going to learn,
+
+table 1: the number of participants by grade and
+gender
+group
+p1
+p2
+
+6th grade
+girl
+boy
+16
+28
+53
+51
+
+7th grade
+girl
+boy
+19
+23
+12
+6
+
+8th grade
+girl
+boy
+18
+13
+21
+20
+
+were balanced between different parts of speech, including 20
+adjectives, 20 nouns, and 20 verbs. based on previous works,
+we expected that students would have varying degrees of
+familiarity with the words at pre-test, but that most words
+would be either completely novel (“unknown”) or somewhat
+familiar (“partially known”) [8, 15]. this selection of
+materials ensured that there would be variability in word
+knowledge across students for each word and across words
+for each student.
+in dscovar, students learned how to infer the meaning
+of an unknown word in a sentence by using surrounding
+contextual information. having more information in a
+sentence (i.e., a sentence with a high degree of contextual
+constraint) can decrease the uncertainty of inference. in
+this study, the degree of sentence constraint was determined
+using standard cloze testing methods: quantifying the
+diversity of responses from 30 human judges when the target
+word is left as a fill-in-the-blank question.
+
+3.1.3
+
+study protocol
+
+the word learning study comprised four parts: (1) a pretest, which was used to estimate baseline knowledge of
+words, (2) a training session, where learners were exposed to
+words in meaningful contexts, (3) an immediate post-test,
+and (4) a delayed post-test, which occurred approximately
+one week after training.
+pre-test. the pre-test session was designed to measure
+the students’ prior knowledge of the target words. for
+each target word, students were asked to answer two types
+of questions: familiarity-rating questions and synonym
+selection questions. in familiarity rating questions, students
+provided their self-rated familiarity levels (unknown, known,
+and familiar) for presented target words. in synonymselection questions, students were asked to select a synonym
+word for the given target word from five multiple choice
+options. the outcome from synonym-selection questions
+provided more objective measures for students’ prior domain
+knowledge of target words.
+training. approximately one week after the pre-test
+session, students participated in the training. during
+training, students learned strategies to infer the meaning
+of an unknown word in a sentence by using surrounding
+contextual information.
+a training session consisted of two parts: an instruction
+video and practice questions. in the instruction video,
+students saw an animated movie clip about how to identify
+and use contextual information from the sentence to infer
+the meaning of an unknown word. in the practice question
+part, students could exercise the skill that they learned from
+the video. dscovar provided sentences that included a
+target word with different levels of surrounding contextual
+information. the amount of contextual information for
+each sentence was determined by external crowd workers
+(details described in section 3.1.2). in the practice question
+part, each target word was presented four times within82
+
+different sentences. students were asked to type a synonym
+of the target word, which was presented in the sentence as
+underlined and bold. over two weeks, students participated
+in two training sessions with a week’s gap between them.
+each training session contained the instruction video and
+practice questions for 30 target words. an immediate posttest session followed right after each training session.
+figure 1: an example of a training session question.
+in this example, the target word is “education” with
+a feedback message for a high-accuracy response.
+
+figure 2: ten semantic scales used for projecting
+target words and responses [16].
+• bad – good
+
+• complex – simple
+
+• passive – active
+
+• fast – slow
+
+• powerful – helpless
+
+• noisy – quiet
+
+• big – small
+
+• new – old
+
+• helpful – harmful
+
+• healthy – sick
+
+end. the word’s relationship with each semantic anchor can
+be automatically measured from its semantic similarity with
+these exemplar semantic elements.
+
+3.2.2
+
+students were randomly selected to experience different
+instruction video conditions (full instruction video vs.
+restricted instruction video). additionally, various difficulty
+level conditions and feedback conditions (e.g., dscovar
+provides a feedback message to the student based on answer
+accuracy vs. no feedback) were tested within the same
+student. however, in this study, we focused on data
+from students who experienced a full instruction video
+and repeating difficulty conditions. repeating difficulty
+conditions included questions with all high or medium
+contextual constraint levels. by doing so, we wanted to
+minimize the impact from various experimental conditions
+for analyzing post-test outcomes. moreover, we filtered out
+response sequences that did not include all four responses
+for the target word. as a result, we analyzed 818 response
+sequences from 7,425 items in total.
+immediate and delayed post-test. the immediate
+post-test occurred right after the students finished the
+training; the delayed post-test was conducted one week later.
+data collected during the immediate and delayed posttests were used to estimate short-and long-term learning,
+respectively. test items were identical to those in the pretest
+session, except for item order, which varied across tests. for
+analysis of the delayed post-test data, we only used the data
+from target words for which the student provided a correct
+answer in the earlier, immediate post-test session. as a
+result, 449 response sequences were analyzed for predicting
+the long-term retention.
+
+3.2
+
+semantic score-based features
+
+we now describe the semantic features tested in our
+prediction models.
+
+3.2.1
+
+semantic scales
+
+for this study, we used semantic scales from osgood’s study
+[16]. ten scales were selected by a cognitive psychologist as
+being considered semantic attributes that can be detected
+during word learning (figure 2). each semantic scale
+consists of pairs of semantic attributes. for example, the
+bad–good scale can show how the meaning of a word can
+be projected on a scale with bad and good located at either
+
+basic semantic distance scores
+
+to extract meaningful semantic information, we have
+applied the following measures that can be used to explain
+various characteristics of student responses for different
+target words. in this study, we used a pre-trained model
+for word2vec,1 built based on the google news corpus
+(100 billion tokens with 3 million unique vocabularies,
+using a negative sampling algorithm), to measure semantic
+similarity between words. the output of the pre-trained
+word2vec model contained a numeric vector with 300
+hundred dimensions.
+first, we calculated the relationship between word pairs (i.e.,
+a single student response and the target word, or a pair of
+responses) in both the regular word2vec (w2v) score and
+the osgood semantic scale (osg) score. in the w2v score,
+the semantic relationship between words was represented
+with a cosine similarity between word vectors:
+dw2v (w1 , w2 ) = 1 − |sim(v (w1 ), v (w2 ))|.
+
+(1)
+
+in this equation, the function v returned the vectorized
+representation of the word (w1 or w2 ) from the pre-trained
+word2vec model. by calculating the cosine similarity
+between two vectors (a cosine similarity function is noted
+as sim), we could extract a single numeric similarity score
+between two words. this score was converted into a
+distance-like score by taking the absolute value of the cosine
+similarity score and subtracting from one.
+for the osg score, we extracted two different types of
+scores: a non-normalized score and a normalized score. a
+non-normalized score showed how a word is similar to a
+single anchor word (e.g., bad or good ) from the osgood scale.
+non
+sosg
+(w, ai,j ) = sim(v (w), v (ai,j ))
+
+(2)
+
+non
+non
+non
+dosg
+(w1 , w2 ; ai,j ) = |sosg
+(w1 , ai,j )| − |sosg
+(w2 , ai,j )| (3)
+
+in equation 2, ai,j represents a single anchor word (j) in
+the i-th osgood scale. the similarity between the anchor
+word and the evaluating word w was calculated with cosine
+similarity of word2vec outcomes for both words. in a nonnormalized setting, the distance between two words given
+by a particular anchor word was calculated by the difference
+of absolute cosine similarity scores (equation 3).
+the second type of osg score is a normalized score. by
+using word2vec’s ability to do arithmetical calculation of
+1
+api and pre-trained model for word2vec was downloaded
+from this url: https://github.com/3top/word2vec-api83
+
+multiple word vectors, the normalized osg score provided
+a relative location of the word from two anchor ends of the
+osgood scale.
+nrm
+sosg
+(w, ai ) = sim(v (w), v (ai,1 ) − v (ai,2 ))
+nrm
+nrm
+nrm
+dosg
+(w1 , w2 ; ai ) = |sosg
+(w1 , ai ) − sosg
+(w2 , ai )|
+
+(4)
+(5)
+
+in equation 4, the output represents the cosine similarity
+score between the word w and two anchor words (ai,1
+and ai,2 ). for example, if the cosine similarity score of
+nrm
+sosg
+(w, ai ) is close to -1, it means the word w is close to
+the first anchor word ai,1 . if the score is close to 1, it is vice
+versa. in equation 5, the distance between two words was
+calculated as the absolute value of the difference between
+two cosine similarity measures.
+
+3.2.3
+
+deriving predictive features
+
+based on semantic distance equations explained in the
+previous section, this section explains examples of predictive
+features that we used to predict students’ short-term
+learning and long-term retention.
+distance between the target word and the
+response. for regular word2vec score models and osgood
+scale score models, distance measures between the target
+word and the response (by using equations 1 and 5) were
+used to estimate the accuracy of the response to a question.
+this feature represents the trial-by-trial answer accuracy of
+a student response. each response sequence for the target
+word contained four distance scores.
+difference between responses. another feature that
+we used in both types of models was the difference between
+responses. this feature could capture how a student’s
+current answer is semantically different from the previous
+response. from each response sequence, we could extract
+three derivative scores from four responses.
+convex hull area of responses.
+alternative to
+the difference between responses feature, osgood scale
+models were also tested with the area size of convex hull
+that can be generated by responses calculated with nonnormalized osgood scale scores (equation 3). for example,
+for each osgood scale, a non-normalized score provided
+two-dimensional scores that can be used for geometric
+representation. by putting the target word in an origin
+position, a sequence of responses can create a polygon
+that can represent the semantic area that the student
+explored with responses. since some response sequences
+were unable to generate the polygon by including less than
+three unique responses, we added a small, random noise
+that uniformly distributed (between −10−4 and 10−4 ) to all
+response points. additionally, a value of 10−20 was added to
+all convex hull area output to create a visible lower-bound
+value.
+unlike the measure of difference between responses, this
+feature also considers angles that can be created between
+responses and the target word. this representation can
+provide more information than just using difference between
+responses.
+
+3.3
+
+modeling
+
+to predict students’ short-term learning and long-term
+retention, we used a mixed-effect logistic regression model
+
+(mlr). mlr is a general form of logistic regression model
+that includes random effect factors to capture variations
+from repeated measures.
+
+3.3.1
+
+off-line variables
+
+off-line variables capture item- or subject-level variances
+that can be observed repeatedly from the data. in this study,
+we used multiple off-line variables as random effect factors.
+first, results from familiarity-rating and synonym-selection
+questions from the pre-test session were used to include
+item- and subject-level variances. both variables include
+information on the student’s prior domain knowledge level
+for target words. second, the question difficulty condition
+was considered as an item group level factor. in the analysis,
+sentences for the target word that were presented to the
+student contained the same difficulty level, either high or
+medium contextual constraint levels, over four trials. third,
+a different experiment group was used as a subject group
+factor. as described in section 3.1.1, this study contains
+data from students in different institutions in separate
+geographic locations. the inclusion of these participant
+groups in the model can be used to explain different
+short-term learning outcomes and long-term retention by
+demographic groups.
+
+3.3.2
+
+model building
+
+in this study, we compared the performance of mlr models
+with four different feature types. first, the baseline model
+was set to indicate the mlr model’s performance without
+any fixed effect variables but only with random intercepts.
+second, the response time model was built to be compared
+with semantic score-based models. many previous studies
+have used response time as an important predictor of student
+engagement and learning [2, 12]. in this study, we used two
+types of response time variables, the latency for initiating
+the response and finishing typing the response, as predictive
+features. both variables were measured in milliseconds over
+four trials and natural log transformed for the analysis.
+third, semantic features from regular word2vec scores were
+used as predictors. this model was built to show how
+semantic scores from word2vec can be useful for predicting
+students’ short- and long-term performance in dscovar.
+lastly, osgood scale-based features were used as predictors.
+this model was compared with the regular word2vec score
+model to examine the effectiveness of using osgood scales for
+evaluating students’ performance in dscovar. for these
+semantic-score based models, we tested out different types
+of predictive features that were described in section 3.2.3.
+all models shared the same random intercept structure
+that treated each off-line variable as an individual random
+intercept.
+for osgood scale models, we also derived reduced-scale
+models. reduced-scale models were compared with the fullscale model, which uses all ten osgood scales. in this case,
+using fewer osgood scales can provide easier interpretation
+of semantic analysis for intelligent tutoring system users.
+
+3.3.3
+
+model evaluation
+
+to compare performance between different models, this
+study used various evaluation metrics, including auc (an
+area under the curve score from a response operating
+characteristic (roc) curve), f1 (a harmonic mean of
+precision and recall), and error rate (a ratio of the number of84
+
+misclassified items over total items). 95% confidence interval
+of each evaluation metric was calculated from the outcome of
+a ten-fold cross-validation process repeated over ten times.
+to select the semantic score-based features for models based
+on regular word2vec scores and osgood scale scores, we
+used rankings from each evaluation metric. the model with
+the highest overall rank (i.e., sum the ranks from auc, f1 ,
+and error rate, and select the model with the lowest ranksum value) was considered the best-performing model for
+the score type (i.e., models based on the regular word2vec
+score or osgood scale score). more details on this process
+will be illustrated in the next section.
+
+4. results
+4.1 selecting models
+
+in this section, we selected the best-performing model based
+on the models’ overall ranks in each evaluation metric. all
+model parameters were trained in each fold of repeated
+cross-validation. we calculated 95% confidence intervals for
+comparison. to calculate the confidence interval of f1 and
+error rate measures, the maximum (f1 ) and minimum (error
+rate) scores of each fold were extracted. these maximum
+and minimum values were derived from applying multiple
+cutoff points to the mixed-effect regression model.
+
+4.1.1
+
+predicting immediate learning
+
+first, we built models that predict the students’ immediate
+learning from the immediate post-test session.
+from
+models based on regular word2vec scores (w2v), the model
+with the distance between the target and responses and
+the difference between responses (dist+resp) provided the
+highest rank from various evaluation metrics (table 2).
+from models based on osgood scales (osg), the model with
+the difference between responses (resp) provided the highest
+rank.
+the selected w2v model provided significantly better
+performance than the baseline model. the selected osg
+model also showed significantly better performance than the
+baseline model, except for the auc score. the selected
+w2v model was significantly better than the model using
+response time features in the auc score and error rates.
+the selected w2v model showed significantly better
+performance than the osg model only with the auc score.
+figure 3 shows that the w2v model has a slightly larger area
+under the roc curve than the osg model. in the precision
+and recall curve, the selected w2v model provides more
+balanced trade-offs between precision and recall measures.
+the selected osg model outperforms the w2v model in
+precision only in a very low recall measure range.
+
+4.1.2
+
+predicting long-term retention
+
+we also built prediction models to predict the students’
+long-term retention in the delayed post-test session. in
+this analysis, a student response was included only when
+the student provided correct answers to the immediate
+post-test session questions.
+among w2v score-based
+models, the best-performing model contained the same
+feature types as the immediate post-test results (table 3).
+by using the distance between the target and responses
+and difference between responses (dist+resp), the model
+
+achieved significantly better performance than the baseline
+model, except for the auc score.
+for osg models, the model with a convex hull area of
+responses (chull ) provided the highest overall rank from
+evaluation metrics (table 3). the results were significantly
+better than the baseline model, and marginally better than
+the w2v model. both selected w2v and osg models were
+marginally better than the response time model, except the
+error rate of the osg model was significantly better.
+in figure 3, the selected w2v model slightly outperforms
+the osg model in mid-range true positive rates, while
+the osg model performed slightly better in a higher true
+positive area. precision and recall curves show similar
+patterns to those we observed from the immediate post-test
+prediction models. the osg model only outperforms the
+w2v model in a very low recall value area.
+
+4.1.3 comparing models
+compared to the selected w2v model in the immediate
+post-test condition, the selected w2v model in the delayed
+post-test retention condition showed a significantly lower
+auc score, marginally higher f1 score, and marginally
+higher error rate. in terms of osg models, the selected osg
+model for delayed post-test retention showed a significantly
+better f1 score and error rates than the selected osg model
+in the immediate post-test condition. based on these results,
+we can argue that osgood scale scores can be more useful for
+predicting student retention in the delayed post-test session
+than predicting the outcome from the immediate post-test.
+in terms of selected feature types, the best-performing
+osg models used features based on the difference between
+responses (resp) or the convex hull area (chull ) that was
+created from the relative location of the responses. on the
+other hand, selected w2v models used both the distance
+between the target word and responses and difference
+between responses (dist+resp).
+when we compared
+both w2v and osg models using the difference between
+responses feature, we found that performance is similar in
+the immediate post-test data. however, the osg model
+was significantly better in the delayed post-test data. these
+results show that osgood scale scores can be more useful for
+representing the relationship among response sequences.
+
+4.2 comparing the osgood scales
+
+to identify which osgood scales are more helpful than
+others for predicting students’ performance, we conducted
+a scale-wise importance analysis. the results from this
+section reveal which osgood scales are more important than
+others, and how the performance of prediction models with
+a reduced number of scales is comparable with the full-scale
+model.
+
+4.2.1
+
+identifying more important osgood scales
+
+in this section, based on the selected osgood score model
+from section 4.1, we identified the level of contribution for
+features based on each osgood scale. for example, the
+selected osg model for predicting the immediate post-test
+data uses the difference between responses in ten osgood
+scales as features. in order to diagnose the importance level
+of the first scale (bad–good ), we can retrain the model with
+features based on the nine other scales and compare the85
+
+table 2: ranks of predictive feature sets for regular word2vec models (w2v) and osgood score models
+(osg) in the immediate post-test data. all models are significantly better than the baseline model. (bold:
+the selected model with highest overall rank.)
+features
+baseline
+rt
+dist
+resp
+chull
+dist+resp
+dist+chull
+
+auc
+0.68 [0.67, 0.69] (5)
+0.69 [0.68, 0.70] (4)
+0.72 [0.71, 0.74] (1)
+0.70 [0.69, 0.71] (3)
+na
+0.72 [0.71, 0.73] (2)
+na
+
+w2v models
+f1
+0.74 [0.73, 0.74] (5)
+0.75 [0.75, 0.76] (3)
+0.76 [0.75, 0.76] (2)
+0.75 [0.74, 0.76] (4)
+na
+0.76 [0.75, 0.77] (1)
+na
+
+err
+0.33 [0.33, 0.34] (5)
+0.31 [0.31, 0.32] (4)
+0.29 [0.28, 0.30] (2)
+0.31 [0.30, 0.32] (3)
+na
+0.29 [0.28, 0.30] (1)
+na
+
+auc
+0.68 [0.67, 0.69] (5)
+0.69 [0.68, 0.70] (2)
+0.67 [0.66, 0.68] (7)
+0.69 [0.68, 0.70] (1)
+0.69 [0.68, 0.70] (3)
+0.68 [0.67, 0.69] (4)
+0.67 [0.66, 0.68] (6)
+
+osg models
+f1
+0.74 [0.73, 0.74] (5)
+0.75 [0.74, 0.76] (2)
+0.73 [0.73, 0.74] (7)
+0.75 [0.75, 0.76] (1)
+0.74 [0.73, 0.75] (4)
+0.74 [0.73, 0.75] (3)
+0.74 [0.73, 0.74] (6)
+
+err
+0.33 [0.33, 0.34] (7)
+0.31 [0.31, 0.32] (2)
+0.33 [0.32, 0.34] (6)
+0.31 [0.30, 0.32] (1)
+0.32 [0.31, 0.33] (4)
+0.31 [0.31, 0.32] (3)
+0.33 [0.32, 0.34] (5)
+
+table 3: ranks of predictive feature sets for w2v and osg models in the delayed post-test data. all models
+are significantly better than the baseline model. (bold: the selected model with highest overall rank.)
+features
+baseline
+rt
+dist
+resp
+chull
+dist+resp
+dist+chull
+
+auc
+0.65 [0.64, 0.67] (5)
+0.67 [0.65, 0.68] (3)
+0.66 [0.64, 0.68] (4)
+0.69 [0.67, 0.71] (1)
+na
+0.68 [0.66, 0.70] (2)
+na
+
+w2v models
+f1
+0.75 [0.74, 0.76] (5)
+0.76 [0.76, 0.77] (4)
+0.77 [0.76, 0.78] (3)
+0.77 [0.76, 0.78] (2)
+na
+0.78 [0.77, 0.79] (1)
+na
+
+err
+0.33 [0.32, 0.34] (5)
+0.31 [0.30, 0.32] (3)
+0.31 [0.30, 0.32] (4)
+0.30 [0.29, 0.31] (2)
+na
+0.30 [0.29, 0.31] (1)
+na
+
+performance of the newly trained model with the existing
+full-scale model.
+in table 4, we picked the top five scales that were
+important in individual prediction tasks. we found that bigsmall, helpful-harmful, complex-simple, and fast-slow were
+commonly important osgood scales for predicting students’
+performance in immediate post-test and delayed post-test
+sessions. scales like bad-good and passive-active were only
+important scales in the immediate post-test prediction.
+likewise, new-old was an important scale only in the delayed
+post-test prediction.
+table 4: scale-wise importance of each osgood
+scale. scales were selected based on the sum of each
+evaluation metric’s rank. (bold: osgood scales that
+were commonly important in both prediction tasks;
+*: top five scales in each prediction task including
+tied ranks)
+scales
+bad-good
+passive-active
+powerful-helpless
+big-small
+helpful-harmful
+complex-simple
+fast-slow
+noisy-quiet
+new-old
+healthy-sick
+
+4.2.2
+
+imm. post-test
+auc f1 err all
+1
+1
+1
+1*
+2
+4
+3
+2*
+7
+9
+6
+7.5
+3
+3
+4
+3*
+4
+6
+5
+5.5*
+8
+5
+2
+5.5*
+5
+2
+7
+4*
+6
+8
+8
+7.5
+9
+7
+9
+9
+10
+10 10
+10
+
+del. post-test
+auc f1 err all
+4
+10 4
+6
+8
+6
+6
+7
+10
+8
+10
+10
+1
+3
+2
+2*
+2
+1
+1
+1*
+3
+5
+7
+4.5*
+6
+4
+3
+3*
+7
+9
+9
+9
+5
+2
+8
+4.5*
+9
+7
+5
+8
+
+performance of reduced models
+
+based on the scale-wise importance analysis results, we built
+reduced-scale models that only contain features with more
+important osgood scales. the prediction performance of
+reduced-scale models was similar or marginally better than
+full-scale osg models. for example, the osg model for
+predicting the immediate post-test outcome with the top
+two scales (bad–good and passive–active) were marginally
+better than the full-scale model (auc: 0.71 [0.70, 0.72], f1 :
+0.76 [0.75, 0.77], error rate: 0.30 [0.29, 0.30]). similar results
+were observed for predicting retention in the delayed posttest (selected scales: helpful–harmful, big–small ) (auc: 0.71
+[0.69, 0.72], f1 : 0.79 [0.78, 0.80], error rate: 0.28 [0.27,
+
+auc
+0.65 [0.64, 0.67] (5)
+0.67 [0.65, 0.68] (3)
+0.66 [0.64, 0.68] (4)
+0.63 [0.61, 0.65] (7)
+0.69 [0.68, 0.71] (1)
+0.64 [0.62, 0.66] (6)
+0.69 [0.67, 0.71] (2)
+
+osg models
+f1
+0.75 [0.74, 0.76] (7)
+0.76 [0.76, 0.77] (5)
+0.78 [0.77, 0.79] (3)
+0.76 [0.75, 0.77] (6)
+0.78 [0.77, 0.79] (2)
+0.77 [0.76, 0.78] (4)
+0.78 [0.78, 0.79] (1)
+
+err
+0.33 [0.32, 0.34] (7)
+0.31 [0.30, 0.32] (5)
+0.30 [0.29, 0.31] (3)
+0.32 [0.31, 0.33] (6)
+0.28 [0.27, 0.29] (1)
+0.31 [0.29, 0.32] (4)
+0.29 [0.27, 0.30] (2)
+
+0.29]). although differences were small, the results indicate
+that using a small number of osgood scales can be similarly
+effective to the full-scale model.
+
+5.
+
+discussion and conclusions
+
+in this paper, we introduced a novel semantic similarity
+scoring method that uses predefined semantic scales to
+represent the relationship between words. by combining
+osgood’s semantic scales [16] and word2vec [13], we could
+automatically extract the semantic relationship between
+two words in a more interpretable manner. to show this
+method can effectively represent students’ knowledge in
+vocabulary acquisition, we built prediction models that can
+be used to predict the student’s immediate learning and
+long-term retention. we found that our models performed
+significantly better than the baseline and the responsetime-based models. in the future, we believe results from
+using an osgood scale-based student model could be used
+to provide a more personalized learning experience, such
+as generating questions that can improve an individual
+student’s understanding for specific semantic attributes.
+based on our findings, we have identified the following
+points for further discussion. first, in section 4.1, we
+found that models using osgood scale scores perform
+similarly with models using regular word2vec scores
+for predicting students’ long-term retention of acquired
+vocabulary. however, we think our models can be further
+improved by incorporating additional features. for example,
+non-semantic score-based features like response time and
+orthographic similarity among responses can be useful
+features for capturing different patterns of false predictions
+of current models. moreover, some general measures to
+capture a student’s meta-cognitive or linguistic skills could
+be helpful to explain different retention results found even if
+students provided the same response sequences. similarly, in
+section 4.1.3, we found that osgood scores can be a better
+metric to characterize the relationship between responses
+in terms of predicting students’ retention. a composite
+model that uses both regular word2vec score-based feature
+(target-response distance) and osgood scale score-based
+feature (response-response distance) may also provide better86
+
+figure 3: roc curves and precision and recall curves for selected immediate post-test prediction models
+(left) and delayed post-test prediction models (right). curves are smoothed out with a local polynomial
+regression method based on repeated cross-validation results.
+
+prediction performance.
+second, we found that models with a reduced number of
+osgood scales performed marginally better than the fullscale model. however, differences were very small. since
+this study only used some of the semantic scales from
+osgood’s study [16], further investigation would be required
+to examine the validity of these scales, including other scales
+not used for this study, for capturing the semantic attributes
+of student responses during vocabulary learning.
+also, there were some limitations in the current study
+and areas for future work. first, expanding the scope
+of analysis to the full set of experimental conditions
+used in the study may reveal more complex interactions
+between these conditions and students’ short- and longterm learning. second, this study used a fixed threshold
+of 0.5 for investigating false prediction results. however, an
+optimal threshold for each participant group or prediction
+model could be selected, especially if there are different false
+positive or negative patterns observed for different groups
+of students. lastly, this study collected data from a single
+vocabulary tutoring system that was used in a classroom
+setting. applying the proposed method to data that was
+collected from a non-classroom setting or other vocabulary
+learning system would be useful to show the generalization
+of our suggested method.
+
+6.
+
+acknowledgments
+
+the research reported here was supported by the institute of
+education sciences, u.s. department of education, through
+grant r305a140647 to the university of michigan. the
+opinions expressed are those of the authors and do not
+represent views of the institute or the u.s. department
+of education. we thank dr. charles perfetti and his lab
+team at the university of pittsburgh, particularly adeetee
+bhide and kim muth, and the helpful personnel at all of our
+partner schools.
+
+7.
+
+references
+
+[1] s. adlof, g. frishkoff, j. dandy, and c. perfetti. effects of
+induced orthographic and semantic knowledge on
+subsequent learning: a test of the partial knowledge
+hypothesis. reading and writing, 29(3):475–500, 2016.
+[2] j. e. beck. engagement tracing: using response times to
+model student disengagement. artificial intelligence in
+education: supporting learning through intelligent and
+socially informed technology, 125:88, 2005.
+[3] k. collins-thompson and j. callan. automatic and human
+scoring of word definition responses. in hlt-naacl,
+pages 476–483, 2007.
+[4] m. coltheart. the mrc psycholinguistic database. the
+
+[5]
+[6]
+[7]
+
+[8]
+
+[9]
+
+[10]
+[11]
+
+[12]
+[13]
+
+[14]
+[15]
+[16]
+[17]
+
+[18]
+[19]
+
+[20]
+
+quarterly journal of experimental psychology,
+33(4):497–505, 1981.
+e. dale. vocabulary measurement: techniques and major
+findings. elementary english, 42(8):895–948, 1965.
+f. t. durso and w. j. shore. partial knowledge of word
+meanings. journal of experimental psychology: general,
+120(2):190, 1991.
+g. a. frishkoff, k. collins-thompson, l. hodges, and
+s. crossley. accuracy feedback improves word learning
+from context: evidence from a meaning-generation task.
+reading and writing, 29(4):609–632, 2016.
+g. a. frishkoff, k. collins-thompson, s. nam, l. hodges,
+and s. a. crossley. dynamic support of contextual
+vocabulary acquisition for reading (dscovar): an
+intelligent tutoring system for contextual word learning.
+handbook on educational technologies for literacy, 2016.
+g. a. frishkoff, c. a. perfetti, and k. collins-thompson.
+predicting robust vocabulary growth from measures of
+incremental learning. scientific studies of reading,
+15(1):71–91, 2011.
+t. k. landauer. latent semantic analysis. wiley online
+library, 2006.
+y. li, l. xu, f. tian, l. jiang, x. zhong, and e. chen.
+word embedding revisited: a new representation learning
+and explicit matrix factorization perspective. in
+proceedings of the 24th international joint conference on
+artificial intelligence, buenos aires, argentina, pages
+3650–3656, 2015.
+y. ma, l. agnihotri, m. h. education, r. baker, and
+s. mojarad. effect of student ability and question difficulty
+on duration. in educational data mining, 2016.
+t. mikolov, i. sutskever, k. chen, g. s. corrado, and
+j. dean. distributed representations of words and phrases
+and their compositionality. in advances in neural
+information processing systems, pages 3111–3119, 2013.
+g. a. miller. wordnet: a lexical database for english.
+communications of the acm, 38(11):39–41, 1995.
+s. nam. predicting off-task behaviors in an adaptive
+vocabulary learning system. in educational data mining,
+2016.
+c. e. osgood, g. j. suci, and p. h. tannenbaum. the
+measurement of meaning. university of illinois press, 1957.
+k. ostrow, c. donnelly, s. adjei, and n. heffernan.
+improving student modeling through partial credit and
+problem difficulty. in proc. of the second acm conference
+on learning@scale, pages 11–20. acm, 2015.
+p. i. pavlik and j. r. anderson. practice and forgetting
+effects on vocabulary memory: an activation-based model
+of the spacing effect. cog. science, 29(4):559–586, 2005.
+e. g. van inwegen, s. a. adjei, y. wang, and n. t.
+heffernan. using partial credit and response history to
+model user knowledge. international educational data
+mining society, 2015.
+l. m. yonek. the effects of rich vocabulary instruction
+on students’ expository writing. phd thesis, university of
+pittsburgh, 2008.

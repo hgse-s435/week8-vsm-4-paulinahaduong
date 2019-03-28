@@ -1,0 +1,1029 @@
+39
+
+the antecedents of and associations with elective replay
+in an educational game: is replay worth it?
+zhongxiu liu
+
+north carolina state
+university
+
+christa cody
+
+north carolina state
+university
+
+tiffany barnes
+
+north carolina state
+university
+
+zliu24@ncsu.edu
+cncody@ncsu.edu
+tmbarnes@ncsu.edu
+collin lynch
+teomara rutherford
+north carolina state
+university
+
+cflynch@ncsu.edu
+abstract
+replayability has long been touted as a benefit of educational games. however, little research has measured its impact on learning, or investigated when students choose to replay prior content. in this study, we analyzed data on a sample of 4,827 3rd-5th graders from st math, a game-based educational platform integrated into classroom instruction in
+over 3,000 classrooms across the u.s. we identified features
+that describe elective replays relative to prior gameplay performance, and associated elective replays with in-game accuracy, confidence, and general math ability assessments outside of the games. we found some elective replay patterns
+were associated with learning, whereas others indicated that
+students were struggling in the current educational content.
+we suggest, therefore, that educational games should use
+elective replay behaviors to target interventions according
+to when and whether replay is helpful for learning.
+
+keywords
+educational games, serious game analytics, replayability
+
+1. introduction
+“replayability is an important component of successful games.”
+[15] in most games, there are two types of plays: play and
+replay to pass a level (pass attempts) and replay after passing a level (elective replay). in this paper, we investigate
+the latter. elective replay (er) is particularly interesting
+because the motivations behind a student’s decision to replay and the impact of those replays are relatively unknown.
+this paper explores potential associations between elective
+replay and student characteristics and performance in the
+domain of educational games.
+replayability has been touted as a benefit of educational
+games [9]. replayability encourages players to engage in
+
+north carolina state
+university
+
+taruther@ncsu.edu
+repeated judgement-behavior-feedback loops, where users
+make decisions based on the situation and/or feedback, act
+on those decisions, and receive feedback based on their actions [18]. in the retain model designed by gunter et al.
+[10] to evaluate educational games, replayability is a criteria for naturalization – an important component in helping
+students make their knowledge automatic, reducing the cognitive load of low-level details to allow for higher order thinking. in the retain model, “replay is encouraged to assist
+in retention and to remediate shortcomings.” [10] meaningful elective replay is often encouraged by game features
+such as score leaderboards, which inspire students to replay for higher scores [4]. because higher scores typically
+require a deeper understanding of the educational content
+in a well-designed game, encouraging elective replay may
+promote mastery. games with replay also allow the student to be exposed to more material and give them more
+freedom to control their learning. studies have shown that
+giving students control over their learning process can increase motivation, engagement, and performance [6, 8].
+however, few studies have investigated when students choose
+to replay, why they do so, or have measured the outcomes associated with elective replay. one reason is that educational
+game studies are often comparatively brief, so replayability
+is often minimally assessed with post-game questionnaires
+asking about students’ intention for future play [14, 5]. consequently, there is a need to investigate elective replay with
+actual logged actions in a game setting where students have
+sufficient time and freedom to replay.
+this work analyzed gameplay logs from a series of math
+games within the year-long supplemental digital mathematics curriculum spatial temporal (st) math. we analyzed
+gameplay data from 4,827 3rd-5th graders throughout the
+2012-2013 school year. our data contained 37,452 logged
+elective replays, accounting for 1.48% of the logged play.
+we analyzed gameplay and elective replay features in association with students’ demographic information, in-game
+math objective tests, and the state standardized math test.
+we sought to answer three research questions: q1: what are
+the characteristics of students who engage in elective replay,
+q2: what gets replayed, and under what circumstances?
+and q3: is elective replay associated with improvements
+in students’ accuracy on math objectives, confidence, and40
+
+general math ability?
+
+2. related work
+2.1 factors influencing elective replay
+few empirical studies have investigated the motivations behind elective replay in educational games. burger et al. [5]
+studied the effect of verbal feedback from a virtual agent
+on replay in the context of a brain-training game. they
+found that elaborated feedback increases, whereas comparative feedback decreases, the students’ interest in future replay. they also found that negative feedback generated an
+immediate interest in replay, whereas positive feedback created long term interest in the educational content. in another study, plass et al. [14] compared three conditions in a
+math game: working individually, competing with another
+player, or collaborating with a peer. the study showed that
+both competition and collaboration modes heightened students’ intention to replay when compared with the individual mode, with the latter result being statistically significant. however, both studies measured replay via questionnaires asking the students’ desire to play the entire game
+again instead of observed replay behavior. moreover, these
+studies sought to understand replay only from the angle of
+game design, and did not address the connections, if any,
+between student characteristics and interest in replay.
+other studies suggest elective replay is a habitual behavior
+that arises from individual need, although these studies did
+not directly investigate replay. bartle [3] found one type
+of player who is primarily motivated by concrete measurements of success. in st math, these achiever-type players
+may largely use replay to get better ’scores’ (losing fewer
+lives when passing a level). mostow et al. [12] observed
+a student in a reading tutor who used the learner-control
+features to spend the majority of time replaying stories or
+writing ”junk” stories instead of progressing to new material. thus, some students may also use replay as a form
+of work avoidance – playing already passed levels instead
+of solving the current problem or moving on. sabourin et
+al. [17] found that students in an educational game used
+off-task behaviors to cope with frustration, implying that
+off-task behavior can be a productive self-regulation of negative emotions. in st math, when students get frustrated
+with the current educational content but still have to play
+the game in the classroom, they may replay already learned
+content as a mental break from the current task. these
+studies showed that the circumstances of replay and students’ characteristics influence their decisions to replay and
+its outcomes.
+
+2.2
+
+the outcomes of replay
+
+despite the believed benefits of replayability [9, 18, 10, 4],
+few studies have investigated the educational impact of elective replay. boyce et al. [4] evaluated the effects of game
+elements that were designed to motivate gameplay and elective replay. these included a leaderboard that shows each
+student’s rank based upon their score, a tool for creating
+custom puzzles, and a social system for messaging among
+players. the experimental design required students to play
+the game in one session, and to replay the game as more
+features were added in the subsequent sessions. the study
+found a sharp increase in test scores as these features were
+
+added to the game. the authors concluded that features designed to increase replayability can increase learning gains.
+however, this result may be due to increased time on task as
+the same group replaying the base game with new features.
+in another study, clark et al. [7] analyzed logged studentinitiated elective replay in a digital game. they found that
+frequency of elective replay did not correlate with learning
+gains, prior gaming habits/experience, or how much students liked the game. they also found that, while there
+was no statistically significant difference between the male
+and female students, males replayed more than the females.
+this may have been responsible for their slightly higher, although not statistically significant, “best level scores” – the
+highest score received on each level. these studies showed
+that elective replay may lead to increased learning or higher
+in-game performance. however, more research is needed to
+understand the potential educational impact of replay in educational games, particularly elective replays initiated solely
+by the players.
+
+3. game, data and features
+3.1 st math game
+
+figure 1: st math content and examples
+st math is designed to act as a supplemental program to
+a school’s existing mathematics curriculum. st math is
+mostly played during classroom sessions, but students have
+the option to play it at home. in st math [16], mathematics
+concepts are taught through spatial puzzles within various
+game-like arenas. st math games are structured at the top
+level by objectives, which are broad learning topics. within
+each objective, individual games teach more targeted concepts through presentation of puzzles, which are grouped
+into levels for students to play. students start by completing a series of training games on the use of the st math
+platform and features. they are then guided to complete
+the first available objective in their grade-level curriculum,
+such as “multiplication concepts.” students can only see
+this objective and must complete a pre-test before beginning
+the content. games represent scenarios for problem-solving
+using a particular mathematical concept, such as “finding
+the right number of boots for x animals of y legs.” each
+game contains between one and ten levels, which follow the
+same general structure of the game, but increase in difficulty.
+figure 1 illustrates the hierarchy of st math content and
+examples.
+as with many games, the student is given a set number of
+‘lives’ at the start of each level. every time they fail to41
+
+complete a puzzle correctly they lose one life. if all of their
+lives for a given level are exhausted, they will fail the level
+and be required to restart the level with a new set of lives.
+once a student has passed a level, they can elect to replay
+it at any time. after a student has passed every level in an
+objective, they can take the objective post-test. students
+cannot progress to the next objective until they have completed the last objective post-test. both the objective preand post-tests consist of 5-10 multiple choice questions related to the objective. the post-tests parallel the pre-tests
+in both the question format and difficulty of the content.
+while answering each question in both tests, students indicate their relative confidence in their answer (low/high).
+
+3.2
+
+data
+
+mind research institute (mind), the developers of stmath, collected and provided to the researchers gameplay
+data from 4,827 3rd-5th graders during the school year 20122013. these students came from 17 schools and 221 classrooms. table 1 summarizes students’ demographic information. these demographic data, together with students’ state
+standardized test scores in 2012 and 2013, were matched to
+gameplay data through anonymized ids.
+table 1: populations’ demographics information
+grade3 grade4 grade5
+#students
+male
+eligible for reduced
+lunch
+hispanic or latino
+english language
+learner
+with listed disability
+
+1567
+50.6%
+na:2.9%
+80.7%
+na:2.9%
+84.7%
+na:2.8%
+66.2%
+na:2.9%
+10.9%
+na:2.1%
+
+1528
+50.1%
+na:2.0%
+77.8%
+na:2.1%
+82.3%
+na:1.9%
+56.1%
+na:2.1%
+11.5%
+na:1.7%
+
+1732
+52.2%
+na:3.5%
+81.4%
+na:3.2%
+83.5%
+na:3.1%
+53.0%
+na:3.2%
+11.9%
+na:2.8%
+
+this gameplay data includes pre- and post-tests for each
+objective and the number of level attempts. for each preand post-test, st math logged students’ accuracy and selfreported confidence level (1 for ’high’ and 0 for ’low) for
+each question. for each play at a level, st math logged the
+student’s id, timestamp, and the number of puzzles completed. from these data, we identified er as plays made
+after a student initially passed the level. we found ers in
+89.6% of all objectives in st math, accounting for 1.48%
+of all level attempts. among 4,827 students, 59.85% ered
+at least one level, with an average of 7.84 levels (sd=12.99,
+95% ci [7.37, 8.32]) across 3.06 average objectives replayed
+per student. in the next section, we describe the features
+we created to analyze er.
+
+3.3
+
+features
+
+we created features at three different levels of granularity
+(from finest to largest): level, objective, and student. for
+the level granularity, we treated each unique student-level
+combination as an observation. we calculated the features
+by averaging all gameplay for a specific student at a specific level. for objective granularity, each unique studentobjective combination was treated as a single observation.
+
+features were created by averaging across all levels played by
+a specific student within a single objective. the objective
+granularity also included the objective pre- and post-test
+accuracy and confidence. for the student granularity, we
+treated each student as a single observation. we calculated
+the features by averaging across all objectives played by a
+student over the entire year. the student granularity also
+included student demographic data and state standardized
+math test scores. these granularities ensured that our analysis did not favor units with the majority of data logs. each
+student was considered equally in our analysis, regardless
+of how many objectives they played. our data contained
+4,827 students and 2,524,681 plays, which yielded 1,462,660
+student-level observations, and 74,985 student-objective observations.
+table 2 shows five example plays of “division-level3,” including four pass attempts and one er of this level, interspersed with ers from other levels. we consider consecutive
+ers as an er session, as these ers are circumstanced on
+the same pass attempts.
+table 2: example of er and pass attempts
+play objective-level
+passed? play type
+1
+division- level3
+no
+pass attempt
+2
+division- level3
+no
+pass attempt
+3
+division-level1
+yes
+er (er session1)
+4
+division- level3
+no
+pass attempt
+5
+division-level1
+yes
+er (er session2)
+6
+division- level3
+yes
+pass attempt
+7
+division- level3
+yes
+er (er session3)
+8
+subtraction-level1 no
+er (er session3)
+
+3.3.1
+
+pass attempt features
+
+we defined performance to be the percentage of puzzles a
+student completed before losing all lives on the level. pass
+attempts are plays prior to er, where we assumed students play with the intention of passing the level. pass attempt features included: performance when a student first
+attempted a level (1st pass attempt performance), number of
+attempts taken to pass a level (# pass attempts), and average performance of all pass attempts (average pass attempt
+performance). at the student granularity, students took an
+average of 1.91 (sd=0.89) attempts to pass each level, with
+average performance of 0.80 (sd=0.10) on the first pass attempt, and 0.87 (sd=0.07) on all pass attempts (indicating
+overall improved performance on later attempts).
+
+3.3.2
+
+elective replay features
+
+table 3 shows er features that describe er from three angles: (i) the frequencies of er, (ii) the performance of er,
+and (iii) the circumstances of er in terms of the er’s prior
+plays. to summarize, the majority of ers had higher performance than their levels’ first attempt, and resulted in
+another pass of their levels. levels that were ered had similar performance compared to levels that weren’t ered, but
+levels that were followed(54.65%) or interrupted (54.35%)
+by er had much lower performance than those that weren’t
+followed or interrupted by er. most ers’ immediately prior
+pass attempts were from different levels or objectives. there
+were few instances (9.80%) where students passed a level and
+immediately ered it following the pass.42
+
+table 3: elective replay (er) features and their descriptive statistics among students who electively replayed, collapsed to the student granularity.
+er features
+
+descriptive stats
+
+i. frequencies of er
+% er out of all plays
+m=2.40%, sd=4.26%
+% objectives that have been electively replayed
+m=22.94%, sd=20.89%
+% objectives whose pass attempts were interrupted/followed by er
+m=19.48%, sd=17.57%
+ii. performance of er
+performance of er
+m=0.71, sd=0.28
+m=71.96%, sd=31.44%
+% ers performed better than the level’s first attempt
+% ers that result in another pass of the level
+m=60.36%, sd=35.51%
+iii. circumstances of er
+the replayed level e.g. “division-lvl1,”“division-lvl3,” and “subtraction-lvl1” in table 2
+pass attempts features
+m=0.79, 1.98, 0.87 for 1st performance, #pass attempts, and avg performance
+the immediately-prior play of the er e.g. play 2 is the immediately-prior play of play 3 in table2
+performance on the immediately-prior play
+m=0.63, sd=0.29
+% ers whose immediately-prior plays is also an er
+m=0.31, sd=0.28
+% er whose immediately prior pass attempt is on the same level
+m=9.80%, sd=23.84%
+m=40.75%, sd=39.09%
+% ...... on a different level in the same objective
+% ...... on a different objective
+m=49.44%, sd=40.76%
+the immediate prior pass attempts followed or interrupted by er and er session e.g. “division-lvl3” for
+all er sessions in table 2
+pass attempts features
+m=0.51, 3.62, 0.55 for 1st performance, #pass attempts, and avg performance
+% er sessions whose prior pass attempt passed the level
+m=45.65%, sd=40.69%
+note. statistics are reported at the student granularity, which are calculated through averaging across all objectives played by a student,
+and then averaged across all students who electively replayed. this means each student contributes equally to the average, regardless of
+how many objectives s/he played.
+
+3.3.3
+
+student grouping from er features
+
+we created student groups to encapsulate the circumstances
+under which er occurred, based on students’ majority er
+and er sessions. based on prior literature, we hypothesized
+that er is a habitual behavior that arises from individual
+needs, such as gaining higher scores [3], avoiding progress on
+the current task [12], or taking a mental break from negative emotions [17]. thus, grouping students based upon the
+circumstances of replay based on their majority behaviors
+provides high level profiles to investigate characteristics of
+students who engaged in er and benefited from er.
+we characterized er by the timing relative to the student’s
+current learning objectives and gameplay. the first grouping describes whether the majority er sessions started before (group b) or after (group a) passing the previous attempted level (current learning objective). if there is a tie
+between the two types of replay session, the student belongs to neither group. for example, table 2 describes a
+group b student, who has two replay sessions before passing
+“division-level3,” and one replay session after passing this
+level but before moving on to the next level.
+the second grouping describes whether an er followed plays
+on the same level (sl), a different level under the same objective (dlso), or a different objective (do). for our example in table 2, the student’s pass attempts on “divisionlevel3” was interrupted twice on the third and fifth plays, by
+replays on “division-level1”(dlso). after passing “division-
+
+level3”, the student replayed the same level(sl) once during
+the seventh play, and a different objective “ subtractionlevel1” (do) once during the eighth play. this group b
+student had two dlso replays, one sl, and one do replays.
+thus, this student also belongs to group dlso, because the
+two groupings are independent of each other.
+
+4. methods & results
+4.1 who engaged in elective replay?
+we first investigated the demographic characteristics of students who engaged in elective replay. we found that males
+did so more often than females (male: 63.2%, female: 57.0%,
+c2(1, n=4827) = 17.99, p<.001). we also found that english
+language learners (ell) did so more often than their nonell peers (ell: 62.3%, non-ell: 57.1%, c2(1, n=4827)
+= 12.69, p<.001 ), as did students with reported disabilities (disability: 68.7%, non disability: 59.1%, c2(1, n =
+4827) = 18.17, p<.001). there were no statistically significant differences in the frequencies of er based on race
+when operationalized as hispanic/non hispanic, or based
+on free/reduced lunch eligibility. the frequency of er was
+not found to be correlated with other out-of-game student
+factors, such as state standardized math test scores.
+the frequency of er was also not correlated with in-game
+pre-test accuracy and confidence at the objective granularity. next, we investigated the gameplay characteristics of
+students who electively replayed. we first separated students into groups based on their replay patterns. the first43
+
+table 4: mann-whitney u tests comparing gameplay characteristics between er pattern student groups
+group (# stu- pre-test
+pre-test
+avg pass at- avg 1st at- #pass at- er perfordents)
+accuracy
+confidence tempts’ per- tempt per- tempts
+mance
+formance
+formance
+base:no er
+(n=1938)
+er (n=2889)
+group a
+(n=1114)
+group b
+(n=1464)
+group sl
+(n=173)
+group dlso
+(n=983)
+group do
+(n=1399)
+
+m=0.61
+sd=0.17
+*m=0.57
+sd=0.17
+m=0.62
+sd=0.16
+*m=0.52
+sd=0.17
+m=0.61
+sd=0.17
+*m=0.54
+sd=0.18
+*m=0.58
+sd=0.16
+
+m=0.75
+sd=0.23
+m=0.74
+sd=0.24
+m=0.77
+sd=0.22
+*m=0.72
+sd=0.25
+m=0.75
+sd=0.23
+m=0.73
+sd=0.24
+m=0.75
+sd=0.23
+
+m=0.88
+sd=0.08
+*m=0.87
+sd=0.07
+*m=0.90
+sd=0.05
+*m=0.84
+sd=0.07
+m=0.88
+sd=0.07
+*m=0.84
+sd=0.08
+m=0.88
+sd=0.06
+
+m=0.81
+sd=0.11
+*m=0.80
+sd=0.10
+*m=0.84
+sd=0.08
+*m=0.75
+sd=0.09
+m=0.81
+sd=0.09
+*m=0.76
+sd=0.10
+m=0.81
+sd=0.08
+
+m=1.82
+sd=0.84
+*m=1.92
+sd=0.78
+*m=1.62
+sd=0.52
+*m=2.28
+sd=1.09
+m=1.82
+sd=0.81
+*m=2.27
+sd=1.16
+m=1.80
+sd=0.71
+
+na
+m=0.72
+sd=0.29
+*m=0.77
+sd=0.27
+*m=0.67
+sd=0.29
+*m=0.84
+sd=0.29
+*m=0.67
+sd=0.32
+m=0.73
+sd=0.26
+
+note. 1) green and red indicate statistically significances higher and lower than the base class, with *p < .001, +p < .01 2)
+group a, b: most er sessions happened before (b), after (a) passing the prior non-replay level. group sl, dlso, do: most
+er followed pass attempts on the same level(sl), different level in same objective(dlso), or different objective (do)
+
+5 columns of table 4 shows the results of mann-whitney u
+tests with benjamini-hochberg correction to compare each
+group in-game performance to the students who never electively replayed any levels (the base group). the last column
+compares the averaged er performance of each group to the
+rest of students who electively replayed.
+compared to the base group, students for whom most replays happened before passing the prior non-replay level
+(group b) and students for whom most replays followed a
+different level on the same objective (group dlso) started
+with significantly lower pre-test scores and did worse in gameplay, as measured by the three pass attempt features described in section 3.3.2. for example, students in group
+b started with lower accuracy and confidence at pre-test,
+took an average 0.5 more attempts to pass a level, and had
+lower performance on the 1st pass attempt and all pass attempts (including the 1st). it seems that group b students
+who replayed earlier levels before passing the current one
+had less prior knowledge, and struggled more in the game.
+by contrast, students in group a, for whom most replay
+happened after passing the current level, did slightly better in gameplay compared to students who never electively
+replayed (the base group). because these students started
+with pre-test scores that were not statistically significantly
+different from the base group, their replay patterns are associated with higher gameplay performance.
+
+4.2
+
+what gets replayed, and when?
+
+next, we studied what levels get replayed, and under what
+circumstances. we used a decision tree classifier which allowed us to identify which factors are most important in
+relative to er. our goal was not to find precise predictive
+models, but to augment our understanding of performance
+and its relationship to er. we used r’s rpart package with
+parameters minsplit=5% and cp=0.02 to build trees to classify levels that were replayed from levels that were not replayed, and levels whose pass attempts were interrupted or
+
+followed by replay from levels that were not interrupted or
+followed by replay. we randomly undersampled the majority class (levels without replay, levels were not interrupted
+or followed by replay), so that each class represented half of
+the observations. we used pass attempt features at the level
+granularity together with pre-test results, objective, and demographic information to build our tree. we used 10-fold
+cross validation to access the trees’ accuracies.
+table 5 reports the trees and the importance of the features.
+we found that a student’s performance on a particular level
+influenced whether replay happened during/after the level’s
+pass attempts. for example, a student was more likely to
+replay a different level under the same objective (dlso)
+if they took more than two attempts to pass the current
+level. this result is related to the previous result in table 4,
+showing that, at the student level, those with lower gameplay performance were more likely to replay another level
+under the same objective.
+on the other hand, the objective to which a level belongs
+influences whether or not a level would be ered. we built
+trees to predict if a level is replayed following the same level
+(same condition of the last row in table 5, n=1,776), the
+same objective but a different level (n=12,616), or a different objective (n=31,852). for all three conditions, the
+trees only contains a single node – objective, with accuracy
+of 55.2%, 62.0%, and 66.9% respectively. this er decision
+could have been influenced by either the content or timing
+of the objectives. in our tree node, we noticed that many
+objectives with a higher chance of er occurred earlier in
+the curriculum, this could be because students had more
+time in which these objectives were available for er. our
+tree model also had only 55.2% accuracy when predicting
+whether a level would be ered following the pass attempts
+of itself. one explanation is that we do not have puzzle
+granularity data on how many lives a student actually lost.
+from prior literature [4] [7], students may replay the same44
+
+table 5: decision trees to predict levels whose pass
+attempts were interrupted or followed by er
+condition:
+inter- trees
+rupted/followed by
+er from a different
+level in the same objective (n=8,094)
+
+er from a different
+objective (n=12,506)
+
+er on the same level
+(n=1,766)
+
+77.8% accuracy
+#pass attempts < 2.5, no
+#pass attempts ≥ 2.5, yes
+
+78.7% accuracy
+1st attempt performance ≥ 0.94
+-objective group a, no
+-objective group b, yes
+1st attempt performance < 0.94
+-objective group a
+—# pass attempts < 6.5, no
+—# pass attempts ≥ 6.5, yes
+-objective group b, yes
+55.2% accuracy
+objective group a, no
+objective group b, yes
+
+note. trees are presented in text format. for example, the first
+tree shows that if a student passed a level with less than 2.5 pass
+attempts, the tree predicts this student will not replay another
+level during/after this level.
+
+level following it pass attempts to get a better score, which
+means losing fewer lives (making fewer errors) at a level. as
+shown in table 4, group sl students who performed most
+of their ers after the same level also achieved the highest
+er performance.
+
+4.3
+
+is elective replay associated with gains?
+
+in this section we will address our second research question.
+as part of our analysis we considered three gain scores: accuracy gain, confidence gain, and math gain. the first two
+were measured by in-game pre- and post-tests. recall that
+both before and after a student attempts an objective, st
+math logs the students’ correctness and confidence scores
+on each question on the pre- and post-tests. we averaged
+these scores across the pre- and post-test questions to compute the first two gain scores. these were assessed at the
+objective granularity. math gain was calculated based upon
+the difference between the students’ state standardized math
+test scores in years 2012 and 2013. this was assessed at the
+student granularity.
+11.8% of the students were excluded from the math gain
+analysis due to missing state math test records. these excluded students performed statistically significantly worse in
+the game as measured by the three pass attempt features;
+this implies that we excluded weaker students. 8.5% of the
+objective observations were excluded from the accuracy and
+confidence gain analysis due to missing pre- or post-tests.
+these excluded observations were not statistically significantly different from the rest as measured by pass attempt
+features. the accuracy and confidence gains were significantly correlated (r=0.37, p<0.001), but these two gains
+were not strongly correlated with math gain scores at the
+student granularity (r<0.1, p<0.001). table 6 reports the
+percentage of data points that gained, dropped (mainly for
+avoiding ceiling effect in this data), and did not gain for each
+
+figure 2: decision tree to predict whether a student will gain in state standardized math test
+type of gain based on the marx and cummings normalization method [11].
+
+table 6: %observations with gains, no gains, and
+percentage dropped for the three gains
+gain types
+er?
+gained dropped no gain
+accuracy
+(n=75,083)
+confidence
+(n=75,083)
+math test
+(n=4,827)
+
+er
+no er
+er
+no er
+er
+no er
+
+48.10%
+43.70%
+28.30%
+26.40%
+41.60%
+40.80%
+
+8.60%
+6.10%
+42.60%
+37.40%
+0.40%
+0.50%
+
+37.90%
+36.60%
+23.70%
+22.70%
+46.90%
+45.70%
+
+note. 1)observations in the ’dropped’ column (pre- and posttests were both 0 or 1) were excluded from analysis. 2)accuracy and confidence gains were measured at objective granularity, math gain was measured at student granularity. 3)er and no
+er were collapsed across level.
+
+we first constructed decision trees to partition our data to
+see which factors influence gains, using the method described
+in the prior section. no sampling was necessary because the
+groups had similar sizes. we used pass attempt features,
+er features, pre-test results, and demographics. for student granularity, we also added the percentage of required
+objectives attempted by the student.
+at the objective granularity, we found that pre-test accuracy
+and confidence were the only selected nodes that predicted
+accuracy (70.0% accuracy) and confidence gain (74.1% accuracy). students with a pre-test accuracy of < 0.71 (at least 2
+questions wrong out of 5-10) had a 64.7% chance of positive
+accuracy gain in the same objective, while the remainder of
+the students had only a 25.9% chance. students with high
+pre-test confidence (≤0.95, indicated confidence on almost
+all questions) had a 62.5% chance of positive confidence gain
+in the same objective. it could be that these in-game tests
+were too easy, as 18.9% of pretests achieved full scores in
+accuracy and 54.5% achieved full scores in confidence.
+our decision tree for the student granularity is shown in
+figure 2, with a cross-validated accuracy of 57.8%. students who started with medium level of math abilities (2012
+state test math scores <474, and ≥ 347) improved their
+scores when they performed well in st math (average pass
+attempts performance > 0.8857). this shows that the game-45
+
+play data in st math has predictive power for assessment
+outside of the game. however, for all three gain scores, the
+er features were not selected for inclusion in the decision
+tree nor was any correlation found with the students gains.
+
+research questions: q1: what are the characteristics of students who electively replay? q2: what gets replayed, and
+under what circumstances? and q3: is elective replay associated with improvements in students’ accuracy on math
+objectives, confidence, and general math ability?
+
+table 7: mann-whitney u tests comparing gains
+between er pattern student groups.
+group
+(# math
+accuracy confidence
+students)
+(max=600) (max=1) (max=1)
+
+we concluded that, with over half of students who electively
+replayed at least one level, er is a common behavior in st
+math. moreover, examining elective replay can enhance our
+understanding about how students play and the characteristics of successful play. for example, we found that students who did poorly on the current level were more likely
+to electively replay a different level during/after the level’s
+pass attempts. we also found that students who generally
+engaged in elective replay before passing the current level
+(group b) started with lower pre-test scores, did worse during gameplay, and had the lowest objective-level accuracy
+and confidence gain and math gains. one explanation for
+this result is that weaker students used er as a work avoidance tactic, as found in mostow et al. [12], and that instances of er stand in for lower motivation or engagement
+for the objective topic, st math, or mathematics overall.
+
+base:no er
+(n=1938)
+er (n=2889)
+group a
+(n=1114)
+group b
+(n=1464)
+group sl
+(n=173)
+group dlso
+(n=983)
+group do
+(n=1399)
+
+m=31.5
+sd=146.6
+m=27.3
+sd=139.7
+m=53.4
+sd=167.9
++m=6.7
+sd=109.0
+m=46.2
+sd=161.2
+m=21.4
+sd=123.0
+m=32.3
+sd=150.6
+
+m=0.31
+sd=0.25
+m=0.30
+sd=0.25
+*m=0.35
+sd=0.24
+*m=0.24
+sd=0.25
+m=0.31
+sd=0.28
+*m=0.25
+sd=0.26
+m=0.32
+sd=0.23
+
+m=0.33
+sd=0.38
+m=0.32
+sd=0.37
++m=0.38
+sd=0.36
+*m=0.26
+sd=0.37
+m=0.31
+sd=0.37
+*m=0.27
+sd=0.37
+m=0.34
+sd=0.36
+
+note. green and red indicate statistically significances higher
+and lower than the base class, with *p < .001, +p < .01
+
+finally, we investigated how er patterns relate to gains.
+table 7 reports the result from separating students into 6
+groups based on er patterns and conducting mann-whitney
+u tests with benjamini-hochberg correction (as in the previous section). moreover, although decision trees constructed
+from the complete dataset show that low pre-test results
+led to more gains, some er pattern groups showed opposite
+trends. for example, group b, who primarily ered before
+passing the current level, started with lower pre-test scores,
+did worse in the game, and had less gains, which were statistically significant, in all three gain measures. the same
+applies to group dlso. these two groups of students also
+had the lowest er performance.
+on the other hand, the base group and group a (who
+mostly ered after passing the current level) started with
+pre-test accuracy and confidence scores that are not significantly different (table 4), but group a did significantly
+better in game, and had higher gains in accuracy and confidence, which were statistically significant. because the mean
+pre-test score for the base and a groups is approximately
+0.6, these students were reasonably familiar with the objective before they began playing it. the difference in accuracy
+and confidence gains suggest that er after students successfully pass a level helped students learn, or implied better
+learning in the previous gameplay.
+
+5. discussion and conclusions
+this work presents a significant extension on prior studies of
+replay which have typically taken place over a short period of
+time and have assessed replay via intentional questionnaires
+not observed behaviors [14, 5]. this work analyzed logged
+student-initiated elective replay from a sample of 4,827 3rd5th graders during school year 2012-2013 in st math in
+a natural educational setting. we sought to answer three
+
+on the other hand, compared to students who didn’t er,
+students who mostly electively replayed after passing the
+current level (group a) started with pre-test scores that
+were not significantly different, did better in the game, and
+had higher learning and confidence gains. one reason could
+be that these students electively replayed for a better score,
+as we also found that students who mostly replayed the
+same level immediately after passing it (group sl) had the
+highest er performance. this association is especially true
+among achiever-type players [3] that prefer to gain concrete
+measurements of success. because losing fewer lives in st
+math requires better mastery of the math content, er may
+have helped these students learn. another explanation is
+that these students’ ers could imply better learning during
+prior gameplay, as table 4 also shows that group a students
+had better pass attempt performance. possibly, successful
+prior performance motivated these students to electively replay more of the game. moreover, because successful prior
+performance feeds self-efficacy [2, 13], confidence gains in
+group a students, who chose more er, may be linked to
+electively replaying levels they have already mastered.
+from the application perspective, as expected from this complex environment, our effect-sizes are too small to claim er
+itself as a powerful intervention for learning. instead, our
+findings suggest the potential of using er patterns to identify weaker students and their struggling moments for intervention. for example, students with group b er patterns
+started weaker, did poorly in the game, and had lower gains
+in learning, confidence, and math state test scores. it may
+be the case that group b er (before passing a level) is a
+signal that students are struggling in current content and
+are in need of a mental break [17] or help. if this is the case,
+it would be beneficial upon detecting these er patterns for
+st math to alert teachers or to provide interventions, such
+as suggesting the student to take a break or providing supplemental resources to further explain the math concepts
+from the pass attempts interrupted by er. our results also
+suggest avenues for experimental studies that designs a more
+effective er experience, such as preventing work-avoidance46
+
+in er. for example, changing the number of lives students
+have at each replay, or constraining the problems offered
+each time they are replayed to be isomorphic but not identical.
+this work has several limitations. first, the in-game prepost- tests may be too easy for students, as 18.9% of pretests
+achieved a full score in accuracy, and 54.5% achieved a full
+score in confidence. the high percentage of students with
+non-positive learning and accuracy gain could also be caused
+by students’ slipping or guessing in multiple-choice questions
+(e.g., 1 incorrect answer reduces accuracy by 14%-20%). the
+accuracy of the pre- and post-test questions for assessing
+knowledge might be improved by using short answer questions. the second limitation is that we did not have puzzle
+granularity data on how many lives a student actually lost
+or the types of errors they made. third, the grouping of students based on the majority of elective replay assumes that
+elective replay is a habitual and consistent behavior. future
+research should investigate other groupings, as well as examining whether there were changes in how students used
+replay, and what caused the changes. fourth, future work
+may also include creating quantified features to compare the
+content and game features across objectives so we may better understand how the game’s content influence students’
+decision to engage in elective replay.
+in summary, this work adds new insights to our understanding of elective replay in educational games. our work reveals
+differential associations between elective replay and performance when replay is categorized by the timing in relation to
+the student’s current learning objectives and gameplay. our
+work suggests that low-performing students did not benefit
+from er; high-performing students both chose er at better
+times and their ers were associated with benefits from either er or previous gameplay, which supports the results of
+prior self-regulation research by aleven et al [1]. this work
+presents prospects for both examining more detailed characteristics of replay and utilizing experimental manipulations.
+
+6.
+
+acknowledgements
+
+this work was supported by nsf grant iuse #1544273
+“evaluation for actionable change: a data-driven approach”
+teomara rutherford pi, tiffany barnes & collin f. lynch
+co-pis.
+
+7.
+
+references
+
+[1] v. aleven, e. stahl, s. schworm, f. fischer, and
+r. wallace. help seeking and help design in
+interactive learning environments. review of
+educational research, 73(3):277–320, 2003.
+[2] a. bandura. perceived self-efficacy in cognitive
+development and functioning. educational
+psychologist, 28:117–148.
+[3] r. bartle. hearts, clubs, diamonds, spades: players
+who suit muds. journal of mud research, 1(1):19,
+1996.
+[4] a. boyce, k. doran, a. campbell, s. pickford,
+d. culler, and t. barnes. beadloom game: adding
+competitive, user generated, and social features to
+increase motivation. in the 6th international
+conference on foundations of digital games, pages
+
+139–146. acm, 2011.
+[5] c. burgers, a. eden, m. d. van engelenburg, and
+s. buningh. how feedback boosts motivation and play
+in a brain-training game. computers in human
+behavior, 48:94–103, 2015.
+[6] s. l. calvert, b. l. strong, and l. gallagher. control
+as an engagement feature for young children’s
+attention to and learning of computer content.
+american behavioral scientist, 48(5):578–589, 2005.
+[7] d. b. clark, b. c. nelson, h. y. chang,
+m. martinez-garza, k. slack, and c. m. d’angelo.
+exploring newtonian mechanics in a
+conceptually-integrated digital game: comparison of
+learning and affective outcomes for students in taiwan
+and the united states. computers education,
+57(3):2178–2195, 2011.
+[8] d. i. cordova and m. r. lepper. intrinsic motivation
+and the process of learning: beneficial effects of
+contextualization, personalization, and choice. journal
+of educational psychology, 88(4):715, 1996.
+[9] j. p. gee. what video games have to teach us about
+learning and literacy. st. martin’s griffin - macmillan,
+new york, usa, 2007.
+[10] g. a. gunter, r. f. kenny, and e. h. vick. taking
+educational games seriously: using the retain model
+to design endogenous fantasy into standalone
+educational games. educational technology research
+and development, 56(5-6):511–537, 2008.
+[11] j. d. marx and k. cummings. normalized change.
+american journal of physics, 75(1):87–91, 2007.
+[12] j. mostow, j. beck, r. chalasani, a. cuneo, p. jia,
+and k. kadaru. a la recherche du temps perdu, or as
+time goes by: where does the time go in a reading
+tutor that listens? in in international conference on
+intelligent tutoring systems, pages 320–329, 2002.
+[13] f. pajares. self-efficacy beliefs in academic setting.
+review of educational research, 66:543–578.
+[14] j. l. plass, p. a. o’keefe, b. d. homer, j. case, e. o.
+hayward, m. stein, and k. perlin. the impact of
+individual, competitive, and collaborative
+mathematics game play on learning, performance, and
+motivation. journal of educational psychology,
+105(4):1050, 2013.
+[15] m. prensky. computer games and learning: digital
+game-based learning. in handbook of computer games
+studies. the mit press, cambridge, ma, usa, 2005.
+[16] t. rutherford, g. farkas, g. duncan, m. burchinal,
+m. kibrick, j. graham, l. richland, n. tran,
+s. schneider, l. duran, and m. martinez. a
+randomized trial of an elementary school mathematics
+software intervention: spatial-temporal math. journal
+of research on educational effectiveness,
+7(4):358–383, 2014.
+[17] j. l. sabourin, j. p. rowe, b. w. mott, and j. c.
+lester. considering alternate futures to classify
+off-task behavior as emotion self-regulation: a
+supervised learning approach. jedm-journal of
+educational data mining, 5(1):9–38, 2013.
+[18] s. thomas, g. schott, and m. kambouri. designing
+for learning or designing for fun? setting usability
+guidelines for mobile educational games. learning with
+mobile devices: a book of papers, pages 173–181, 2004.

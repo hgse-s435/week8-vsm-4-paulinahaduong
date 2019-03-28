@@ -1,0 +1,968 @@
+134
+
+towards reliable and valid measurement of individualized
+student parameters
+ran liu
+
+kenneth r. koedinger
+
+human-computer interaction institute
+carnegie mellon university
+
+human-computer interaction institute
+carnegie mellon university
+
+ranliu@cmu.edu
+
+koedinger@cmu.edu
+
+abstract
+research in educational data mining could benefit from greater
+efforts to ensure that models yield reliable, valid, and interpretable
+parameter estimates. these efforts have especially been lacking
+for individualized student-parameter models. we collected two
+datasets from a sizable student population with excellent “depth”
+– that is, many observations for each skill for each student. we fit
+two models, the individualized-slope additive factors model
+(iafm) and individualized bayesian knowledge tracing (ibkt),
+both of which individualize for student ability and student
+learning rate. estimates of student ability were reliable and valid:
+they were consistent across both models and across both datasets,
+and they significantly predicted out-of-tutor pretest data. in one of
+the datasets, estimates of student learning rate were reliable and
+valid: consistent across models and significantly predictive of
+pretest-posttest gains. this is the first demonstration that
+statistical models of data resulting from students’ use of learning
+technology can produce reliable and valid estimates of individual
+student learning rates. further, we sought to interpret and
+understand what differentiates a student with a high estimated
+learning rate from a student with a low one. we found that
+learning rate is significantly related to estimates of student ability
+(prior knowledge) and self-reported measures of diligence.
+finally, we suggest a variety of possible applications of models
+with reliable estimates of individualized student parameters,
+including a more novel, straightforward way of identifying wheel
+spinning.
+
+keywords
+explanatory models, model interpretability, individualized
+parameters, 3, additive factors model, individualized bayesian
+knowledge tracing
+
+1. introduction
+in educational data mining, statistical models are typically
+evaluated based on fit to overall data and/or predictive accuracy
+on test data. while this is an important initial step in evaluating
+the contributions of advancements in statistical and cognitive
+modeling, research in the field could benefit from greater efforts
+to ensure that models are reliable and valid. more reliable and
+valid models offer more explanatory power, contributing to the
+advancement of learning science. they also inspire greater
+confidence that deploying model advancements in future tutoring
+systems will genuine result in the hypothesized improvements to
+learning.
+some recent work has been done towards interpreting, validating,
+and acting upon cognitive/skill modeling improvements [7, 8, 10,
+11, 17]. educational data mining efforts oriented around
+personalizing student constructs [3, 12, 13, 14, 18], however, have
+remained focused on improving predictive accuracy and/or
+demonstrating hypothetical time savings. little has been done to
+
+validate or understand the estimates that models with
+individualized or clustered student parameters produce.
+anecdotally, efforts to do so have shown that these individualized
+student parameter estimates, or discovered student clusters, are
+often difficult to interpret.
+it is especially critical to examine the reliability and validity of
+parameter estimates for modeling advancements that dramatically
+increase the parameter count, as is generally true for
+individualized student-parameter models. more parameters create
+greater degrees of freedom and increase the likelihood that the
+model may be underdetermined by the data.
+we focus on the question: to what degree can we trust a model’s
+parameter estimates to correctly represent the constructs they are
+supposed to?
+key to expecting reliable, valid estimates of student-level
+constructs is not just big data in the “long” sense, but big data in
+the “deep” sense. oftentimes, the datasets used in secondary
+analyses in edm are large in terms of total number of students (or
+total observations) but highly sparse in terms of observations per
+skill, per student. these features make it difficult to get reliable
+measurements of constructs at the individual student level,
+particularly constructs related to learning over time.
+here, we collected two datasets from a sizable student population
+(196 students) with excellent “depth” – that is, many observations
+for each skill for each student. we then fit two models that
+individualize for student ability and student learning rate (the
+individualized-slope additive factors model [9] and
+individualized bayesian knowledge tracing [18]). we assess the
+models’ fit to data and predictive accuracy. we also move beyond
+these metrics to examine the reliability of the models’ estimates of
+student ability and student learning rate. additionally, we
+externally validate the parameter estimates against out-of-tutor
+assessment data.
+we further interpret and understand the constructs by visualizing
+representative student learning trajectories, examining the
+relationship between estimated student ability and student
+learning rate, and the relationship between those constructs and
+self-reported data on motivational attributes. finally, we propose
+some useful applications of reliable and valid individualized
+student-parameter models, including a new way to detect wheel
+spinning.
+
+2. prior work
+prior work on individualizing student parameters has focused on
+variants of bayesian knowledge tracing (bkt) [3]. this work
+includes modeling the parameters separately for each individual
+student instead of separately for each skill [3], individualizing the
+p(init) (“initial knowledge”) parameter for each student [13], and
+individualizing both p(init) and p(learn) (“learning rate”) to the135
+
+base bkt model [18]. these models have generally focused on
+assessing predictive accuracy improvements relative to their
+respective non-individualized baseline models.
+
+“general education” classrooms designed to provide the
+opportunity for individuals with disabilities and special needs to
+learn alongside their non-disabled peers.
+
+there have also been some “time savings” analyses [12, 18] that
+evaluate the hypothetical real world impact that individualizing
+statistical model fits could have. these analyses report the effect
+of fitting individualized bkt models, compared to traditional
+bkt, on the hypothetical number of under- and over- practice
+attempts that would be predicted for each student. results
+generally have indicated that many more practice opportunities
+are needed for models to infer the same level of knowledge when
+using whole-population parameters rather than individual student
+parameters. these analyses show that individualized models differ
+in their hypothetical decision points if they were to be applied to
+drive mastery-based learning, but they do not in and of themselves
+interpret the individualized parameter estimates, nor do they
+assess the reliability and validity of such estimates.
+
+students spent five consecutive days participating in each study
+during their regular geometry class periods. on the first and last
+days, they took a computerized pretest and posttest, respectively.
+during the middle three days, they worked within an intelligent
+tutoring system [19] designed to give them practice on their
+current chapter’s content. this procedure applied to both studies,
+one of which covered the students’ chapter 3 content (parallel
+lines cut by a transversal, angles & parallel lines, finding
+slopes of lines, slope-intercept form, point-slope form) and the
+other of which covered the students’ chapter 4 content
+(classifying triangles, finding measures of triangle sides &
+angles, triangle congruence properties). figure 1 shows an
+example problem interface from the intelligent tutoring system,
+which was designed using cognitive tutor authoring tools [1].
+
+in a previous effort to better understand individualized student
+learning rate parameters [9], we examined predictive accuracy and
+parameter reliability in an extension of the additive factors
+model [2] applied to existing educational datasets. we did not
+find evidence that individualizing student rate parameters
+consistently improved predictive accuracy improvements, nor
+could we validate the parameter estimates on out-of-tutor
+assessment data. however, the datasets we analyzed either
+contained a small number of students or were largely sparse in
+observations for student-skill pairs, with the exception of two
+datasets. these two datasets happened to be the ones on which the
+individualized-slope additive factors model did achieve higher
+predictive accuracy. thus, we wondered if the sparsity of the
+datasets were the primary limitation, rather than the modeling
+advancement itself. this idea is corroborated by the fact that
+pooling students into “groups” rather than generating
+individualized estimates worked well on those datasets [9].
+for the present modeling work, we collected our own data in
+order to ensure the data features that we believe are necessary for
+reliable, valid, and potentially meaningful estimates of constructs
+at the individual student level.
+
+3. methods
+it is common in edm to do secondary analyses across multiple
+datasets. however, it can be difficult to find datasets that (1)
+contain a sizable number of students, (2) contain many
+observations for each skill for each student (i.e., are not sparse),
+(3) contain students spanning a range of abilities in the domain
+covered by the tutor, and (4) contain data from out-of-tutor
+assessment data that is well-mapped to the content in the tutor.
+for the present work, we wanted to use as close to an “ideal”
+dataset as possible for estimating student parameters. we
+collected our own dataset with a sizable number of students (196),
+many observations (5-50, depending on the skill) for each skill for
+each student. in addition, we ensured that a wide range of student
+ability levels was represented in our data to allow for the
+possibility that models could capture this variability.
+
+3.1 data collection
+196 students, spanning 10 classes taught by three different
+teachers, enrolled in high school geometry participated in two
+studies conducted about a month apart. a range of student
+abilities were included in the study. two of the 10 classes were
+“honors” and three of the 10 classes were “inclusion”. honors
+classrooms are intended for students who have strong theoretical
+interests and abilities in mathematics. inclusion classrooms are
+
+figure 1. example problem interface from the intelligent
+tutoring system used for data collection.
+we also collected self-report survey data on motivational factors
+falling along three dimensions. these were competitiveness (e.g.,
+“in this unit, i am striving to do well compared to other students”
+and “in this unit, i am striving to avoid performing worse than
+others”), effort (e.g., “i am striving to understand the content of
+this unit as thoroughly as possible” and “i work hard to do well in
+this class even if i don't like what we are doing”), and diligence
+(e.g., “when class work is difficult, i give up or only study the
+easy parts” [inverted scale] and “i am diligent”). self-report
+measures were indicated on a likert scale from 1-7.
+a key reason we collected two datasets, covering two distinct
+chapters of the curriculum, is that we were interested in
+investigating the consistency of student-level parameter estimates
+across different content, time, and contexts. we discuss this
+further, along with preliminary results, in section 4.4.1.
+
+3.2 statistical models
+3.2.1 the individualized-slope additive factors
+model (iafm)
+the additive factors model (afm) [2] is a logistic regression
+model that extends item response theory by incorporating a
+growth or learning term.
+ln
+
+!!"
+!-!!"
+
+= θ! +!∈!"# q !" (β!
+
++ γ! t!" )
+
+(1)
+
+136
+
+this statistical model (equation 1) gives the probability 𝑝!" that a
+student i will get a problem step j correct based on the student’s
+baseline ability (𝜃! ), the baseline easiness (𝛽! ) of the required
+knowledge components on that problem step (𝑄!" ), and the
+improvement (𝛾! ) in each required knowledge component (kc)
+with each additional practice opportunity. this kc slope, or
+“learning rate,” parameter is multiplied by the number of practice
+opportunities (𝑇!" ) the student already had on it. knowledge
+components (kcs) are the underlying facts, skills, and concepts
+required to solve problems [6].
+
+literal comparison between the predictive accuracies of the two
+classes of models due to differences in whether they use incoming
+test data towards their predictions on later test data (bkt/ibkt
+do, and afm/iafm do not).
+
+individualized-slope afm (iafm) builds upon this baseline
+model by adding a per-student learning rate parameter (𝛿! ). this
+parameter represents the improvement (𝛿! ) by student i with every
+additional practice opportunity with the kcs required on problem
+step j.
+
+counter to the majority of findings reported in [9], iafm
+achieved higher predictive accuracy than afm in both datasets
+here. this further supports the idea that the “depth” of the dataset
+is a critical factor in whether an individualized student-parameter
+model can explain unique variance in the data.
+
+ln
+
+!!"
+!!!!"
+
+= 𝜃! +
+
+!∈!"# 𝑄!" (𝛽!
+
++ 𝛾! 𝑇!" + 𝛿! 𝑇!" )
+
+(2)
+
+the kc and student learning rate parameters are both multiplied
+by the number of opportunities (𝑇!" ) the student already had to
+practice that kc.
+
+both iafm and ibkt outperform their non-individualized
+counterparts by all metrics, with the exception of bkt having a
+better bic value than ibkt for the chapter 4 dataset. this is not
+surprising, as bic is known to over-penalize for added
+parameters. we recommend cross validation as a better indicator
+that ibkt is the true better fitting model in this case.
+
+table 1. summary of model fit and predictive accuracy
+metrics comparing afm vs. iafm and bkt vs. ibkt. crossvalidation values are mean rmse values across 10 runs, with
+standard deviations included in parentheses.
+data
+set
+
+3.2.2 individualized bayesian knowledge tracing
+(ibkt)
+bayesian knowledge tracing (bkt [3]) is an algorithm that
+models student knowledge as a latent variable using a hidden
+markov model. the goal of bkt is to infer, for each skill,
+whether a student has mastered it or not based on his/her sequence
+of performance on items requiring that skill. it assumes a twostate learning model whereby each skill is either known or
+unknown. there are four parameters that are estimated in a bkt
+model: the initial probability of knowing a skill a priori – p(init),
+the probability of a skill transitioning from not known to known
+state after an opportunity to practice it – p(learn), the probability
+of slipping when applying a known skill – p(slip), and the
+probability of correctly guessing without knowing the required
+skill – p(guess). fitting bkt produces estimates for each of these
+four parameters for every skill in a given dataset. bkt models are
+usually fit using the expectation maximization method (em),
+conjugate gradient search, or discretized brute-force search.
+individualized bayesian knowledge tracing (ibkt [18]) builds
+upon this baseline bkt model by individualizing the estimate of
+the probability of initially knowing a skill, p(init), and the
+transition probability, p(learn), for each student. to accomplish
+the student-level individualization of these parameters, each of
+them is split into skill- and student-based components that are
+summed and passed through a logistic transform to yield the final
+parameter estimate. details on the decomposition of p(init) and
+p(learn) into skill- and student-based components are described
+in [18].
+
+4. results
+4.1 model fit & predictive accuracy
+as a first pass evaluation of the two individualized models, we
+assessed them using akaike information criterion (aic) and
+bayesian information criterion (bic), which are standard metrics
+for model comparison, and 10 independent runs of split-halves
+cross validation (cv). although 10-fold cross validation has been
+popular in the field, [4] showed that it has a high type-i error due
+to high overlap among training sets and recommended at least 5
+replications of 2-fold cv instead.
+here, the comparison of interest is each individualized model
+against its non-individualized counterpart. we do not encourage a
+
+ch. 3
+
+ch. 4
+
+model
+
+aic
+
+bic
+
+afm
+
+57229
+
+57283
+
+cv test rmse
+(10-run average)
+0.38440 (0.0039)
+
+iafm
+
+55931
+
+56003
+
+0.37868 (0.0044)
+
+bkt
+
+66714
+
+67473
+
+0.4222 (0.0005)
+
+ibkt
+
+56325
+
+60479
+
+0.3777 (0.0006)
+
+afm
+
+18059
+
+18106
+
+0.41037 (0.0048)
+
+iafm
+
+17863
+
+17925
+
+0.40789 (0.0050)
+
+bkt
+
+19908
+
+20376
+
+0.44091 (0.0014)
+
+ibkt
+
+18285
+
+21809
+
+0.40725 (0.0018)
+
+4.2 reliability of student parameters
+next, we examined the degree to which we can rely on these
+parameters to reasonably estimate the constructs that they should
+be estimating. we believe that a strong relationship between the
+parameter estimates of two statistical models with entirely
+different architectures is a high bar for testing reliability. that is,
+if a student genuinely displayed evidence of high overall ability in
+a dataset (relative to his/her peers), then both iafm and ibkt
+should estimate that to be the case.
+because of known and observed nonlinear relationships between
+logistic regression and bayesian knowledge tracing parameter
+estimates, we measured correlation based on spearman’s
+coefficient (rs), which is based on rank order.
+we observed strong and statistically significant correlations
+between iafm student intercept and ibkt student p(init)
+parameter estimates (figure 2, top row). we also observed a
+strong and statistically significant correlation between iafm
+student slope and ibkt student p(learn) parameter estimates for
+one of the two datasets (chapter 4). this correlation was much
+milder, though still significant, for the other dataset (chapter 3).
+we hypothesize that this difference between datasets may be due
+to the presence of more difficult kcs in chapter 4. a dataset with
+more difficult items should provide more sensitive measures of
+individual differences in improvement, since it avoids ceiling
+effects. indeed, this was the case: the mean kc easiness parameter
+estimate (𝛽! ) for chapter 4 was 0.799 (which translates to a137
+
+probability of 0.69), compared to 1.253 for chapter 3 (which
+translates to a probability of 0.78). when students are practicing
+many opportunities at ceiling (which was the case in particular for
+chapter 3, based on exploratory analyses of the data), the
+individualized models will often assign them a lower “learning
+rate” due to an essentially flat learning trajectory.
+
+this has several interesting implications for educational
+applications. first, it suggests that formative assessment via
+modeling of process data as learning unfolds is a reasonable
+method of assessment.
+it also suggests that detailed assessment data (e.g., from a pretest)
+could be used to reasonable effect to improve different students’
+“on-line” estimates of students’ knowledge of kcs. for example,
+combining kc parameter estimates (derived from model-fitting to
+prior domain-relevant data) with student intercept priors based on
+pretest assessment data would allow a model like afm to
+generate individualized predictions of how much each student
+needs to practice to reach mastery.
+in addition, these results suggest that individualized bkt models
+could use pretest assessment data to “set” reasonably valid
+student-specific p(init) values before collecting any within-tutor
+data from those students.
+in considering the degree to which these results may generalize, it
+is important to note that the pretests in the present datasets were
+specifically designed to map closely to the practice problems in
+the intelligent tutor. pretests contained 1-2 questions for each kc
+that was practiced in the tutor, and the items were similar to those
+encountered within the tutor.
+
+figure 2. relationships between iafm student intercept and
+ibkt student p(init) parameter estimates (top row), and
+between iafm student slope and ibkt student p(learn)
+parameter estimates (bottom row), for the two datasets.
+
+4.3 validity of student parameters
+
+to assess the validity of student parameter estimates, we related
+them to out-of-tutor assessments of the relevant student
+constructs. in this case, we validated parameter estimates using
+pretest and posttest assessment data collected in the study.
+
+4.3.1 estimates of student ability
+the student intercept (𝜃! ) parameter of iafm and the student
+p(init) parameter of bkt are designed to estimate baseline
+student ability, as least for the knowledge domain represented in
+the dataset. to validate the models’ estimates of this construct, we
+examined relationships between the model estimates and students’
+pretest scores, which are an out-of-tutor assessment of student
+initial ability for the skills covered by the tutor.
+we report standard pearson correlation coefficients here, since the
+relationships between pretest scores and the parameter estimates
+did not appear to be particularly nonlinear.
+figure 3 illustrates a summary of these relationships. both
+models’ estimates of the student ability construct were strongly
+and significantly correlated with pretest scores.
+in addition, adding an individualized student slope improved the
+validity of the model’s estimate of student ability (a parameter
+that’s modeled in both afm and iafm). we compared the
+correlations between afm’s intercept estimates to pretest scores
+(chapter 3: r = 0.62, p < 0.0001, chapter 4: r = 0.58, p < 0.0001)
+to iafm’s intercept estimate / pretest score correlations (chapter
+3: 0.74, p < 0.0001, chapter 4: r = 0.66, p < 0.0001).
+
+figure 3. relationships between out-of-tutor pretest scores
+and iafm/ibkt estimates of student ability based on withintutor data.
+
+4.3.2 estimates of student learning rate
+given that the only external assessment data collected were a
+pretest and posttest, we sought to validate the construct of student
+learning rate (as estimated by the models) on pretest-posttest
+gains. students were given roughly the same amount of time to
+engage with the tutors, so those with accelerated learning rates
+might be expected to gain more knowledge in the time available.
+thus, we examined the degree to which student learning rate
+estimates predicted pretest-posttest gains while controlling for
+pretest scores. we controlled for pretest scores because they have
+been shown to negatively predict learning gains due to assessment138
+
+ceiling effects. that is, students who start out performing well on
+the pretest have less “room for improvement”.
+
+model estimates of the student ability and student learning rate
+constructs across units?
+
+for the chapter 3 dataset, iafm student slope (𝛿! ) estimates did
+not significantly predict learning gains. in a linear regression
+predicting pretest-posttest gains, pretest scores were a significant
+predictor (β=-0.189, p=0.005) and student slope estimates were
+not (β=0.396, p=0.144). ibkt student p(learn) estimates did not
+significant predict learning gains. in a linear regression predicting
+pretest-posttest gains, pretest scores were a significant predictor
+(β=-0.226, p=0.005) and student slope estimates were not
+(β=0.062, p=0.218).
+
+figure 4 summarizes this relationship. estimates of student ability
+are fairly consistent, especially as estimated by iafm. it seems
+sensible to interpret this as suggesting that overall student ability
+on chapter 3 content is strongly related to overall student ability
+on chapter 4 content, as we have shown estimates of student
+ability to be both reliable and valid.
+
+for the chapter 4 dataset, iafm student slope (𝛿! ) estimates
+significantly predict learning gains. in a linear regression
+predicting pretest-posttest gains, pretest scores (β=-0.641,
+p<0.0001) and student slope estimates (β=0.576, p=0.007) were
+both significant predictors. ibkt student p(learn) estimates also
+significantly predict learning gains. in a linear regression
+predicting pretest-posttest gains, pretest scores (β=-0.645,
+p<0.0001) and p(learn) estimates (β=0.133, p=0.004) were both
+significant predictors.
+for one of the two units (chapter 4), we observed that student
+learning rate estimates were validated on external assessments of
+learning gain. interestingly, this is the same unit for which we
+observed a strong cross-model reliability in student learning rate
+estimates. thus, we have converging evidence that student
+learning rates estimates for the chapter 4 dataset are both reliable
+and valid.
+
+estimates of student learning rate are less consistent. this may
+either be due to the fact that chapter 3 estimates of student
+learning rate were neither very reliable nor very valid.
+alternatively, the differences in student learning rate estimates
+across the two chapters may also be due to the fact that students
+genuinely learn different material at different rates. unfortunately,
+we cannot resolve this question with the present data. we are
+currently collecting more datasets from this same group of
+students. if we obtain more reliable and valid student learning rate
+estimates in future data from this group of students, we can more
+confidently address this question in future research.
+
+4.4.2 understanding student learning rate estimates
+given that we established the reliability and validity of iafm and
+ibkt’s parameter estimates for the chapter 4 dataset were
+reasonably reliable and valid, we sought to dig deeper into the
+explanatory power of these estimates. to this end, we conducted
+exploratory analyses on the chapter 4 data to (1) visualize the
+learning trajectories of students with the highest vs. lowest
+estimated learning rates, (2) understand the relationships between
+estimated learning rates and prior-knowledge and motivational
+factors, and (3) understand the degree of variability in estimated
+learning rate across students.
+
+first attempt success
+0.4
+0.6
+0.8
+
+first attempt success
+0.4
+0.6
+0.8
+
+1.0
+
+ibkt student p(learn) estimate
+
+1.0
+
+iafm student slope estimate
+
+4
+6
+8
+# practice opportunities
+
+10
+
+0
+
+4.4 towards understanding & using student
+parameter estimates
+4.4.1 consistency of individual student constructs
+across datasets
+a core motivating question for collecting two datasets on the
+same group of students was: how consistent are iafm and ibkt
+
+4
+6
+8
+# practice opportunities
+
+10
+
+6
+4
+
+5
+
+top 25% ibkt learning rates
+middle 50% ibkt learning rates
+bottom 25% ibkt learning rates
+
+0
+
+1
+
+2
+
+3
+
+likert scale
+
+4
+3
+1
+
+2
+
+likert scale
+
+5
+
+6
+
+top 25% iafm learning rates
+middle 50% iafm learning rates
+bottom 25% iafm learning rates
+
+0
+
+figure 4. relationships between student parameter estimates
+across the two datasets (same student population).
+
+2
+
+7
+
+2
+
+7
+
+0
+
+0.2
+
+0.2
+
+top 25%
+middle 50%
+bottom 25%
+
+competitiveness
+
+effort
+
+diligence
+
+competitiveness
+
+effort
+
+diligence
+
+figure 5. top row: early-opportunity learning trajectories of
+students, grouped based on iafm (left) and ibkt (right)
+estimated learning rates. solid lines are actual data; dotted
+lines are each respective model’s predicted performance.
+bottom row: mean self-report likert scale ratings of
+questions measuring dimensions of competitiveness, effort,
+and diligence. grouped based on iafm (left) or ibkt (right)
+estimated learning rates. error bars show standard errors on
+the means.139
+
+figure 5 (top row) shows the aggregate learning trajectories for
+students split based either on their iafm student slope estimates
+(top left) or their ibkt student p(learn) estimates (top right). the
+top 25% of student parameter estimates are plotted in blue, the
+middle 50% (between 1st and 3rd quartiles) are plotted in red, and
+the lower 25% are plotted in black. dotted lines represent each
+respective model’s predicted earning trajectories.
+one striking pattern, especially in the iafm learning trajectories
+(top left), is the apparent relationship between average success on
+initial practice opportunities (i.e., prior knowledge) and estimated
+learning rate through the remaining opportunities. this
+observation is corroborated by a strong and significant correlation
+between iafm student intercepts and iafm student slopes
+(r=0.78, p<0.0001). one might interpret this to suggest that
+students who enter into the tutor with greater prior knowledge will
+be poised to gain more from the tutor (i.e., “the rich get richer”).
+alternatively, students may have higher overall knowledge
+because they are fast learners. there may also be individual traitbased variables that positively drive both learning rate and overall
+achievement.
+to explore the relationships between measures of traits relevant to
+learning, we analyzed self-report survey data grouped by three
+factors (as described in section 3.1): competitiveness, effort, and
+diligence. the relationship between these measures and the high,
+medium, and low learning rate estimates from iafm and ibkt
+are shown in figure 5 (bottom row). there appears to be a
+relationship between the means of each self-report measure and
+the general range that the learning rate estimate falls in.
+we analyzed the continuous relationship between students’ mean
+self-report rating along each dimension and their iafm learning
+rate estimates. in a linear regression predicting iafm student
+slopes, competitiveness and effort were not significant predictors
+but diligence (β=0.016, p=0.007) was. in a similar linear
+regression predicting iafm student intercepts, again diligence
+was the only significant predictor (β=0.02, p=0.04). thus, among
+self-reported measures, the strongest dimension predicting both
+student ability/prior knowledge and student learning rate was the
+diligence measure. future work using causal modeling is
+warranted to discover the true nature of causality among these
+student-level constructs.
+finally, we investigated the degree of variability in estimated
+learning rate across students. the first quantile of student learning
+rates from iafm is 0.03 logits and the third quantile of rates from
+iafm is 0.08 logits. these can be conceptualized as canonical
+“slow” and “fast” learners. if we were to assume starting at
+around 70% performance (which comes from the model’s global
+intercept estimate), it would take the “slow” (0.03 logits) student
+approximately 25 opportunities to reach mastery (defined as 85%,
+the performance equivalent of a p(know)=0.95, factoring in the
+guess and slip probabilities we used in the actual tutor). it would
+take the “fast” (0.08 logits) student approximately 11
+opportunities to reach the same place.
+
+4.4.3 identifying wheel spinners
+the current definition of “wheel spinning” put forth in the
+educational data mining community is the “phenomenon in
+which a student has spent a considerable amount of time
+practicing a skill, yet displays little or no progress towards
+mastery” [5]. there has been some controversy around the ideal
+way to measure mastery (e.g., 3 corrects in a row vs. reaching a
+certain p(know) in knowledge tracing). furthermore, some
+students may be classified as wheel spinners based on not
+mastering in a certain number of opportunities but they may still
+be making progress.
+
+we propose that reliable and validated estimates of individual
+student learning rate parameters, combined with kc learning rate
+parameters, could be used to estimate wheel spinning student/kc
+pairs in way that is agnostic to mastery status. specifically, if the
+combined student and kc learning rate parameters in iafm
+predict no improvement or negative improvement across
+additional practice opportunities, and aren’t already at a high level
+of performance on their first opportunity (here we considered this
+to be 80% or above), we could consider the student to be wheel
+spinning on the kc. this method of estimating wheel spinning
+would be particularly useful for datasets with sparse data on some
+student-kc pairs, as it is not performance-dependent after the
+model has been fit to the full dataset.
+based on this operationalized definition, we found that
+approximately 15% of student-kc pairs in the chapter 4 dataset
+are estimated to be wheel spinning. that is, those students are not
+making progress on those kcs. this is a substantially lower
+estimate than the 25% reported by a recent wheel spinning
+detector in [5]. an interesting route for future work would be to
+do a direct comparison of the wheel spinning detector presented in
+[5] and our proposed student/kc learning rate identifier within the
+same dataset. this would allow for testing the possibility that
+some students who are still making progress, albeit extremely
+slowly, may be prematurely labeled as “wheel spinners” by [5].
+
+5. summary & limitations
+previous efforts towards more explanatory, interpretable, and
+actionable modeling advancements in the realm of
+skill/knowledge component model discovery have been promising
+in their potential and demonstrated impact on learning science and
+education. the present paper represents a novel effort to bring
+these deeper modeling approaches, focused on ensuring
+explanatory power, to the realm of individualized studentparameter models.
+towards improving the reliability and validity of individualized
+student estimates, we collected two datasets from the same student
+population. both datasets were “deep” along the dimension of
+student-kc observations. we fit iafm and ibkt to both datasets
+and showed that the models outranked their non-individualized
+counterparts in terms of fit to data and predictive accuracy.
+importantly, we moved beyond these metrics to show that
+estimates of student ability were highly reliable (iafm and ibkt
+yielded strongly correlated estimates) and valid (estimates
+significantly predicted pretest data).
+this demonstration of confidence in the student ability estimates
+from ibkt, but even more so iafm, has promising implications
+for the possibility of individualizing the student models that
+determine mastery in intelligent tutoring systems at least in terms
+of overall student ability/knowledge. our results also suggest that
+it would be reasonable to fix such student ability parameters, or
+set priors on them, based on either well-mapped pretest
+assessment data or prior (deep) data from those students’ learning.
+we also showed that estimates of student learning rate per
+practice opportunity were reliable and valid in one of the two
+datasets (chapter 4). this is the first evidence, to our knowledge,
+of obtaining both reliable and valid student learning rates through
+a statistical model with individualized student parameters. we
+believe that this success is largely related to the amount and
+quality of per-student data we collected.
+with the confidence of having reliable and valid parameter
+estimates, we then proceeded to further investigate potential
+explanations for differences in student learning rates within the140
+
+chapter 4 dataset. we found a strong and significant relationship
+between student ability and improvement rate as well as an
+additional effect of diligence, based on self-report measures.
+further research is warranted to distill the causal relationships
+between these constructs.
+knowing that a model’s estimates of individualized student
+parameters not only fit data well, but are reliable and valid,
+provides greater confidence for applying the model to (1) interpret
+the parameter estimates to understand characteristics of students,
+and (2) use the model to individualize the trajectory of mastery
+estimation for future students.
+even though both ibkt and iafm outperformed their nonindividualized counterparts in predicting performance in the
+chapter 3 dataset, we did not find strong evidence of reliability
+and validity of the student-specific parameter estimates. thus, we
+did not rely on that dataset to help us understand individual
+differences in learning rates. for the same reason, we could not
+confidently attribute the differences, in estimated student learning
+rates across the datasets, to true differences in students’ learning
+rates for the two chapters’ material.
+although considering reliability and validity of models’ parameter
+estimates sets a higher bar than predictive accuracy for evaluating
+modeling advances, we believe those to be important
+characteristics of a model that is to be explanatory, interpretable,
+and/or actionable. here, we have demonstrated that with a
+sufficiently good dataset, iafm and ibkt are individualized
+student models that can produce reliable and valid parameter
+estimates.
+since our present work was limited to two datasets on one
+population of students, it is unclear the degree to which our
+modeling results will generalize, especially given that at least
+iafm does not produce reliable, valid parameter estimates on
+more sparse datasets [9]. in addition, these results are limited to
+two specific statistical models produce individualized estimates
+student-level parameters, with a particular focus on individual
+differences in learning rate. there are other classes of models that
+could be extended to estimate differences in learning rate: for
+example, producing individualized estimates of the differential
+effects of success versus failure [15]. this would be an interesting
+focus for future work on this topic.
+nevertheless, we have laid a foundation of methodology by which
+reliability and validity of parameter estimates, whether student- or
+kc-level, can be assessed. we have also demonstrated ways of
+using the reliable and valid student parameter estimates from
+iafm and ibkt to yield interesting insights about student
+learning.
+
+6. acknowledgments
+we thank the institute of education sciences for support to rl
+(training grant #r305b110003) and the national science
+foundation for support to carnegie mellon university’s learnlab
+(#sbe-0836012).
+
+7. references
+[1] aleven, v., sewall, j., mclaren, b.m., and koedinger, k.r.
+(2006). rapid authoring of intelligent tutors for real-world
+and experimental use. in proceedings of the 6th icalt.
+ieee, los alamitos, ca, pp. 847-851.
+[2] cen, h., koedinger, k.r., & junker, b. (2006). learning
+factors analysis: a general method for cognitive model
+evaluation and improvement. intelligent tutoring systems,
+164-175.
+
+[3] corbett, a.t., & anderson, j.r. (1995). knowledge tracing:
+modeling the acquisition of procedural knowledge. user
+modeling and user-adapted interaction, 4, 253-278.
+[4] dietterich, t. g. (1998). approximate statistical tests for
+comparing supervised classification learning algorithms.
+neural computation, 10(7), 1895–1923.
+[5] gong, y. & beck, j. (2015). towards detecting wheelspinning: future failure in mastery learning. in
+proceedings of learning at scale ’15.
+[6] koedinger, k.r., corbett, a.c., & perfetti, c. (2012). the
+knowledge-learning-instruction (kli) framework: bridging
+the science-practice chasm to enhance robust student
+learning. cognitive science, 36(5), 757-798.
+[7] koedinger, k.r., mclaughlin, e.a., & stamper, j.c. (2012).
+automated student model improvement. 5th international
+conference on edm.
+[8] koedinger, k. r., stamper, j. c., mclaughlin, e. a., &
+nixon, t. (2013). using data-driven discovery of better
+cognitive models to improve student learning. in h. c. lane,
+k. yacef, j. mostow, & p. pavlik (eds.), proceedings of the
+16th international conference on artificial intelligence in
+education (aied ʼ13), 9–13 july 2013, memphis, tn, usa
+(pp. 421–430). springer.
+[9] liu, r., & koedinger, k. r. (2015). variations in learning
+rate: student classification based on systematic residual error
+patterns across practice opportunities. in o. c. santos, j. g.
+boticario, c. romero, m. pechenizkiy, a. merceron, p.
+mitros, j. m. luna, c. mihaescu, p. moreno, a. hershkovitz,
+s. ventura, & m. desmarais (eds.), proceedings of the 8th
+international conference on education data mining
+(edm2015), 26–29 june 2015, madrid, spain (pp. 420–423).
+international educational data mining society.
+[10] liu, r., & koedinger, k. r. (under review). closing the
+loop: automated data-driven skill model discoveries lead to
+improved instruction and learning gains.
+[11] liu, r., koedinger, k. r., & mclaughlin, e. a. (2014).
+interpreting model discovery and testing generalization to a
+new dataset. in j. stamper, z. pardos, m. mavrikis, & b. m.
+mclaren (eds.), proceedings of the 7th international
+conference on educational data mining (edm2014), 4–7
+july, london, uk (pp. 107–113). international educational
+data mining society.
+[12] lee, j.i., & brunskill, e. (2012). the impact on
+individualizing student models on necessary practice
+opportunities. 5th international conference on edm.
+[13] pardos, z.a., & heffernan, n.t. (2010). modeling
+individualization in a bayesian networks implementation of
+knowledge tracing. user modeling, adaptation, and
+personalization, 255-266.
+[14] pardos, z. a., trivedi, s., heffernan, n. t., & sárközy, g.
+n. (2012). clustered knowledge tracing. in s. a. cerri, w. j.
+clancey, g. papadourakis, k.-k. panourgia (eds.),
+proceedings of the 11th international conference on
+intelligent tutoring systems (its 2012), 14–18 june 2012,
+chania, greece (pp. 405–410). springer.
+[15] pavlik, p.i., cen, h., & koedinger, k.r. (2009).
+performance factors analysis–a new alternative to knowledge
+tracing. aied, 531–538.
+[16] shmueli, g. (2010). to explain or to predict? statistical
+science, 25(3), 289–310. doi:10.1214/10-sts330
+[17] stamper, j., & koedinger, k. r. (2011). human-machine
+student model discovery and improvement using data.
+proceedings of the 15th international conference on141
+
+artificial intelligence in education (aied ʼ11), 28 june–2
+july, auckland, new zealand (pp. 353–360). springer.
+[18] yudelson, m.v., koedinger, k.r., & gordon, g.j. (2013).
+individualized bayesian knowledge tracing models. aied,
+171-180.
+
+[19] vanlehn, k. (2006). the behavior of tutoring systems.
+international journal of artificial intelligence in education,
+16, 227–265.
